@@ -3,7 +3,7 @@ body {
     background-color:#F2F2EC
 }
 
-.container-fluid {
+.main-container {
     padding: 0% 7%;
 }
 
@@ -35,9 +35,14 @@ p.abstract {
     font-size: 1em;
 }
 
-p.credit {
+.photo-credit {
+    padding-top: 4%;
     color: #4d4d4d;
     font-size: 1em;
+}
+
+.about {
+    padding-top: 3%;
 }
 
 p.contact {
@@ -45,6 +50,10 @@ p.contact {
     font-size: 1em;
     margin: 0;
     padding: 3% 0;
+}
+
+.btn-group {
+    padding-bottom: 20px;
 }
 
 
@@ -81,22 +90,13 @@ a:active {
     border-radius: 10px;
     padding: 1%;
     background-color:#e0e0d2;
-    margin: 4% 0;
+    margin: 2% 0 4% 0;
 }
 
 .profile-pic {
     width: 200px;
     height: auto;
     border-radius: 100px;
-    margin-bottom: 10%;
-}
-
-.profile-container{
-    margin: 0 6% 1% 0;
-}
-
-.page-content {
-    margin-top: 4%;
 }
 
 .navbar-light .navbar-brand {
