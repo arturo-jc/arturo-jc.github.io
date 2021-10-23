@@ -46,11 +46,14 @@ p.abstract {
     padding-top: 3%;
 }
 
-p.contact {
+.contact {
+    padding: 20px 0;
+}
+
+.contact > p {
     color: #4d4d4d;
     font-size: 1em;
     margin: 0;
-    padding: 3% 0;
 }
 
 .btn-group {
@@ -89,7 +92,7 @@ a:active {
 
 .abstract-container {
     border-radius: 10px;
-    padding: 1%;
+    padding: 15px 30px;
     background-color:#e0e0d2;
     margin: 2% 0 4% 0;
 }
@@ -138,6 +141,7 @@ a:active {
 .footer-container {
     background-color:#e0e0d2;
     margin-bottom: 0;
+    padding: 0% 7%;
 }
 
 
