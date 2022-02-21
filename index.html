@@ -1,85 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arturo Javier-Castellanos</title>
-
-	<!-- Bootstrap core CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
-	<!-- Custom styles for this template -->
-	<link rel="stylesheet" type="text/css" href="css/styles.css"/>
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
 	<!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cairo&family=Montserrat&family=Bebas+Neue&display=swap" rel="stylesheet">
-
-	<!-- Font Awesome -->
-	<script src="https://kit.fontawesome.com/aebaafdeec.js" crossorigin="anonymous"></script>
-
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">		
 </head>
-
 <body>
-
-
-  <!-- Navbar -->
-
-	<div class="container-fluid main-container min-vh-100">
-		<nav class="navbar navbar-expand-lg navbar-light pb-0">
-		  <div class="container-fluid navbar-container">
-			<span class="navbar-brand mb-0"></span>
-			<button class="navbar-toggler mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-			  <span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			  <ul class="navbar-nav ms-auto mb-0 mb-lg-0">
-				<li class="nav-item ms-auto">
-				  <a class="nav-link" aria-current="page" href="index.html">About</a>
-				</li>
-				<li class="nav-item ms-auto">
-				  <a class="nav-link" href="philosophy.html">Philosophy</a>
-				</li>
-				<li class="nav-item ms-auto">
-				  <a class="nav-link" href="programming.html">Programming</a>
-				</li>
-			  </ul>
-			</div>
-		  </div>
-		</nav>
-
-		<div>
-			<h1>Arturo Javier-Castellanos</h1>
-			<div class="container-fluid">
-				<div class="row about">
-					<div class="col-lg-4 text-center">
-						<img class="profile-pic" src="img/profile.jpg" alt="Arturo Javier-Castellanos">
-						<p class="photo-credit text-center">Photo credit: Isaiah Lin.</p>
+	<nav class="navbar">
+		<ul class="navbar__list">
+			<li class="navbar__item">
+				<a href="#about" class="navbar__link">About</a>
+			</li>
+			<li class="navbar__item">
+				<a href="#projects" class="navbar__link">Projects</a>
+			</li>
+			<li class="navbar__item">
+				<a href="#research" class="navbar__link">Research</a>
+			</li>
+			<li class="navbar__item">
+				<a href="#footer" class="navbar__link">Contact</a>
+			</li>
+		</ul>
+		<button class="navbar__menu-btn">
+			<svg class="navbar__menu-icon">
+				<use xlink:href="img/sprites.svg#icon-menu"></use>
+			</svg>
+		</button>
+	</nav>
+	<div class="header">
+		<div class="header__text-positioner">
+			<div class="header__text-container">
+				<div class="header__background">
+					<div class="header__heading">
+						<h1 class="header__heading-main">Arturo Javier-Castellanos</h1>
+						<div class="header__subheading">
+							Philosopher & Aspiring Web Developer
+						</div>
 					</div>
-					<div class="col-lg-8">
-					<p>I am a Mexican philosopher based in Winnipeg, Canada. I did my undergraduate work in philosophy at the <a href="http://www.filos.unam.mx/" target="_blank">National Autonomous University of Mexico</a>, and then I earned my PhD in philosophy from <a href="https://thecollege.syr.edu/philosophy/" target="_blank">Syracuse University</a> in 2020.</p>
-					<p>Nowadays I am interested in <a href="programming.html">software development</a>.</p>
-					<p>For more information, please take a look at my <a href="pdf/cv.pdf">cv</a>.</p>
-					</div>
-
 				</div>
 			</div>
 		</div>
 	</div>
-
-	<div class="container-fluid footer-container">
-			<footer>
-				<div class="contact">
-					<p><i class="fa fa-envelope-o"></i> aajavier [at] syr [dot] edu</p>
-					<p><a href="https://www.linkedin.com/in/arturo-javier-castellanos-551006197/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a></p>
-					<p><a href="https://github.com/arturo-jc/" target="_blank"><i class="fab fa-github"></i> Github</a></p>
+	<section class="about" id="about">
+		<div class="about__container">
+			<h3 class="about__heading heading-3">About</h3>
+			<div class="about__photo-box about__photo-box--1">
+				<img src="img/profile.jpg" alt="" class="about__profile-pic">
+			</div>
+			<div class="about__content about__content--1">
+				<p class="paragraph">My name is Arturo Javier-Castellanos, and I'm a philosophy instructor and aspiring web developer based in Winnipeg, Manitoba.</p>
+			</div>
+			<div class="about__content about__content--2">
+				<p class="paragraph">I was born and raised in Tapachula, Chiapas. When I turned 18, I moved to Mexico City to pursue a BA in philosophy at the <a href="http://www.filos.unam.mx/" target="_blank">National Autonomous University of Mexico</a>, where I met some of my best friends. We went on a wild roadtrip across the state of Hidalgo that ended with my friend crashing the car. Good times.</p>	
+			</div>
+			<div class="about__photo-box about__photo-box--2">
+				<div class="composition">
+					<img src="img/bio1.jpg" alt="" class="composition__picture composition__picture--1">
+					<img src="img/bio2.jpg" alt="" class="composition__picture composition__picture--2">
+					<img src="img/bio3.jpg" alt="" class="composition__picture composition__picture--3">
 				</div>
-			</footer>
-	</div>
+			</div>
+			<div class="about__content about__content--3">
+				<p class="paragraph">When I first decided to pursue a BA in philosophy, I didn't know what I was getting into. Fortunately, I ended up liking philosophy so much that I decided to pursue a PhD. At the age of 24, I moved to Syracuse, New York to attend <a href="https://thecollege.syr.edu/philosophy/" target="_blank">Syracuse University</a>. This is where I met my wife Carolyn Garland. In 2019, we got married, and then in 2021, we moved to Winnipeg with our dog Mabel.</p>
+			</div>
+			<div class="about__photo-box about__photo-box--3">
+				<div class="composition">
+					<img src="img/bio4.jpg" alt="" class="composition__picture composition__picture--4">
+					<img src="img/bio5.jpg" alt="" class="composition__picture composition__picture--5">
+					<img src="img/bio6.jpg" alt="" class="composition__picture composition__picture--6">
+				</div>
+			</div>
+			<div class="about__content about__content--4">
+				<p class="paragraph">When I first arrived to Winnipeg, I didn't have a Canadian work permit, so I spent several months teaching myself web development while I waited&#8212;you can see some of my projects below, and read more about my journey into web development <a href="https://arturojc355400397.wordpress.com/" target="_blank">over at my blog</a>.</p>
+				<p class="paragraph">Nowadays, I work at the <a href="https://umanitoba.ca/philosophy/" target="_blank">University of Manitoba</a>, where I teach critical thinking.</p>
+			</div>
+		</div>
+	</section>
+	<section class="projects" id="projects">
+		<div class="projects__container">
 
-<!-- Bootstrap script -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+			<h3 class="projects__heading heading-3">Projects</h3>
+			<div class="projects__content">
+				<div class="card card--1">
+					<img class="card__img" src="img/groupreads.jpg">
+					<div class="card__btn-group">
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--red">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-feed"></use>
+								</svg>
+								live
+								<a class="btn__link btn__link--red" href="http://groupreads.herokuapp.com/" target="_blank" >
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-feed"></use>
+									</svg>
+									live
+								</a>
+							</div>
+						</div>
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--white">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-embed2"></use>
+								</svg>
+								code
+								<a class="btn__link btn__link--white" href="https://github.com/arturo-jc/groupreads" target="__blank">
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-embed2"></use>
+									</svg>
+									code
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="card__content">
+							<div class="card__info">
+								<h4 class="card__title">GroupReads</h4>
+								<p class="card__subtitle">Reading group manager</p>
+								<ul class="card__list">
+									<li class="card__item">Framework: React</li>
+									<li class="card__item">Server: Node.js/Express</li>
+									<li class="card__item">DB: MongoDB/Mongoose</li>
+								</ul>
+							</div>
+							<p class="card__read-more">Read more <a href="https://arturojc355400397.wordpress.com/2022/01/06/making-my-first-react-app/" target="_blank">over at my blog</a>!</p>
+					</div>
+				</div>
+				<div class="card card--2">
+					<img class="card__img" src="img/tidybuddy.jpg" alt="">
+					<div class="card__btn-group">
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--red">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-feed"></use>
+								</svg>
+								live
+								<a class="btn__link btn__link--red" href="http://tidybuddy.herokuapp.com/" target="_blank" >
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-feed"></use>
+									</svg>
+									live
+								</a>
+							</div>
+						</div>
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--white">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-embed2"></use>
+								</svg>
+								code
+								<a class="btn__link btn__link--white" href="https://github.com/arturo-jc/tidybuddy" target="__blank">
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-embed2"></use>
+									</svg>
+									code
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="card__content">
+						<div class="card__info">
+							<h4 class="card__title">TidyBuddy</h4>
+							<p class="card__subtitle">Chore tracker</p>
+							<ul class="card__list">
+								<li class="card__item">Server: Node.js/Express</li>
+								<li class="card__item">DB: MongoDB/Mongoose</li>
+							</ul>
+						</div>
+						<p class="card__read-more">Read more <a href="https://arturojc355400397.wordpress.com/2021/12/06/making-my-first-express-app/" target="_blank">over at my blog</a>!</p>
+					</div>
+				</div>
+				<div class="card card--3">
+					<img class="card__img" src="img/musqlo.jpg" alt="">
+					<div class="card__btn-group">
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--red">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-feed"></use>
+								</svg>
+								live
+								<a class="btn__link btn__link--red" href="http://musqlo.herokuapp.com/" target="_blank" >
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-feed"></use>
+									</svg>
+									live
+								</a>
+							</div>
+						</div>
+						<div class="btn__container">
+							<div class="btn__bottom-layer btn__bottom-layer--white">
+								<svg class="btn__icon">
+									<use xlink:href="img/sprites.svg#icon-embed2"></use>
+								</svg>
+								code
+								<a class="btn__link btn__link--white" href="https://github.com/arturo-jc/musqlo" target="__blank">
+									<svg class="btn__icon">
+										<use xlink:href="img/sprites.svg#icon-embed2"></use>
+									</svg>
+									code
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="card__content">
+						<div class="card__info">
+							<h4 class="card__title">MUSQLO</h4>
+							<p class="card__subtitle">Workout generator</p>
+							<ul class="card__list">
+								<li class="card__item">Server: Python/Flask</li>
+								<li class="card__item">DB: PostgreSQL/SQLAlchemy</li>
+							</ul>
+						</div>
+						<p class="card__read-more">Read more <a href="https://arturojc355400397.wordpress.com/2021/10/21/reflections-on-making-my-first-web-application/" target="_blank">over at my blog</a>!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="research" id="research">
+		<div class="research__container">
+			<h3 class="research__heading heading-3">Research</h3>
+			<div class="research__content">
+				<div class="article__container">
+					<img class="article__photo" src="img/brain.jpg" alt="">
+					<div class="article__content">
+							<a class="article__link" target="_blank" href="https://link.springer.com/article/10.1007/s10670-021-00427-4">
+								<span class="article__link-underline">
+									Erkenntnis (2021)
+									<svg class="article__open-icon">
+										<use xlink:href="img/sprites.svg#icon-arrow-up-right"></use>
+									</svg>
+								</span>
+							</a>
+						<div class="article__title-box">
+								<a class="article__title" target="_blank" href="pdf/javstn_draft.pdf">
+									<span class="article__title-underline">
+										Should the Number of Overlapping Experiencers Count?
+										<svg class="article__download-icon">
+											<use xlink:href="img/sprites.svg#icon-download2"></use>
+										</svg>
+									</span>
+								</a>
+						</div>
+						<div class="article__abstract">According to the cohabitation account, all the persons that result from a fission event cohabit the same body prior to fission. This article concerns a problem for this account. <span class="article__expand">Suppose Manuel and Jimena are suffering from an equally painful migraine. Unlike Jimena, however, Manuel will undergo fission. Assuming you have a spare painkiller, whom should you give it to? Intuitively, you have no more reason to give it to one or the other. The problem is that the cohabitation account suggests otherwise. According to the account, there are two persons cohabiting Manuel’s body, in which case you should arguably give them the pill, since doing so alleviates the pain of more beings. One response argues that the two persons cohabiting Manuel’s body share one pain. Thus, giving them the pill alleviates no more pain than giving it to Jimena, and therefore you have no more reason to do one or the other. The goal of this article is to show that this response fails. </span>
+							<button class="expand__btn">
+								<span class="expand__txt">Expand</span>
+								<svg class="expand__icon">
+									<use class="expand__icon-src" xlink:href="img/sprites.svg#icon-enlarge2"></use>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="article__container">
+					<img class="article__photo" src="img/books.jpg" alt="">
+					<div class="article__content">
+							<a class="article__link" target="_blank" href="https://academic.oup.com/pq/article-abstract/69/275/277/5126501">
+								<span class="article__link-underline">
+									Philosophical Quarterly (2019). 69/275: 277–293
+									<svg class="article__open-icon">
+										<use xlink:href="img/sprites.svg#icon-arrow-up-right"></use>
+									</svg>
+								</span>
+							</a>
+						<div class="article__title-box">
+								<a class="article__title" target="_blank" href="pdf/javqvo_draft.pdf">
+									<span class="article__title-underline">
+										Quantifier Variance, Ontological Pluralism and Ideal Languages
+										<svg class="article__download-icon">
+											<use xlink:href="img/sprites.svg#icon-download2"></use>
+										</svg>
+									</span>
+								</a>
+						</div>
+						<div class="article__abstract">Kris McDaniel has recently defended a criterion for being an ontological pluralist that classifies the quantifier variantist as one. In this paper, I argue that this is a mistake. <span class="article__expand">There is an important difference between the two views, which is sometimes obscured by a common view in the metaphysics of fundamentality. According to the simple analysis, a language is ideal—it allows for a maximally metaphysically perspicuous description of reality—just in case all its primitives are perfectly natural. I argue that this analysis struggles to distinguish quantifier variance from ontological pluralism, and then I discuss various accounts that can do better. I then propose a criterion for being an ontological pluralist that does not misclassify the quantifier variantist. Finally, I discuss some additional advantages of my proposal. </span>
+							<button class="expand__btn">
+								<span class="expand__txt">Expand</span>
+								<svg class="expand__icon">
+									<use class="expand__icon-src" xlink:href="img/sprites.svg#icon-enlarge2"></use>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="article__container">
+					<img class="article__photo" src="img/duplicates.jpg" alt="">
+					<div class="article__content">
+							<a class="article__link" target="_blank" href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.211">
+								<span class="article__link-underline">
+									Thought: A Journal of Philosophy (2016). 5/3: 196-202
+									<svg class="article__open-icon">
+										<use xlink:href="img/sprites.svg#icon-arrow-up-right"></use>
+									</svg>
+								</span>
+							</a>
+						</span>
+						<div class="article__title-box">
+							<a class="article__title" target="_blank" href="pdf/javdac_draft.pdf">
+								<span class="article__title-underline">
+									Duplication and Collapse
+									<svg class="article__download-icon">
+										<use xlink:href="img/sprites.svg#icon-download2"></use>
+									</svg>
+								</span>
+							</a>
+						</div>
+						<div class="article__abstract">Kris McDaniel has argued that strong composition as identity entails a principle he calls the 'Plural Duplication Principle' (PDP), and that PDP is inconsistent with the possibility of strongly emergent properties. <span class="article__expand">Theodore Sider has objected that this possibility is only inconsistent with a closely analogous principle he calls the 'Set Duplication Principle' (SDP). According to Sider, however, the friend of strong composition as identity is under no pressure to accept SDP. In this paper, I argue that the friend of strong composition as identity has strong reason to accept either SDP or a principle that is likewise inconsistent with the possibility of strongly emergent properties. Thus, Sider's objection fails. </span>
+							<button class="expand__btn">
+								<span class="expand__txt">Expand</span>
+								<svg class="expand__icon">
+									<use class="expand__icon-src" xlink:href="img/sprites.svg#icon-enlarge2"></use>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="article__container">
+					<img class="article__photo" src="img/kitty.jpg" alt="">
+					<div class="article__content">
+							<a  class="article__link" target="_blank" href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.127">
+								<span class="article__link-underline">
+								Thought: A Journal of Philosophy (2014). 3/3: 184-92
+								<svg class="article__open-icon">
+									<use xlink:href="img/sprites.svg#icon-arrow-up-right"></use>
+								</svg>
+								</span>
+							</a>
+						<div class="article__title-box">
+								<a class="article__title" target="_blank" href="pdf/javsct_draft.pdf">
+									<span class="article__title-underline">
+										Some Challenges to a Contrastive Treatment of Grounding
+										<svg class="article__download-icon">
+											<use xlink:href="img/sprites.svg#icon-download2"></use>
+										</svg>
+									</span>
+								</a>
+						</div>
+						<div class="article__abstract">Jonathan Schaffer has offered three alleged counterexamples to the transitivity of grounding. He has then used these cases to motivate his own contrastive account of grounding. In this paper, I argue that this line of argument backfires: <span class="article__expand"> if one of Schaffer’s own counterexamples succeeds, there is a similar case that undermines the motivation for Schaffer's own account. The upshot is that Schaffer cannot use the counterexample in question to motivate his account. </span>
+							<button class="expand__btn">
+								<span class="expand__txt">Expand</span>
+								<svg class="expand__icon">
+									<use class="expand__icon-src" xlink:href="img/sprites.svg#icon-enlarge2"></use>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<footer class="footer" id="footer">
+		<div class="footer__contact">
+			<a class="footer__link" href="mailto:&#097;&#046;&#106;&#097;&#118;&#105;&#101;&#114;&#046;&#099;&#097;&#115;&#116;&#101;&#108;&#108;&#097;&#110;&#111;&#115;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">
+				<svg class="footer__icon footer__icon--email">
+					<use xlink:href="img/sprites.svg#icon-mail-envelope-closed"></use>
+				</svg>
+			</a>
+			<a class="footer__link" href="https://www.linkedin.com/in/arturo-javier-castellanos-551006197/" target="_blank">
+				<svg class="footer__icon footer__icon--linkedin">
+					<use xlink:href="img/sprites.svg#icon-linkedin"></use>
+				</svg>
+			</a>
+			<a class="footer__link" href="https://github.com/arturo-jc" target="_blank">
+				<svg class="footer__icon footer__icon--github">
+					<use xlink:href="img/sprites.svg#icon-github"></use>
+				</svg>
+			</a>
+		</div>
+		<div class="footer__attribution">
+			&copy; Copyright <span class="year"></span> by Arturo Javier-Castellanos.
+		</div>
 
+	</footer>
+	<script src="/js/index.js"></script>
 </body>
 </html>

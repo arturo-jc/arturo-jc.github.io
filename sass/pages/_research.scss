@@ -1,0 +1,30 @@
+.research {
+    &__container{
+        @extend .container;
+    }
+
+    &__heading {
+        grid-column: content-start / content-end;
+        justify-self: start;
+    }
+
+    &__content{
+        grid-column: content-start / content-end;
+        display: grid;
+        grid-template-columns: [content-start] repeat(3, 1fr) [content-end];
+        column-gap: 3rem;
+        row-gap: 4rem;
+        justify-items: center;
+
+        @media only screen and (max-width: $bp-lg) {
+            grid-template-columns: [content-start] repeat(2, 1fr) [content-end];
+            column-gap: 6rem;
+            row-gap: 6rem;
+        }
+
+        @media only screen and (max-width: $bp-md) {
+            grid-template-columns: [content-start] 1fr [content-end];
+            row-gap: 4rem;
+        }
+    }
+}
