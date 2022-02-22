@@ -41,5 +41,8 @@ $bp-xsm: 25em; // 400px
     @media only screen and (max-width: $bp-lg) {
         --height-navbar: 3.6rem;
     }
+    @media only screen and (max-width: $bp-sm) {
+        --height-card-content: 18rem;
+    }
 }
 
