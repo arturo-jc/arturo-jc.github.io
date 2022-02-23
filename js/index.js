@@ -88,3 +88,29 @@ for (let article of articles){
         })
     }
 }
+
+
+// REVEAL ON SCROLL
+const hidden_elements = document.querySelectorAll(".reveal");
+
+function reveal() {
+    for (let hidden of hidden_elements) {
+      const elementTop = hidden.getBoundingClientRect().top;
+      const distanceSlow = 150;
+      const distanceQuick = 25;
+      switch (hidden.classList.contains("reveal-quick")){
+        case true:
+            if (elementTop < window.innerHeight - distanceQuick) {
+            hidden.classList.add("active");
+            setTimeout(()=> hidden.classList.add("quick-animate"), 800);
+            }
+        break;
+        default:
+            if (elementTop < window.innerHeight - distanceSlow) {
+            hidden.classList.add("active");
+            setTimeout(()=> hidden.classList.add("quick-animate"), 800);
+            }
+        }
+    }
+}
+  window.addEventListener("scroll", reveal)

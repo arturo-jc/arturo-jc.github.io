@@ -325,7 +325,9 @@ body {
     box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.2);
     width: 20rem;
     position: absolute;
-    transition: transform 0.2s, opacity 0.2s; }
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+    .about__photo-box.quick-animate .composition__picture {
+      transition: transform 0.2s, opacity 0.2s; }
     @media only screen and (max-width: 37.5em) {
       .composition__picture {
         width: 80%; } }
@@ -337,6 +339,13 @@ body {
       top: -3rem;
       transform: translate(-50%, -50%);
       z-index: 2; }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--1 {
+          transform: translate(-50%, 0%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--1 {
+          transform: translate(-50%, -50%);
+          opacity: 1; } }
       @media (hover: hover) {
         .composition__picture--1:hover {
           transform: scale(1.05) translate(-50%, -50%);
@@ -348,6 +357,13 @@ body {
       left: calc(50% - 9rem);
       top: 2rem;
       transform: rotate(-5deg) translate(-50%, -50%); }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--2 {
+          transform: rotate(-5deg) translate(0%, -50%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--2 {
+          transform: rotate(-5deg) translate(-50%, -50%);
+          opacity: 1; } }
       @media (hover: hover) {
         .composition__picture--2:hover {
           transform: rotate(-5deg) scale(1.05) translate(-50%, -50%);
@@ -367,6 +383,13 @@ body {
       top: 5rem;
       transform: rotate(7deg) translate(-50%, -50%);
       z-index: 3; }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--3 {
+          transform: rotate(7deg) translate(-100%, -50%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--3 {
+          transform: rotate(7deg) translate(-50%, -50%);
+          opacity: 1; } }
       @media (hover: hover) {
         .composition__picture--3:hover {
           transform: rotate(7deg) scale(1.05) translate(-50%, -50%);
@@ -379,6 +402,13 @@ body {
       top: -3rem;
       transform: rotate(8deg) translate(-50%, -50%);
       z-index: 2; }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--4 {
+          transform: rotate(8deg) translate(-100%, -50%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--4 {
+          transform: rotate(8deg) translate(-50%, -50%);
+          opacity: 1; } }
       @media (hover: hover) {
         .composition__picture--4:hover {
           transform: rotate(8deg) scale(1.05) translate(-50%, -50%);
@@ -390,6 +420,13 @@ body {
       left: calc(50% - 9rem);
       top: -5rem;
       transform: rotate(-5deg) translate(-50%, -50%); }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--5 {
+          transform: rotate(-5deg) translate(0%, -50%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--5 {
+          opacity: 1;
+          transform: rotate(-5deg) translate(-50%, -50%); } }
       @media (hover: hover) {
         .composition__picture--5:hover {
           transform: rotate(-5deg) scale(1.05) translate(-50%, -50%);
@@ -402,6 +439,13 @@ body {
       top: 3rem;
       transform: translate(-50%, -50%);
       z-index: 3; }
+      @media only screen and (min-width: 37.5em) {
+        .about__photo-box.reveal .composition__picture--6 {
+          transform: translate(-50%, -100%);
+          opacity: 0; }
+        .about__photo-box.reveal.active .composition__picture--6 {
+          opacity: 1;
+          transform: translate(-50%, -50%); } }
       @media (hover: hover) {
         .composition__picture--6:hover {
           transform: scale(1.05) translate(-50%, -50%);
@@ -438,6 +482,13 @@ body {
   background-size: 100%;
   background-repeat: no-repeat;
   box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.2); }
+  .card.reveal {
+    transform: translateY(10rem) scale(0.8);
+    opacity: 0;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+    .card.reveal.active {
+      transform: none;
+      opacity: 1; }
   @media only screen and (max-width: 37.5em) {
     .card {
       width: 80%; } }
@@ -625,8 +676,16 @@ body {
   display: grid;
   grid-template-columns: [photo-start content-start] repeat(3, 1fr) [photo-end content-end];
   row-gap: 1rem;
+  column-gap: 2rem;
   grid-auto-rows: min-content;
   position: relative; }
+  .article__container.reveal {
+    transform: translateY(10rem);
+    opacity: 0;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+    .article__container.reveal.active {
+      transform: none;
+      opacity: 1; }
   @media only screen and (max-width: 50em) {
     .article__container {
       grid-template-columns: [photo-start] 1fr [photo-end content-start] repeat(2, 1fr) [content-end]; } }
@@ -722,26 +781,46 @@ body {
 .article__expand.show {
   display: inline; }
 
+.about__container {
+  align-items: stretch; }
+
 .about__heading {
   grid-column: content-start / content-end; }
 
-.about__content--1 {
-  grid-column: center-start / center-end; }
+.about__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; }
+  .about__content.reveal {
+    transform: translateX(10rem);
+    opacity: 0;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+    .about__content.reveal.active {
+      transform: none;
+      opacity: 1; }
+  .about__content--1 {
+    grid-column: center-start / center-end; }
+  .about__content--2 {
+    grid-column: left-start / left-end; }
+    @media only screen and (max-width: 87.5em) {
+      .about__content--2 {
+        grid-column: center-start / center-end; } }
+  .about__content--3 {
+    grid-column: center-start / center-end; }
+  .about__content--4 {
+    grid-column: right-start / right-end; }
+    @media only screen and (max-width: 87.5em) {
+      .about__content--4 {
+        grid-column: center-start / center-end; } }
 
-.about__content--2 {
-  grid-column: left-start / left-end; }
-  @media only screen and (max-width: 87.5em) {
-    .about__content--2 {
-      grid-column: center-start / center-end; } }
-
-.about__content--3 {
-  grid-column: center-start / center-end; }
-
-.about__content--4 {
-  grid-column: right-start / right-end; }
-  @media only screen and (max-width: 87.5em) {
-    .about__content--4 {
-      grid-column: center-start / center-end; } }
+@media only screen and (max-width: 37.5em) {
+  .about__photo-box.reveal {
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+    .about__photo-box.reveal.active {
+      transform: none;
+      opacity: 1; } }
 
 .about__photo-box--1 {
   grid-column: content-start / span 2; }
@@ -768,6 +847,22 @@ body {
 .about__profile-pic {
   width: 100%;
   border-radius: 50%; }
+  @media only screen and (min-width: 50em) {
+    .about__profile-pic.reveal {
+      transform: translateX(10rem);
+      opacity: 0;
+      transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+      .about__profile-pic.reveal.active {
+        transform: none;
+        opacity: 1; } }
+  @media only screen and (max-width: 50em) {
+    .about__profile-pic.reveal {
+      transform: scale(0.8);
+      opacity: 0;
+      transition: transform 0.8s ease-out, opacity 0.8s ease-out; }
+      .about__profile-pic.reveal.active {
+        transform: none;
+        opacity: 1; } }
   @media only screen and (max-width: 37.5em) {
     .about__profile-pic {
       width: 50%;

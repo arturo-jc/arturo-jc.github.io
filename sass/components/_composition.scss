@@ -12,7 +12,11 @@
         @include default-shadow;
         width: 20rem;
         position: absolute;
-        transition: transform 0.2s, opacity 0.2s;
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+
+        .about__photo-box.quick-animate &{
+            transition: transform 0.2s, opacity 0.2s;
+        }
 
         @media only screen and (max-width: $bp-sm){
             width: 80%;
@@ -27,6 +31,17 @@
             top: -3rem;
             transform: translate(-50%, -50%);
             z-index: 2;
+
+            @media only screen and (min-width: $bp-sm) {      
+                .about__photo-box.reveal &{
+                    transform: translate(-50%, 0%);
+                    opacity: 0;
+                }
+                .about__photo-box.reveal.active &{
+                    transform: translate(-50%, -50%);
+                    opacity: 1;
+                }
+            }
 
             @media (hover: hover){
                 &:hover{
@@ -44,6 +59,30 @@
             left: calc(50% - 9rem);
             top: 2rem;
             transform: rotate(-5deg) translate(-50%, -50%);
+
+            @media only screen and (min-width: $bp-sm) { 
+                .about__photo-box.reveal &{
+                    transform: rotate(-5deg) translate(0%, -50%);
+                    opacity: 0;
+                }
+                .about__photo-box.reveal.active &{
+                    transform: rotate(-5deg) translate(-50%, -50%);
+                    opacity: 1;
+                }       
+            }
+
+            // @media only screen and (max-width: $bp-sm){
+            //     .about__photo-box.reveal &{
+            //         transform: scale(0.8);
+            //         opacity: 0;
+            //         transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+            //     }
+    
+            //     .about__photo-box.reveal.active &{
+            //         transform: none;
+            //         opacity: 1;
+            //     }
+            // }
             
             @media (hover: hover){
                 &:hover{
@@ -71,7 +110,18 @@
             top: 5rem;
             transform: rotate(7deg) translate(-50%, -50%);
             z-index: 3;
-   
+
+            @media only screen and (min-width: $bp-sm) { 
+                .about__photo-box.reveal &{
+                    transform: rotate(7deg) translate(-100%, -50%);
+                    opacity: 0;
+                }
+                .about__photo-box.reveal.active &{
+                    transform: rotate(7deg) translate(-50%, -50%);
+                    opacity: 1;
+                }        
+            }
+            
             @media (hover: hover){
                 &:hover{
                     transform: rotate(7deg) scale(1.05) translate(-50%, -50%);
@@ -91,6 +141,17 @@
             transform: rotate(8deg) translate(-50%, -50%);
             z-index: 2;
 
+            @media only screen and (min-width: $bp-sm) { 
+                .about__photo-box.reveal &{
+                    transform: rotate(8deg) translate(-100%, -50%);
+                    opacity: 0;
+                }
+    
+                .about__photo-box.reveal.active &{
+                    transform: rotate(8deg) translate(-50%, -50%);
+                    opacity: 1;
+                }        
+            }
                         
             @media (hover: hover){
                 &:hover{
@@ -109,7 +170,18 @@
             top: -5rem;
             transform: rotate(-5deg) translate(-50%, -50%);
 
-                        
+            @media only screen and (min-width: $bp-sm) { 
+                .about__photo-box.reveal &{
+                    transform: rotate(-5deg) translate(-0%, -50%);
+                    opacity: 0;
+                }
+    
+                .about__photo-box.reveal.active &{
+                    opacity: 1;
+                    transform: rotate(-5deg) translate(-50%, -50%);
+                }                     
+            }
+
             @media (hover: hover){
                 &:hover{
                     transform: rotate(-5deg) scale(1.05) translate(-50%, -50%);
@@ -129,7 +201,18 @@
             transform: translate(-50%, -50%);
             z-index: 3;
 
-                        
+            @media only screen and (min-width: $bp-sm) { 
+                .about__photo-box.reveal &{
+                    transform: translate(-50%, -100%);
+                    opacity: 0;
+                }
+    
+                .about__photo-box.reveal.active &{
+                    opacity: 1;
+                    transform: translate(-50%, -50%);
+                }
+            }
+           
             @media (hover: hover){
                 &:hover{
                     transform: scale(1.05) translate(-50%, -50%);

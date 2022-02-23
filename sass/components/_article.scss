@@ -4,8 +4,10 @@
         display: grid;
         grid-template-columns: [photo-start content-start] repeat(3, 1fr) [photo-end content-end];
         row-gap: 1rem;
+        column-gap: 2rem;
         grid-auto-rows: min-content;
         position: relative;
+        @include reveal-up;
 
         @media only screen and (max-width: $bp-md) {
             grid-template-columns: [photo-start] 1fr [photo-end content-start] repeat(2, 1fr) [content-end];

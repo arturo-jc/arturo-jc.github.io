@@ -16,6 +16,53 @@
     background-size: 1px $width;
 }
 
+@mixin reveal-left{
+    &.reveal {
+        transform: translateX(10rem);
+        opacity: 0;
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        &.active{
+            transform: none;
+            opacity: 1;
+        }
+    }
+}
+
+@mixin reveal-up{
+    &.reveal {
+        transform: translateY(10rem);
+        opacity: 0;
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        &.active{
+            transform: none;
+            opacity: 1;
+        }
+    }
+}
+
+@mixin reveal-expand{
+    &.reveal {
+        transform: scale(0.8);
+        opacity: 0;
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        &.active{
+            transform: none;
+            opacity: 1;
+        }
+    }
+}
+@mixin reveal-expand-up{
+    &.reveal {
+        transform: translateY(10rem) scale(0.8);
+        opacity: 0;
+        transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        &.active{
+            transform: none;
+            opacity: 1;
+        }
+    }
+}
+
 // EXTENDS
 
 .default-grid{
