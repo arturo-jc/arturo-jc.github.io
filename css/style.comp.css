@@ -163,7 +163,7 @@ body {
       left: 0;
       height: 100%;
       width: 100%;
-      background-color: var(--color-red);
+      background-color: #953333;
       transform: scaleY(0);
       transform-origin: bottom;
       transition: transform .2s; }
