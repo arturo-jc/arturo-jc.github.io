@@ -13,9 +13,6 @@ html {
     scroll-behavior: smooth;
     box-sizing: border-box;
     font-size: 62.5%; // = 10px (desired rem size) / 16px (browser default font size)
-    // @media only screen and (max-width: $bp-xl) {
-    //     font-size: 50%;
-    // }
 }
 
 body {
@@ -39,4 +36,8 @@ a:visited{
             text-decoration: underline;
         }
     }
+}
+
+.reveal{
+    position: relative;
 }
