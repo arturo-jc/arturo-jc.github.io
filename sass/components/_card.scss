@@ -31,6 +31,10 @@
         background-image: url("../img/musqlo.jpg");
     }
 
+    &--4{
+        background-image: url("../img/proofwriter.jpg");
+    }
+
     &:hover &__content {
         transform: translateY(0);
     }
