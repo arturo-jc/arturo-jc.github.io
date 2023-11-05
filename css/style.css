@@ -499,12 +499,8 @@ body {
     .card {
       width: 100%; } }
   .card--1 {
-    background-image: url("../img/groupreads.jpg"); }
+    background-image: url("../img/sbss.jpg"); }
   .card--2 {
-    background-image: url("../img/tidybuddy.jpg"); }
-  .card--3 {
-    background-image: url("../img/musqlo.jpg"); }
-  .card--4 {
     background-image: url("../img/proofwriter.jpg"); }
   .card:hover .card__content {
     transform: translateY(0); }
