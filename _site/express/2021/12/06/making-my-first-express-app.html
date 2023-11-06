@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Arturo JC: Making my first Express app</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/highlight.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">		
+  </head>
+  <body>
+    <nav class="navbar">
+  <ul class="navbar__list">
+    <li class="navbar__item">
+      <a href="/#about" class="navbar__link">About</a>
+    </li>
+    <li class="navbar__item">
+      <a href="/#projects" class="navbar__link">Projects</a>
+    </li>
+    <li class="navbar__item">
+      <a href="/#research" class="navbar__link">Research</a>
+    </li>
+    <li class="navbar__item">
+      <a href="/#footer" class="navbar__link">Contact</a>
+    </li>
+    <li class="navbar__item">
+      <a href="/blog" class="navbar__link">Blog</a>
+    </li>
+  </ul>
+  <button class="navbar__menu-btn">
+    <svg class="navbar__menu-icon">
+      <use xlink:href="/assets/svg/sprites.svg#icon-menu"></use>
+    </svg>
+  </button>
+</nav>
+
+    <main class="post">
+  <div class="post__container">
+    <div class="post__back-button">
+      <a href="/blog"><< All posts</a>
+    </div>
+    <div class="post__heading">
+      <h3 class="heading-3">Making my first Express app</h3>
+      <span>
+        Dec 06, 2021
+      </span>
+    </div>
+    <div class="post__content">
+      <p>Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the <a href="https://tidybuddy.herokuapp.com/">results</a>, and here’s the <a href="https://github.com/arturo-jc/TidyBuddy">repository</a></p>
+
+<p>(This is part of my larger plan to teach myself web development by doing one largeish project after each course I complete. Next up, Brad Traversy’s React Front to Back).</p>
+
+<p>Anyway, this time I made a point to write down each thing I learned as I worked on my project. Looking at my list, it may be broken down into three big topics:</p>
+
+<ul>
+  <li>Express</li>
+  <li>EJS</li>
+  <li>Mongoose</li>
+</ul>
+
+<h2 id="express">Express</h2>
+<p>One of the big things I learned about Express was how to handle errors in a more organized way—how to divide the labor between controllers, middleware and error-handler.</p>
+
+<p>In Colt Steele’s course, I learned how to use middleware to perform some basic checks—is the user logged in? Does the user own the resource in question? I copied this basic pattern, but at one point I found myself performing simple checks in the controllers themselves—for instance, checking if two passwords matched. I did this out of convenience—the logic was simple and didn’t reduce readability. I was both throwing errors and <em>handling</em> those errors in the controllers themselves—flashing and redirecting the user in some cases, calling next on the error in others. I was also handling errors directly in my middleware—again, flashing/redirecting in some middleware functions, calling next in others. But then I realized this was probably not a good idea in the long run.</p>
+
+<p>So, what did I do? I delegated <em>all</em> authorization checks to my middleware, and used my controllers exclusively for interacting with the DB and rendering templates—no errors thrown in my controllers. And then I moved <em>all</em> the error handling—all the decision-making as to how to handle this or that error—from my middleware to my… well, error-handler.</p>
+
+<p>This involved some creativity. When I was handling errors and failed checks directly in the controllers, this was easy—I could simply flash and redirect right from the controller, for instance. Now I had to tell the error-handler what to do with a given error via the middleware. How do I tell the error-handler that I want certain errors flashed and others rendered?</p>
+
+<p>To do this, I adapted a technique I learned from Colt Steele. Following Steele, I defined an <code class="language-plaintext highlighter-rouge">ExpressError</code> class that extends <code class="language-plaintext highlighter-rouge">Error</code> and has <code class="language-plaintext highlighter-rouge">message</code> and <code class="language-plaintext highlighter-rouge">statusCode</code> parameters, except I added an optional <code class="language-plaintext highlighter-rouge">name</code> parameter. Then I used this <code class="language-plaintext highlighter-rouge">name</code> parameter to communicate from my middleware to my error-handler how I wanted each error handled. So, for instance, some middleware functions would throw an <code class="language-plaintext highlighter-rouge">ExpressError</code> and pass in “AuthorizationErrorFlash” as its name, others would pass “AuthorizationErrorRender”, and my error-handler would handle them accordingly. Then, when I wanted an authorization error in a given route to result in a flash message, I would simply pass in the appropriate middleware to the route in question. If I change my mind later on, it’s as easy as passing in a different middleware.</p>
+
+<p>The other big thing I learned about Express was how to pass data directly from one controller to another—without the use of the DB.</p>
+
+<p>Here’s the problem I faced. My dashboard template contains a feed. Inside the feed there can be many activities. Each activity has a comment section that’s hidden by default. The user can decide to open the comment section and post a comment, at which point the page refreshes, which means all comment sections are again hidden by default. That’s bad user experience. If you post a comment, you want to see it right away. So whenever a user posts a comment, I had to render the template in such a way that all comment sections are hidden by default <em>except for</em> whichever activity the user just commented under.</p>
+
+<p>How do you do that? The first part was easy. From my <code class="language-plaintext highlighter-rouge">showHousehold</code> controllers which renders the dashboard, pass in a string to an <code class="language-plaintext highlighter-rouge">activityId</code> parameter in <code class="language-plaintext highlighter-rouge">res.render</code>, then when you’re rendering the comment sections below each activity, use EJS to include a “hidden” class if and only if the activity’s ID matches whatever string you passed as <code class="language-plaintext highlighter-rouge">activityId</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ejs" data-lang="ejs">    &lt;div class="comment-section &lt;%= activity._id.toString() === activityId? '' : 'hidden' %&gt;"&gt;</code></pre></figure>
+
+<p>The problem is, how do I get the ID of whichever activity the user just commented under? Well, comments are created in my <code class="language-plaintext highlighter-rouge">createComment</code> controller, so that’s where the ID had to come from.</p>
+
+<p>One option would have been to render the dashboard right from the <code class="language-plaintext highlighter-rouge">createComment</code> controller, but that wasn’t a good idea. There’s a good deal of logic that goes into rendering the dashboard, so rendering it from both <code class="language-plaintext highlighter-rouge">showHousehold</code> and <code class="language-plaintext highlighter-rouge">createComment</code> would have resulted in a lot of duplication.</p>
+
+<p>Rather than rendering, I had to redirect the user to my show household route so that my <code class="language-plaintext highlighter-rouge">showHousehold</code> controller could carry out all that logic, but I had to somehow pass the activity ID from <code class="language-plaintext highlighter-rouge">createComment</code> over to <code class="language-plaintext highlighter-rouge">showHousehold</code>.</p>
+
+<p>How do you do that? My solution was to pass it as a query string. Then I could simply catch the activity ID in <code class="language-plaintext highlighter-rouge">showHousehold</code> and pass it to <code class="language-plaintext highlighter-rouge">res.render</code> so that my app knows which comment sections to display and which to hide.</p>
+
+<h2 id="ejs">EJS</h2>
+<p>Two big things, which are probably going to strike experienced users as quite basic.</p>
+
+<p>At one point, I needed to call a function that calculates the first day of the current week inside an EJS template. But I didn’t want to <em>define</em> the function inside the template—I didn’t want to clutter the template. Besides, I may need that function again in a different template. So, I learned that if you have some reusable JS code, you can always move it all to its dedicated EJS file, then include that file where needed. Handy!</p>
+
+<p>Another problem I faced was I wanted to loop over an array and create a todo-item for each element of the array. Since I wanted to reuse this code, I created a dedicated <code class="language-plaintext highlighter-rouge">item.ejs</code> partial I could include in different places. First, I tried:</p>
+
+<figure class="highlight"><pre><code class="language-ejs" data-lang="ejs">    for (let item of items){
+        &lt;%- include("./item") %&gt;
+    }</code></pre></figure>
+
+<p>Bad news: item is undefined in <code class="language-plaintext highlighter-rouge">item.ejs</code>. Good news: the solution was not too far off. After a bit of googling, I discovered you can simply pass arguments to template parameters (such as item) by putting them inside an object and passing that object to <code class="language-plaintext highlighter-rouge">include</code>, so I made a new <code class="language-plaintext highlighter-rouge">items.ejs</code> partial and did:</p>
+
+<figure class="highlight"><pre><code class="language-ejs" data-lang="ejs">    for (let item of frequentItems){
+        &lt;%- include("./items", {items: frequentItems}) %&gt;
+    }</code></pre></figure>
+
+<p>Now I can use the same <code class="language-plaintext highlighter-rouge">items.ejs</code> partial and just pass different arrays into the items parameter. Neat!</p>
+
+<h2 id="mongoose">Mongoose</h2>
+<p>This is probably the topic I learned the most about.</p>
+
+<p>The most important thing I learned was probably populating a document several levels deep.</p>
+
+<p>In my app, every user should belong to a household. In order to render the dashboard, the user’s household document needs to be <em>fully</em> populated—every field and subfield.</p>
+
+<p>My household documents have an <code class="language-plaintext highlighter-rouge">activityTypes</code> field, which is meant to store an array of activity type documents. Easy enough to populate:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">populate</span><span class="p">(</span><span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">)</span></code></pre></figure>
+
+<p>Problem is, activity type documents have a <code class="language-plaintext highlighter-rouge">completedBy</code> field, which is meant to store an array of activity documents. That needs to be populated as well. No big deal:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">populate</span><span class="p">({</span>
+            <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">populate</span><span class="p">:</span> <span class="p">{</span> <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">completedBy</span><span class="dl">"</span> <span class="p">}</span>
+        <span class="p">});</span></code></pre></figure>
+
+<p>So far, so good. But activity documents have a <code class="language-plaintext highlighter-rouge">user</code> field that itself needs to be populated. And that’s how I ended up with this monstruous-looking thing:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">populate</span><span class="p">({</span>
+            <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">populate</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">completedBy</span><span class="dl">"</span><span class="p">,</span>
+                <span class="na">populate</span><span class="p">:</span> <span class="p">{</span> <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">user</span><span class="dl">"</span> <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">});</span></code></pre></figure>
+
+<p>The second big thing I learned was how to delete subdocument arrays.</p>
+
+<p>In addition to the <code class="language-plaintext highlighter-rouge">user</code> field mentioned above, my activity documents also have a <code class="language-plaintext highlighter-rouge">comments</code> field, which is meant to store an array of—you guess it—comment documents. When an activity is deleted, there is nowhere for its comments to go, and so those comments should be automatically deleted along with it.</p>
+
+<p>Turns out Mongoose middleware is tailor-made for this. All I had to do was plug this in to my activity schema:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">ActivitySchema</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="dl">"</span><span class="s2">findOneAndDelete</span><span class="dl">"</span><span class="p">,</span> <span class="k">async</span> <span class="nf">function </span><span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">await</span> <span class="nx">Comment</span><span class="p">.</span><span class="nf">deleteMany</span><span class="p">({</span> <span class="na">_id</span><span class="p">:</span> <span class="p">{</span> <span class="na">$in</span><span class="p">:</span> <span class="nx">activity</span><span class="p">.</span><span class="nx">comments</span> <span class="p">}</span> <span class="p">})</span>
+        <span class="p">}</span>
+    <span class="p">});</span></code></pre></figure>
+
+<p>This tells Mongoose that if it deletes an activity, it should also delete all comments whose Id is included in the activity’s comments field, which is just what I wanted.</p>
+
+<p>The third big thing I learned about Mongoose is how to delete “dead” references from documents. Here’s what I mean.</p>
+
+<p>My household documents have a <code class="language-plaintext highlighter-rouge">users</code> field, which is meant to store an array of user documents. Except it doesn’t actually store the documents inside the array—instead, it stores a <em>reference</em> to each document that Mongoose uses to fetch the documents in question.</p>
+
+<p>The problem is that when you delete a user document from the DB, the reference is not deleted from the users array. The array now contains a reference to a document that no longer exists. This is what I meant by a “dead” reference. This doesn’t cause problems in my limited experience, but I don’t like it all the same.</p>
+
+<p>Since Mongoose wouldn’t automatically remove these references for me, I had to learn how to do it myself. So now when I delete a user in my <code class="language-plaintext highlighter-rouge">deleteAccount</code> controller, I call:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">updateMany</span><span class="p">(</span>
+        <span class="p">{</span> <span class="na">users</span><span class="p">:</span> <span class="nx">user</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="na">$pull</span><span class="p">:</span> <span class="p">{</span> <span class="na">users</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">_id</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="p">);</span></code></pre></figure>
+
+<p>In a StackOverFlow thread, someone suggested to use Mongoose middleware for this purpose. However, I ran into circularity issues when I tried this approach (I was requesting two models into each other and using them to define each other). For all I know, it may be possible to get around this problem, but I didn’t keep trying as I was satisfied with the solution above.</p>
+
+<p>The last Mongoose thing I learned was this. In my app, a user can request to join a household. When a user makes a request, I want to push the user into the household’s pendingRequests field, but <em>only if the user is not already in the field in question</em> (no point adding them twice over!)</p>
+
+<p>I spent an embarrassing amount of time searching how to perform this kind of logic with Mongoose’s findByIdAndUpdate method, but it was worth it in the end because I learned about Mongo’s <code class="language-plaintext highlighter-rouge">$addToSet</code> operator, which does exactly what I wanted:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findByIdAndUpdate</span><span class="p">(</span><span class="nx">householdId</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="na">$addToSet</span><span class="p">:</span> <span class="p">{</span> <span class="na">pendingRequests</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">);</span></code></pre></figure>
+
+<p>One last thing that’s not exactly about Mongoose, but about a Mongoose plugin. For authentication, I used <code class="language-plaintext highlighter-rouge">passport</code> in conjunction with <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code>. What the last package does is it adds a number of methods to your <code class="language-plaintext highlighter-rouge">User</code> model. You can use these methods to create and pass a strategy to <code class="language-plaintext highlighter-rouge">passport</code> like so:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nf">use</span><span class="p">(</span><span class="k">new</span> <span class="nc">LocalStrategy</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nf">authenticate</span><span class="p">()));</span></code></pre></figure>
+
+<p>(<code class="language-plaintext highlighter-rouge">LocalStrategy</code> comes from a further package called passport-local—more about it in a moment).</p>
+
+<p>However, I did not like the way <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code> handles authentication by default. It fetches the user by username. I didn’t like that. Fortunately, you can tell <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code> to use email instead:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">UserSchema</span><span class="p">.</span><span class="nf">plugin</span><span class="p">(</span><span class="nx">passportLocalMongoose</span><span class="p">,</span> <span class="p">{</span> <span class="na">usernameField</span><span class="p">:</span> <span class="dl">"</span><span class="s2">email</span><span class="dl">"</span> <span class="p">});</span></code></pre></figure>
+
+<p>However, this is still not going to work—and this took me an embarrassingly long time to figure out. As I said, what this plug in does is add methods to your User model that you can then use to create and pass a strategy to passport. One of those methods is .authenticate, which works just fine if you’re happy with the way passport-local-mongoose handles authentication by default. But if you want it to use email instead (like I told it to above), you need to use a different method called <code class="language-plaintext highlighter-rouge">.authenticate</code> like so:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nf">use</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nf">createStrategy</span><span class="p">());</span></code></pre></figure>
+
+<p>Notice I am no longer relying on <code class="language-plaintext highlighter-rouge">LocalStrategy</code>, which means I no longer need to require <code class="language-plaintext highlighter-rouge">passport-local</code>.</p>
+
+<p>And that’s it for now.</p>
+
+<p>Until next time!</p>
+
+    </div>
+  </div>
+</main>
+
+    	<footer class="footer" id="footer">
+		<div class="footer__contact">
+			<a class="footer__link" href="mailto:&#097;&#046;&#106;&#097;&#118;&#105;&#101;&#114;&#046;&#099;&#097;&#115;&#116;&#101;&#108;&#108;&#097;&#110;&#111;&#115;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">
+				<svg class="footer__icon footer__icon--email">
+          <use xlink:href="/assets/svg/sprites.svg#icon-mail-envelope-closed"></use>
+				</svg>
+			</a>
+			<a class="footer__link" href="https://www.linkedin.com/in/arturo-javier-castellanos-551006197/" target="_blank">
+				<svg class="footer__icon footer__icon--linkedin">
+          <use xlink:href="/assets/svg/sprites.svg#icon-linkedin"></use>
+				</svg>
+			</a>
+			<a class="footer__link" href="https://github.com/arturo-jc" target="_blank">
+				<svg class="footer__icon footer__icon--github">
+          <use xlink:href="/assets/svg/sprites.svg#icon-github"></use>
+				</svg>
+			</a>
+		</div>
+		<div class="footer__attribution">
+			&copy; Copyright <span class="year"></span> by Arturo Javier-Castellanos.
+		</div>
+
+	</footer>
+
+  </body>
+	<script src="/js/index.js"></script>
+</html>
+
