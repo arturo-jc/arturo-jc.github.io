@@ -1,0 +1,38 @@
+.post-preview {
+
+    &__container {
+        margin-bottom: 3rem;
+    }
+
+    &__title-box{
+        margin-bottom: 1.5rem;
+    }
+
+    @media (hover: hover){
+        &__title-underline:hover{
+            @include underline(2px, var(--color-brown));
+        }
+    }
+
+    &__title,
+    &__title:link,
+    &__title:visited{
+        color: var(--color-brown);
+        font-family: 'Merriweather', serif;
+        font-weight: 400;
+        font-size: 2.7rem;
+        line-height: 1.4;
+        letter-spacing: -1px;
+        grid-column: content-start / content-end;
+        display: inline;
+
+        &:hover{
+            text-decoration: none;
+        }
+    }
+
+    &__date {
+      font-size: var(--small-font-size);
+    }
+
+}

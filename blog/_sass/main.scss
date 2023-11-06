@@ -7,14 +7,16 @@
 @import "layout/navbar";
 @import "layout/header";
 @import "layout/footer";
-@import "layout/content";
 
 @import "components/composition";
 @import "components/card";
 @import "components/btn";
 @import "components/expand";
 @import "components/article";
+@import "components/post-preview";
 
 @import "pages/about";
 @import "pages/projects";
 @import "pages/research";
+@import "pages/blog";
+@import "pages/post";

@@ -1,0 +1,36 @@
+.post {
+  margin-top: var(--height-navbar);
+
+  &__back-button {
+    grid-column: center-start / center-end;
+  }
+
+  &__container{
+    @extend .container;
+  }
+
+  &__heading{
+    grid-column: center-start / center-end;
+  }
+
+  &__content{
+    grid-column: center-start / center-end;
+
+    h2 {
+      margin-top: 2rem;
+      font-family: 'Roboto', sans-serif;
+      text-transform: uppercase;
+      font-weight: 400;
+      letter-spacing: 3px;
+      font-size: 3rem;
+    }
+
+    p {
+      margin-bottom: 2rem;
+    }
+
+    ul {
+      padding-left: 3rem;
+    }
+  }
+}

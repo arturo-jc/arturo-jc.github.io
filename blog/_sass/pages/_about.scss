@@ -1,0 +1,96 @@
+.about{
+    overflow: hidden;
+
+    &__container{
+        @extend .container;
+        align-items: stretch;
+    }
+
+    &__heading{
+        grid-column: content-start / content-end;
+    }
+
+    &__content{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        @include reveal-left;
+
+        &--1{
+            grid-column: center-start / center-end;
+        }
+        &--2{
+            grid-column: left-start / left-end;
+
+            @media only screen and (max-width: $bp-xxl) {
+                grid-column: center-start / center-end;
+            }
+        }
+        &--3{
+            grid-column: center-start / center-end;
+        }
+        &--4{
+            grid-column: right-start / right-end;
+
+            @media only screen and (max-width: $bp-xxl) {
+                grid-column: center-start / center-end;
+            }
+        }
+    }
+
+    &__photo-box{
+        @media only screen and (max-width: $bp-sm){
+            @include reveal-expand;
+        }
+        &--1{
+            grid-column: content-start / span 2;
+
+            @media only screen and (max-width: $bp-md) {
+                grid-column: 3 / span 2;
+                grid-row: 2 / span 1;
+            }
+            @media only screen and (max-width: $bp-sm) {
+                grid-column: content-start / content-end;
+            }
+
+        }
+        &--2{
+            grid-column: right-start / right-end;
+
+            @media only screen and (max-width: $bp-xxl) {
+                grid-column: center-start / center-end;
+            }
+        }
+        &--3{
+            grid-column: left-start / left-end;
+
+            @media only screen and (max-width: $bp-xxl) {
+                grid-column: center-start / center-end;
+            }
+        }
+
+    }
+
+    &__profile-pic{
+        width: 100%;
+        border-radius: 50%;
+        @media only screen and (min-width: $bp-md){
+            @include reveal-left;
+        }
+        @media only screen and (max-width: $bp-md){
+            @include reveal-expand;
+        }
+
+        @media only screen and (max-width: $bp-sm) {
+            width: 50%;
+            display: block;
+            margin: auto;
+        }
+
+        @media only screen and (max-width: $bp-xsm) {
+            width: 80%;
+            display: block;
+            margin: auto;
+        }
+    }
+}

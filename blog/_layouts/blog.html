@@ -1,0 +1,28 @@
+---
+layout: default
+---
+
+<main class="blog">
+  <div class="blog__container">
+    <h3 class="blog__heading heading-3">Blog</h3>
+    <div class="blog__content">
+      {% for post in site.posts %}
+      <div class="post-preview__container">
+        <div class="post-preview__title-box">
+          <a href="{{ post.url | relative_url }}" class="post-preview__title">
+            <span class="post-preview__title-underline">
+              {{post.title}}
+            </span>
+          </a>
+          <div class="post-preview__date">
+            {{ post.date | date: "%b %d, %Y" }}
+          </div>
+        </div>
+        <div>
+          {{ post.excerpt }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>

@@ -1,0 +1,18 @@
+	<section class="research" id="research">
+		<div class="research__container">
+			<h3 class="research__heading heading-3">Research</h3>
+			<div class="research__content">
+        {% for article in site.data.articles %}
+          {% include article.html
+            title=article.title
+            journal=article.journal
+            image=article.image
+            url=article.url
+            download_url=article.download_url
+            abstract_shown=article.abstract_shown
+            abstract_hidden=article.abstract_hidden
+          %}
+        {% endfor %}
+			</div>
+		</div>
+	</section>

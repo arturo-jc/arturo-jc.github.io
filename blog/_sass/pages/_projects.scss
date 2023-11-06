@@ -1,0 +1,25 @@
+.projects{
+    background-color: var(--color-green-light);
+
+    &__container{
+        @extend .container;
+    }
+
+    &__heading {
+        grid-column: content-start / content-end;
+    }
+
+    &__content{
+        grid-column: content-start / content-end;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
+        column-gap: 3rem;
+        row-gap: 4rem;
+        align-items: start;
+        justify-items: center;
+        
+        @media only screen and (max-width: $bp-sm) {
+            grid-template-columns: 1fr;
+        }
+    }
+}

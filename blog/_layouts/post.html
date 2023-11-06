@@ -1,0 +1,20 @@
+---
+layout: default
+---
+
+<main class="post">
+  <div class="post__container">
+    <div class="post__back-button">
+      <a href="/blog"><< All posts</a>
+    </div>
+    <div class="post__heading">
+      <h3 class="heading-3">{{ page.title }}</h3>
+      <span>
+        {{ page.date | date: "%b %d, %Y" }}
+      </span>
+    </div>
+    <div class="post__content">
+      {{ content }}
+    </div>
+  </div>
+</main>

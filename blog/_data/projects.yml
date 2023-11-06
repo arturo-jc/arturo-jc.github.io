@@ -1,0 +1,16 @@
+# _data/projects.yml
+- title: Step by Step Strength
+  subtitle: Workout Program Generator
+  image: assets/jpg/sbss.jpg
+  live_url: https://stepbystepstrength.com/
+  code_url: https://github.com/arturo-jc/step-by-step-strength-public
+  stack: Angular, Node.js, GraphQL, PostgresQL, TypeORM.
+  class: card--1
+- title: ProofWriter
+  subtitle: Text Expander for First-Order Logic
+  image: assets/jpg/proofwriter.jpg
+  live_url: https://proofwriter.netlify.app/
+  code_url: https://github.com/arturo-jc/proofwriter
+  stack: Angular.
+  class: card--2
+

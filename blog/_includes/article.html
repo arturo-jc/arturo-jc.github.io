@@ -1,0 +1,31 @@
+<div class="article__container reveal reveal-quick">
+  <img class="article__photo" src="{{ include.image }}" alt="">
+  <div class="article__content">
+    <a class="article__link" target="_blank" href="{{ include.url }}">
+      <span class="article__link-underline">
+        {{ include.journal }}
+        <svg class="article__open-icon">
+          <use xlink:href="assets/svg/sprites.svg#icon-arrow-up-right"></use>
+        </svg>
+      </span>
+    </a>
+    <div class="article__title-box">
+      <a class="article__title" target="_blank" href="{{ include.download_url }}">
+        <span class="article__title-underline">
+          {{ include.title }}
+          <svg class="article__download-icon">
+            <use xlink:href="assets/svg/sprites.svg#icon-download2"></use>
+          </svg>
+        </span>
+      </a>
+    </div>
+    <div class="article__abstract">{{ include.abstract_shown }}<span class="article__expand">{{ include.abstract_hidden }}</span>
+      <button class="expand__btn">
+        <span class="expand__txt">Expand</span>
+        <svg class="expand__icon">
+          <use class="expand__icon-src" xlink:href="assets/svg/sprites.svg#icon-enlarge2"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

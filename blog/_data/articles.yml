@@ -1,0 +1,31 @@
+- title: Should the Number of Overlapping Experiencers Count?
+  journal: "Erkenntnis (2021)"
+  image: assets/jpg/brain.jpg
+  url: https://link.springer.com/article/10.1007/s10670-021-00427-4
+  download_url: pdf/javstn_draft.pdf
+  abstract_shown: According to the cohabitation account, all the persons that result from a fission event cohabit the same body prior to fission. This article concerns a problem for this account.
+  abstract_hidden: Suppose Manuel and Jimena are suffering from an equally painful migraine. Unlike Jimena, however, Manuel will undergo fission. Assuming you have a spare painkiller, whom should you give it to? Intuitively, you have no more reason to give it to one or the other. The problem is that the cohabitation account suggests otherwise. According to the account, there are two persons cohabiting Manuel’s body, in which case you should arguably give them the pill, since doing so alleviates the pain of more beings. One response argues that the two persons cohabiting Manuel’s body share one pain. Thus, giving them the pill alleviates no more pain than giving it to Jimena, and therefore you have no more reason to do one or the other. The goal of this article is to show that this response fails.
+
+- title: Quantifier Variance, Ontological Pluralism and Ideal Languages
+  journal: "Philosophical Quarterly (2019). 69/275: 277–293"
+  image: assets/jpg/books.jpg
+  url: https://academic.oup.com/pq/article-abstract/69/275/277/5126501
+  download_url: pdf/javqvo_draft.pdf
+  abstract_shown: Kris McDaniel has recently defended a criterion for being an ontological pluralist that classifies the quantifier variantist as one. In this paper, I argue that this is a mistake.
+  abstract_hidden: There is an important difference between the two views, which is sometimes obscured by a common view in the metaphysics of fundamentality. According to the simple analysis, a language is ideal—it allows for a maximally metaphysically perspicuous description of reality—just in case all its primitives are perfectly natural. I argue that this analysis struggles to distinguish quantifier variance from ontological pluralism, and then I discuss various accounts that can do better. I then propose a criterion for being an ontological pluralist that does not misclassify the quantifier variantist. Finally, I discuss some additional advantages of my proposal.
+
+- title: Duplication and Collapse
+  journal: "Thought: A Journal of Philosophy (2016). 5/3: 196-202"
+  image: assets/jpg/duplicates.jpg
+  url: https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.211
+  download_url: pdf/javdac_draft.pdf
+  abstract_shown: Kris McDaniel has argued that strong composition as identity entails a principle he calls the 'Plural Duplication Principle' (PDP), and that PDP is inconsistent with the possibility of strongly emergent properties.
+  abstract_hidden: Theodore Sider has objected that this possibility is only inconsistent with a closely analogous principle he calls the 'Set Duplication Principle' (SDP). According to Sider, however, the friend of strong composition as identity is under no pressure to accept SDP. In this paper, I argue that the friend of strong composition as identity has strong reason to accept either SDP or a principle that is likewise inconsistent with the possibility of strongly emergent properties. Thus, Sider's objection fails.
+
+- title: Some Challenges to a Contrastive Treatment of Grounding
+  journal: "Thought: A Journal of Philosophy (2014). 3/3: 184-92"
+  image: assets/jpg/kitty.jpg
+  url: https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.127
+  download_url: pdf/javsct_draft.pdf
+  abstract_shown: Jonathan Schaffer has offered three alleged counterexamples to the transitivity of grounding. He has then used these cases to motivate his own contrastive account of grounding.
+  abstract_hidden: "In this paper, I argue that this line of argument backfires: if one of Schaffer’s own counterexamples succeeds, there is a similar case that undermines the motivation for Schaffer's own account. The upshot is that Schaffer cannot use the counterexample in question to motivate his account."

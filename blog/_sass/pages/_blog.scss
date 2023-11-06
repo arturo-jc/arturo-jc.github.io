@@ -1,0 +1,26 @@
+.blog {
+  margin-top: var(--height-navbar);
+
+  &__container{
+    @extend .container;
+  }
+
+  &__heading{
+    grid-column: content-start / content-end;
+  }
+
+  &__content{
+    grid-column: content-start / content-end;
+  }
+}
+
+.highlight {
+  /* Terminal-like container styles */
+  background-color: #2d2d2d; /* Dark background for terminal-like look */
+  color: #f8f8f2;           /* Light text color for visibility */
+  padding: 1em;              /* Some padding around the text */
+  border-radius: 4px;        /* Optional: rounded corners */
+  margin: 1em 0;             /* Space out from regular content */
+  overflow-x: auto;          /* Allows for horizontal scrolling if needed */
+  font-size: var(--small-font-size);
+}
