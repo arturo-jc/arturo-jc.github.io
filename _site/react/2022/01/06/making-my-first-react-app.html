@@ -81,7 +81,7 @@
 
 <p>Whenever we use states, we need a way of updating those states–setting a modal’s <em>show</em> state to <em>true</em> when the user clicks on “Delete account”, or setting <em>user</em> to <em>null</em> when they log out. If we’re <em>using component-level</em> state–basically, a state that only one component needs access too–this is quite easy to do. React comes with a built-in <em>useState</em> function which initializes a <em>state</em> variable to a <em>defaultValue</em> and simultaneously creates a corresponding <em>setState</em> function that we can then use to update the state in question:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="p">[</span> <span class="nx">show</span><span class="p">,</span> <span class="nx">setShow</span> <span class="p">]</span> <span class="o">=</span> <span class="nf">useState</span><span class="p">(</span><span class="nx">defaultValue</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="p">[</span> <span class="nx">show</span><span class="p">,</span> <span class="nx">setShow</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="nx">defaultValue</span><span class="p">)</span></code></pre></figure>
 
 <p>This is all done from within the component that needs access to the state, and since we are dealing with component-level state, there is no need to pass it around.</p>
 

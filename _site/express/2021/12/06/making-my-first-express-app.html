@@ -119,21 +119,21 @@
 
 <p>My household documents have an <code class="language-plaintext highlighter-rouge">activityTypes</code> field, which is meant to store an array of activity type documents. Easy enough to populate:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
-        <span class="p">.</span><span class="nf">populate</span><span class="p">(</span><span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">populate</span><span class="p">(</span><span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">)</span></code></pre></figure>
 
 <p>Problem is, activity type documents have a <code class="language-plaintext highlighter-rouge">completedBy</code> field, which is meant to store an array of activity documents. That needs to be populated as well. No big deal:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
-        <span class="p">.</span><span class="nf">populate</span><span class="p">({</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">const</span> <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">populate</span><span class="p">({</span>
             <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">,</span>
             <span class="na">populate</span><span class="p">:</span> <span class="p">{</span> <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">completedBy</span><span class="dl">"</span> <span class="p">}</span>
         <span class="p">});</span></code></pre></figure>
 
 <p>So far, so good. But activity documents have a <code class="language-plaintext highlighter-rouge">user</code> field that itself needs to be populated. And that’s how I ended up with this monstruous-looking thing:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
-        <span class="p">.</span><span class="nf">populate</span><span class="p">({</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">household</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">householdId</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">populate</span><span class="p">({</span>
             <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">activityTypes</span><span class="dl">"</span><span class="p">,</span>
             <span class="na">populate</span><span class="p">:</span> <span class="p">{</span>
                 <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">completedBy</span><span class="dl">"</span><span class="p">,</span>
@@ -147,9 +147,9 @@
 
 <p>Turns out Mongoose middleware is tailor-made for this. All I had to do was plug this in to my activity schema:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">ActivitySchema</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="dl">"</span><span class="s2">findOneAndDelete</span><span class="dl">"</span><span class="p">,</span> <span class="k">async</span> <span class="nf">function </span><span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if </span><span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">await</span> <span class="nx">Comment</span><span class="p">.</span><span class="nf">deleteMany</span><span class="p">({</span> <span class="na">_id</span><span class="p">:</span> <span class="p">{</span> <span class="na">$in</span><span class="p">:</span> <span class="nx">activity</span><span class="p">.</span><span class="nx">comments</span> <span class="p">}</span> <span class="p">})</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">ActivitySchema</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="dl">"</span><span class="s2">findOneAndDelete</span><span class="dl">"</span><span class="p">,</span> <span class="k">async</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">activity</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">await</span> <span class="nx">Comment</span><span class="p">.</span><span class="nx">deleteMany</span><span class="p">({</span> <span class="na">_id</span><span class="p">:</span> <span class="p">{</span> <span class="na">$in</span><span class="p">:</span> <span class="nx">activity</span><span class="p">.</span><span class="nx">comments</span> <span class="p">}</span> <span class="p">})</span>
         <span class="p">}</span>
     <span class="p">});</span></code></pre></figure>
 
@@ -163,7 +163,7 @@
 
 <p>Since Mongoose wouldn’t automatically remove these references for me, I had to learn how to do it myself. So now when I delete a user in my <code class="language-plaintext highlighter-rouge">deleteAccount</code> controller, I call:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">updateMany</span><span class="p">(</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nx">updateMany</span><span class="p">(</span>
         <span class="p">{</span> <span class="na">users</span><span class="p">:</span> <span class="nx">user</span> <span class="p">},</span>
         <span class="p">{</span> <span class="na">$pull</span><span class="p">:</span> <span class="p">{</span> <span class="na">users</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">_id</span> <span class="p">}</span> <span class="p">}</span>
     <span class="p">);</span></code></pre></figure>
@@ -174,7 +174,7 @@
 
 <p>I spent an embarrassing amount of time searching how to perform this kind of logic with Mongoose’s findByIdAndUpdate method, but it was worth it in the end because I learned about Mongo’s <code class="language-plaintext highlighter-rouge">$addToSet</code> operator, which does exactly what I wanted:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nf">findByIdAndUpdate</span><span class="p">(</span><span class="nx">householdId</span><span class="p">,</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="k">await</span> <span class="nx">Household</span><span class="p">.</span><span class="nx">findByIdAndUpdate</span><span class="p">(</span><span class="nx">householdId</span><span class="p">,</span>
         <span class="p">{</span>
             <span class="na">$addToSet</span><span class="p">:</span> <span class="p">{</span> <span class="na">pendingRequests</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span> <span class="p">}</span>
         <span class="p">}</span>
@@ -182,17 +182,17 @@
 
 <p>One last thing that’s not exactly about Mongoose, but about a Mongoose plugin. For authentication, I used <code class="language-plaintext highlighter-rouge">passport</code> in conjunction with <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code>. What the last package does is it adds a number of methods to your <code class="language-plaintext highlighter-rouge">User</code> model. You can use these methods to create and pass a strategy to <code class="language-plaintext highlighter-rouge">passport</code> like so:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nf">use</span><span class="p">(</span><span class="k">new</span> <span class="nc">LocalStrategy</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nf">authenticate</span><span class="p">()));</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="k">new</span> <span class="nx">LocalStrategy</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">()));</span></code></pre></figure>
 
 <p>(<code class="language-plaintext highlighter-rouge">LocalStrategy</code> comes from a further package called passport-local—more about it in a moment).</p>
 
 <p>However, I did not like the way <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code> handles authentication by default. It fetches the user by username. I didn’t like that. Fortunately, you can tell <code class="language-plaintext highlighter-rouge">passport-local-mongoose</code> to use email instead:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">UserSchema</span><span class="p">.</span><span class="nf">plugin</span><span class="p">(</span><span class="nx">passportLocalMongoose</span><span class="p">,</span> <span class="p">{</span> <span class="na">usernameField</span><span class="p">:</span> <span class="dl">"</span><span class="s2">email</span><span class="dl">"</span> <span class="p">});</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">UserSchema</span><span class="p">.</span><span class="nx">plugin</span><span class="p">(</span><span class="nx">passportLocalMongoose</span><span class="p">,</span> <span class="p">{</span> <span class="na">usernameField</span><span class="p">:</span> <span class="dl">"</span><span class="s2">email</span><span class="dl">"</span> <span class="p">});</span></code></pre></figure>
 
 <p>However, this is still not going to work—and this took me an embarrassingly long time to figure out. As I said, what this plug in does is add methods to your User model that you can then use to create and pass a strategy to passport. One of those methods is .authenticate, which works just fine if you’re happy with the way passport-local-mongoose handles authentication by default. But if you want it to use email instead (like I told it to above), you need to use a different method called <code class="language-plaintext highlighter-rouge">.authenticate</code> like so:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nf">use</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nf">createStrategy</span><span class="p">());</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">passport</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nx">createStrategy</span><span class="p">());</span></code></pre></figure>
 
 <p>Notice I am no longer relying on <code class="language-plaintext highlighter-rouge">LocalStrategy</code>, which means I no longer need to require <code class="language-plaintext highlighter-rouge">passport-local</code>.</p>
 
