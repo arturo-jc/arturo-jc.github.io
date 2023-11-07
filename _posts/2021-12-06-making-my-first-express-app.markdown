@@ -138,9 +138,9 @@ Since Mongoose wouldn’t automatically remove these references for me, I had to
 
 In a StackOverFlow thread, someone suggested to use Mongoose middleware for this purpose. However, I ran into circularity issues when I tried this approach (I was requesting two models into each other and using them to define each other). For all I know, it may be possible to get around this problem, but I didn’t keep trying as I was satisfied with the solution above.
 
-The last Mongoose thing I learned was this. In my app, a user can request to join a household. When a user makes a request, I want to push the user into the household’s pendingRequests field, but *only if the user is not already in the field in question* (no point adding them twice over!)
+The last Mongoose thing I learned was this. In my app, a user can request to join a household. When a user makes a request, I want to push the user into the household’s `pendingRequests` field, but *only if the user is not already in the field in question* (no point adding them twice over!)
 
-I spent an embarrassing amount of time searching how to perform this kind of logic with Mongoose’s findByIdAndUpdate method, but it was worth it in the end because I learned about Mongo’s `$addToSet` operator, which does exactly what I wanted:
+I spent an embarrassing amount of time searching how to perform this kind of logic with Mongoose’s `findByIdAndUpdate` method, but it was worth it in the end because I learned about Mongo’s `$addToSet` operator, which does exactly what I wanted:
 
 {% highlight javascript %}
     await Household.findByIdAndUpdate(householdId,
@@ -156,7 +156,7 @@ One last thing that’s not exactly about Mongoose, but about a Mongoose plugin.
     passport.use(new LocalStrategy(User.authenticate()));
 {% endhighlight %}
 
-(`LocalStrategy` comes from a further package called passport-local—more about it in a moment).
+(`LocalStrategy` comes from a further package called `passport-local`—more about it in a moment).
 
 However, I did not like the way `passport-local-mongoose` handles authentication by default. It fetches the user by username. I didn’t like that. Fortunately, you can tell `passport-local-mongoose` to use email instead:
 
@@ -164,7 +164,7 @@ However, I did not like the way `passport-local-mongoose` handles authentication
     UserSchema.plugin(passportLocalMongoose, { usernameField: "email" });
 {% endhighlight %}
 
-However, this is still not going to work—and this took me an embarrassingly long time to figure out. As I said, what this plug in does is add methods to your User model that you can then use to create and pass a strategy to passport. One of those methods is .authenticate, which works just fine if you’re happy with the way passport-local-mongoose handles authentication by default. But if you want it to use email instead (like I told it to above), you need to use a different method called `.authenticate` like so:
+However, this is still not going to work—and this took me an embarrassingly long time to figure out. As I said, what this plug in does is add methods to your User model that you can then use to create and pass a strategy to passport. One of those methods is .authenticate, which works just fine if you’re happy with the way `passport-local-mongoose` handles authentication by default. But if you want it to use email instead (like I told it to above), you need to use a different method called `.authenticate` like so:
 
 {% highlight javascript %}
     passport.use(User.createStrategy());

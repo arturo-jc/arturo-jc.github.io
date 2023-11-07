@@ -13,16 +13,25 @@
     grid-column: center-start / center-end;
   }
 
+  &__title {
+    color: var(--color-brown);
+    font-family: 'Merriweather', serif;
+    font-weight: 400;
+    font-size: 4rem;
+    line-height: 1.4;
+    letter-spacing: -1px;
+  }
+
   &__content{
     grid-column: center-start / center-end;
 
     h2 {
-      margin-top: 2rem;
+      margin: 3rem 0 1.5rem 0;
       font-family: 'Roboto', sans-serif;
       text-transform: uppercase;
       font-weight: 400;
       letter-spacing: 3px;
-      font-size: 3rem;
+      font-size: 2.8rem;
     }
 
     p {
@@ -32,5 +41,16 @@
     ul {
       padding-left: 3rem;
     }
+  }
+
+  .highlight {
+    /* Terminal-like container styles */
+    background-color: #2d2d2d; /* Dark background for terminal-like look */
+    color: #f8f8f2;           /* Light text color for visibility */
+    padding: 1em;              /* Some padding around the text */
+    border-radius: 4px;        /* Optional: rounded corners */
+    margin: 5rem 0;             /* Space out from regular content */
+    overflow-x: auto;          /* Allows for horizontal scrolling if needed */
+    font-size: var(--small-font-size);
   }
 }
