@@ -22,6 +22,11 @@
     letter-spacing: -1px;
   }
 
+  &__details {
+    display: flex;
+    gap: 2rem;
+  }
+
   &__content{
     grid-column: center-start / center-end;
 
@@ -41,6 +46,10 @@
     ul {
       padding-left: 3rem;
     }
+  }
+
+  &__comments {
+    grid-column: center-start / center-end;
   }
 
   .highlight {

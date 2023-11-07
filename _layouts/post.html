@@ -1,5 +1,6 @@
 ---
 layout: default
+comments: true
 ---
 
 <main class="post">
@@ -9,12 +10,36 @@ layout: default
     </div>
     <div class="post__heading">
       <h3 class="post__title">{{ page.title }}</h3>
-      <span>
-        {{ page.date | date: "%b %d, %Y" }}
-      </span>
+      <div class="post__details">
+        <span>
+          {{ page.date | date: "%b %d, %Y" }}
+        </span>
+        <span><a href="#disqus_thread">Post a comment</a></span>
+      </div>
     </div>
     <div class="post__content">
       {{ content }}
+    </div>
+    <div class="post__comments">
+      <div id="disqus_thread"></div>
+      <script>
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+          /*
+            */
+          var disqus_config = function () {
+            this.page.url = "{{ site.url }}{{ page.url }}";  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = "{{ page.id }}"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://https-arturojc-com.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
   </div>
 </main>
