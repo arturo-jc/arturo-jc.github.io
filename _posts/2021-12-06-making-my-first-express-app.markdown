@@ -4,6 +4,13 @@ title:  "Making my first Express app"
 date:   2021-12-06 16:04:39 -0600
 categories: express
 excerpt: Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the results...
+toc:
+    - title: "Express"
+      id: "express"
+    - title: "EJS"
+      id: "ejs"
+    - title: "Mongoose"
+      id: "mongoose"
 ---
 
 Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the [results](https://tidybuddy.herokuapp.com/), and here's the [repository](https://github.com/arturo-jc/TidyBuddy)

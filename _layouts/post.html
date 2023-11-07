@@ -9,14 +9,22 @@ comments: true
       <a href="/blog"><< All posts</a>
     </div>
     <div class="post__heading">
-      <h3 class="post__title">{{ page.title }}</h3>
-      <div class="post__details">
-        <span>
-          {{ page.date | date: "%b %d, %Y" }}
-        </span>
-        <span><a href="#disqus_thread">Post a comment</a></span>
-      </div>
+      <h1 id="post-title" class="post__title">{{ page.title }}</h1>
+      <span>
+        {{ page.date | date: "%b %d, %Y" }}
+      </span>
     </div>
+    {% if page.toc %}
+      <nav class="post__toc" style="opacity: 0;">
+        <ol>
+          <li><a class="post__toc-item" href="#post-title">{{ page.title }}</a></li>
+          {% for item in page.toc %}
+          <li><a class="post__toc-item" class="" href="#{{ item.id }}">{{ item.title }}</a></li>
+          {% endfor %}
+          <li><a class="post__toc-item" href="#disqus_thread">Comments</a></li>
+        </ol>
+      </nav>
+    {% endif %}
     <div class="post__content">
       {{ content }}
     </div>
@@ -43,3 +51,6 @@ comments: true
     </div>
   </div>
 </main>
+{% if page.toc %}
+  <script src="/js/toc.js"></script>
+{% endif %}

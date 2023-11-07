@@ -43,7 +43,7 @@ menu.addEventListener("click", () => {
 // HIDE NAVBAR UPON ARRIVING AT A SECTION
 
 let autoscroll = false;
-const menu_links = document.querySelectorAll(".navbar__link");
+const menu_links = document.querySelectorAll(".navbar__link, .post__toc-item");
 for (let link of menu_links){
     link.addEventListener("click", ()=> {
         autoscroll = true;

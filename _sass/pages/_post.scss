@@ -22,11 +22,6 @@
     letter-spacing: -1px;
   }
 
-  &__details {
-    display: flex;
-    gap: 2rem;
-  }
-
   &__content{
     grid-column: center-start / center-end;
 
@@ -45,6 +40,38 @@
 
     ul {
       padding-left: 3rem;
+    }
+  }
+
+  &__toc {
+    grid-column: 1 / center-start;
+    position: sticky;
+    top: 50vh;
+    transform: translateY(-50%);
+    align-self: start;
+
+    a {
+      transition: all 50ms ease-in-out;
+      opacity: .8;
+      color: var(--color-brown);
+
+      &:hover {
+        color: var(--color-red);
+      }
+    }
+
+    li {
+      list-style-type: none;
+      font-size: var(--small-font-size);
+    }
+
+    @media only screen and (max-width: $bp-md) {
+      display: none;
+    }
+
+    .active a {
+      opacity: 1;
+      color: var(--color-red);
     }
   }
 
