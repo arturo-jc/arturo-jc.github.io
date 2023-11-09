@@ -4,6 +4,7 @@ title:  "Making my first Express app"
 date:   2021-12-06 16:04:39 -0600
 categories: express
 excerpt: Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the results...
+titleInToc: true
 toc:
     - title: "Express"
       id: "express"

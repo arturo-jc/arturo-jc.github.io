@@ -17,7 +17,9 @@ comments: true
     {% if page.toc %}
       <nav class="post__toc" style="opacity: 0;">
         <ol>
-          <li><a class="post__toc-item" href="#post-title">{{ page.title }}</a></li>
+          {% if page.titleInToc %}
+            <li><a class="post__toc-item" href="#post-title">{{ page.title }}</a></li>
+          {% endif %}
           {% for item in page.toc %}
           <li><a class="post__toc-item" class="" href="#{{ item.id }}">{{ item.title }}</a></li>
           {% endfor %}

@@ -6,10 +6,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const id = entry.target.getAttribute('id');
 
+      const el = document.querySelector(`.post__toc-item[href="#${id}"]`);
+
+      if (!el) { return ; }
+
       if (entry.intersectionRatio > 0) {
-        document.querySelector(`.post__toc-item[href="#${id}"]`).parentElement.classList.add('active');
+        el.parentElement.classList.add('active');
       } else {
-        document.querySelector(`.post__toc-item[href="#${id}"]`).parentElement.classList.remove('active');
+        el.parentElement.classList.remove('active');
       }
 
     });

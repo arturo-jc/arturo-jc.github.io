@@ -4,6 +4,7 @@ title:  "Making my first React app"
 date:   2022-01-06 16:04:39 -0600
 categories: react
 excerpt: As I mentioned in my previous post, my plan for teaching myself web development is to build a largeish project after each course I complete. The last course I completed was Brad Traversy’s React Front to Back, and so around three weeks or four ago, I set out to build my first React app. Here are the results...
+titleInToc: true
 toc:
     - title: "The Big Picture"
       id: "the-big-picture"
