@@ -2,7 +2,9 @@
 
 ## Live link
 
-https://arturojc.com/
+https://arturojc.dev/
+
+Also served at https://arturo-jc.github.io/
 
 ## About
 

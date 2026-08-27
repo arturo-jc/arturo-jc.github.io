@@ -23,7 +23,7 @@ email: a.javier.castellanos@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Personal website of Arturo Javier Castellanos.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://arturojc.com/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://arturojc.dev" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  arturo-jc
 
 highlighter: rouge
