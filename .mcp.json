@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "namecheap": {
+      "type": "http",
+      "url": "https://mcp.namecheap.com/mcp"
+    }
+  }
+}
