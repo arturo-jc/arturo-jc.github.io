@@ -5,10 +5,10 @@ import { P, bundle, cut, wire, f } from '../kit.js';
 // accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
 // west under the name to U2; three leave its right side, below J1's bus, and go down the copy's right and under it.
 const wide = {
-  cols: 107, name: { x: 6, y: 6, size: 60 }, text: { x: 54, y: 21, w: 36 },
+  cols: 107, seats: { name: { x: 6, y: 6, size: 60 }, copy: { x: 54, y: 21, w: 36 } },
   build(m) {
-    const a = f(m.cap);                         // the accent's row; U1 and what hangs off it are placed from it
-    const vx = f(m.hx + 1.5);                   // the accent's via, just past the first line
+    const a = f(m.name.cap);                    // the accent's row; U1 and what hangs off it are placed from it
+    const vx = f(m.name.hx + 1.5);                 // the accent's via, just past the first line
     const wires = [], labels = [], parts = [];
     const u2 = { x0: 5.75, y0: a + 10, x1: 13.75, y1: a + 24 };
     const chips = [
@@ -23,7 +23,7 @@ const wide = {
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
     const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
-    const F = f(m.top + m.h + 5.3);             // the row of the trace nearest the copy's last line
+    const F = f(m.copy.bot + 5.3);             // the row of the trace nearest the copy's last line
     // the rail: east from U1's right side, down the copy's right and back under it, each stopping short on a via
     const Xr = 94;
     bundle([[74, a + 6], [Xr, a + 6], [Xr, F + 1], [50, F + 1]], 3, { 1: 3 * P }).forEach((w, k) => {
@@ -57,7 +57,7 @@ const wide = {
 // Narrow: J1 and U1 above the name, which is on three lines; the accent net comes down out of U1 and in
 // along the name's first line; three traces run down the left of the name and the copy and turn under it.
 const narrow = {
-  cols: 32, name: { x: 6, y: 14, size: 50 }, text: { x: 6, under: 2.2, w: 24 },
+  cols: 32, seats: { name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }) },
   build(m) {
     const chips = [
       { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
@@ -67,10 +67,10 @@ const narrow = {
     // J1 → U1, four wide
     wires.push(...bundle([[7.5, 2.5], [7.5, 6.5], [18, 6.5]], 4));
     // the accent net: down out of U1 and in along the name's first line, ending just past it
-    const ay = f(m.cap), vx = f(m.hx + 1.5);
+    const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
     wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
     // J1 → down the left of the name and the copy → under the copy; each stops short on a via
-    const under = f(m.top + m.h + 2);           // the row of the trace nearest the copy's last line
+    const under = f(m.copy.bot + 2);           // the row of the trace nearest the copy's last line
     bundle([[3, 2.5], [3, under + 1], [26, under + 1]], 3).forEach((w, i) => {
       const stop = [13, 19, 25][i];
       cut(w, 1, stop).end = 'via';
@@ -80,7 +80,7 @@ const narrow = {
 
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
-      { kind: 'R', x: 2, y: f(m.top + 0.32 * m.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.top + 0.64 * m.h), dir: 'v' },
+      { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },
     ];
     labels.push(
       { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },

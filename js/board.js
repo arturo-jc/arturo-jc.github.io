@@ -11,56 +11,56 @@ function baselineOf(el) {
   return y;
 }
 
-// What a layout cannot know in advance about its type, in cells from the board's top left: `top` is the
-// copy's top and `h` its height; `cap` is the row of the middle of the capitals of the heading's first line,
-// and `hx` the column where that line's last letter ends. The heading is the section's h1 or h2, and its
-// first line is its first span when it is set on several lines, each in a span.
-function measure(board, u) {
-  const box = board.getBoundingClientRect();
-  const copy = board.querySelector('.copy').getBoundingClientRect();
-  const heading = board.querySelector('h1, h2'), line = heading.querySelector('span') ?? heading;
+// What a layout cannot know in advance about a seated block, in cells from the board's top left: `top`, `bot`
+// and `h` are its box. A block with a heading also has `cap`, the row of the middle of the capitals of the
+// heading's first line, and `hx`, the column where that line's last letter ends. The heading is the block
+// itself when it is an h1 or h2, and otherwise its h3; its first line is its first span when it is set on
+// several lines, each in a span.
+function measure(el, box, u) {
+  const cell = px => px / u / P, r = el.getBoundingClientRect();
+  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height) };
+  const heading = el.matches('h1, h2') ? el : el.querySelector('h3');
+  if (!heading) return m;
+  const line = heading.querySelector('span') ?? heading;
   const word = document.createRange();
   word.selectNodeContents(line);
   const cv = document.createElement('canvas').getContext('2d');
   cv.font = `${getComputedStyle(heading).fontWeight} 1000px ${getComputedStyle(heading).fontFamily}`;
   const capHeight = cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(getComputedStyle(heading).fontSize);
-  return {
-    top: (copy.top - box.top) / u / P,
-    h: (board.querySelector('.copy > :last-child').getBoundingClientRect().bottom - copy.top) / u / P,
-    cap: (baselineOf(line) - capHeight / 2 - box.top) / u / P,
-    hx: (word.getBoundingClientRect().right - box.left) / u / P,
-  };
+  m.cap = cell(baselineOf(line) - capHeight / 2 - box.top);
+  m.hx = cell(word.getBoundingClientRect().right - box.left);
+  return m;
 }
 
-// A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, where the copy
-// sits in `text`, and `build(m)`, which returns the circuit; `m` is the type as measured by measure().
-// A section whose heading is set apart from its copy, as the name is, also gives the heading's seat and
-// size in `name`. The width here must match the media query in styles.css.
+// A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, a seat for each
+// block of type in `seats`, and `build(m)`, which returns the circuit. A seat is keyed by the block's
+// data-seat and gives the cell where its top left sits, its width `w` when it wraps, and its `size` in units
+// when the layout sets it, as it does for the name. A seat can be a function of the blocks seated before it,
+// so that one can sit under another. `m` is every block as measured by measure(), under the same keys.
+// The width here must match the media query in styles.css.
 const NARROW = matchMedia('(max-width: 1099px)');
 
 // Draw a section's circuit into its .board and seat the type in the space left for it.
 function drawBoard(board, layouts) {
   const l = NARROW.matches ? layouts.narrow : layouts.wide;
   const W = l.cols * P;
-  const copy = board.querySelector('.copy'), name = board.querySelector('.name');
   board.style.setProperty('--w', W);
   board.classList.add('drawn');
-  const u = board.getBoundingClientRect().width / W;
+  const box = board.getBoundingClientRect(), u = box.width / W;
   // While DevTools or the device toolbar opens or closes, the viewport is briefly 0 wide; every
   // measurement would divide by 0. Keep the old drawing; the next resize draws the new one.
   if (!u) return;
-  if (l.name) {
-    name.style.setProperty('--fs', l.name.size);
-    name.style.left = `${100 * l.name.x / l.cols}%`;
-    name.style.top = `calc(${l.name.y * P} * var(--u))`;
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-seat="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    if (s.size) el.style.setProperty('--fs', s.size);
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    m[key] = measure(el, box, u);
   }
-  // the copy's top is a row, or a number of rows under the name
-  const top = l.text.y ?? f((name.getBoundingClientRect().bottom - board.getBoundingClientRect().top) / u / P + l.text.under);
-  copy.style.left = `${100 * l.text.x / l.cols}%`;
-  copy.style.width = `${100 * l.text.w / l.cols}%`;
-  copy.style.top = `calc(${top * P} * var(--u))`;
 
-  const c = l.build(measure(board, u));
+  const c = l.build(m);
   const traces = [], ends = [];
   for (const w of c.wires) {
     traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);

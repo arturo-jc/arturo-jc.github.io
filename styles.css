@@ -15,29 +15,33 @@ html { background: var(--bg); }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
 main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
 
-/* A board is one section: a drawing, and the type sitting in the space the drawing leaves: the copy,
-   and in the first section the name. Without the script there is no drawing and the type is an ordinary column. */
+/* A board is one section: a drawing, and the type sitting in the space the drawing leaves. Each block of
+   type that a layout seats has a data-seat: the name and the copy in About, the heading and each project in
+   Projects. Without the script there is no drawing and the blocks are an ordinary column. */
 .board { position: relative; container-type: inline-size; }
-.board .name, .board .copy { max-width: 432px; margin: 0 auto; }
+.board [data-seat] { max-width: 432px; margin: 0 auto; }
 .board .name { margin-bottom: 28px; }
+.board h2[data-seat] { margin-top: 64px; margin-bottom: 24px; }
+.board .project { margin-bottom: 36px; }
 .board svg { display: block; width: 100%; height: auto; overflow: visible; }
 /* --u is one drawing unit, so the type scales with the drawing */
-.board.drawn .name, .board.drawn .copy { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
+.board.drawn [data-seat] { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
 /* Below this width a section draws its narrow layout: see NARROW in js/board.js, which must match.
    The narrow drawing grows with the screen up to 448px and is centred beyond that. */
 @media (max-width: 1099px) {
   main { padding: 20px 0 28px; }
   .board { max-width: 448px; margin: 0 auto; }
-  .board:not(.drawn) .name, .board:not(.drawn) .copy { padding: 0 24px; }
+  .board:not(.drawn) [data-seat] { padding: 0 24px; }
   .name span { display: block; }
 }
 
 /* The name is the page's heading. A layout sets its size in --fs. It is on two lines on a wide screen,
    Arturo / Javier-Castellanos, and on three on a narrow one, where each span is a line. */
-.name, .copy { --u: 1px; }
+[data-seat] { --u: 1px; }
 .name { font: 600 calc(var(--fs, 48) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
 .name span:first-child { display: block; }
-.copy h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; margin: 0 0 calc(30 * var(--u)); }
+/* A section's heading is seated on its own, apart from what it heads. */
+.board h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
 .copy p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0 0 calc(16 * var(--u)); }
 .copy p:last-child { margin-bottom: 0; }
 .copy .nb { white-space: nowrap; }
@@ -45,6 +49,10 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
           text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(3 * var(--u)); }
 .copy a:hover { color: var(--accent); }
 .copy a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* A project is its name, which links to its repo, its stack, and a paragraph. */
+.project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
+.project h3 a { text-underline-offset: calc(4 * var(--u)); }
+.project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
 
 /* the drawing */
 .t { fill: none; stroke: var(--trace); }
