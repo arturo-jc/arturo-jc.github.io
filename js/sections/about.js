@@ -2,10 +2,10 @@
 import { P, bundle, cut, wire, f } from '../kit.js';
 
 // Wide: the name upper left and the copy lower right. U1 sits level with the name's first line, so the
-// accent net is one straight run. A six-wide bus leaves U1 on a long diagonal between the two blocks and
-// splits at the bottom of it: three go west under the name to U2, three go down the copy's left and under it.
+// accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
+// west under the name to U2; three leave its right side, below J1's bus, and go down the copy's right and under it.
 const wide = {
-  cols: 107, name: { x: 6, y: 6, size: 60 }, text: { x: 58, y: 21, w: 36 },
+  cols: 107, name: { x: 6, y: 6, size: 60 }, text: { x: 54, y: 21, w: 36 },
   build(m) {
     const a = f(m.cap);                         // the accent's row; U1 and what hangs off it are placed from it
     const vx = f(m.hx + 1.5);                   // the accent's via, just past the first line
@@ -14,24 +14,24 @@ const wide = {
     const chips = [
       { id: 'U1', x0: 62, y0: a - 3, x1: 74, y1: a + 8, code: 'A0131', allPads: true },
       { id: 'U2', ...u2, code: 'C0412', pins: { l: [], r: [a + 12, a + 13, a + 14, a + 17, a + 20, a + 23], t: [], b: [] } },
-      { id: 'J1', conn: true, x0: 89.2, y0: 3, x1: 97.8, y1: 4.5, pins: { b: [90, 91, 92, 93, 94, 95, 96, 97] } },
+      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, pins: { b: [91, 92, 93, 94, 95] } },
     ];
     // the accent net: straight from U1 to the name
     wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via' }));
-    // J1 → U1, eight wide
-    wires.push(...bundle([[93.5, 4.5], [93.5, a + 2.5], [74, a + 2.5]], 8));
-    // The long diagonal: six traces leave U1 and turn 45° together. Both halves are sliced from one
-    // six-wide bundle, so they nest; the halves differ only in where they go after the diagonal.
+    // J1 → U1, five wide
+    wires.push(...bundle([[93, 4.5], [93, a + 1], [74, a + 1]], 5));
+    // The long diagonal: the far half of a six-wide bundle, which keeps it where it sat when all six ran it.
     const X = 49.5, yc = a + 4.5, Yd = yc + 10, shoulder = 96;
     const F = f(m.top + m.h + 2.2);             // the row of the trace nearest the copy's last line
-    // … three go down the copy's left and under it, each stopping short on a via
-    bundle([[62, yc], [X, yc], [X, F + 2.5], [86, F + 2.5]], 6, { 1: shoulder }).slice(0, 3).forEach((w, i) => {
-      const stop = [66, 74, 82][i];
+    // the rail: east from U1's right side, down the copy's right and back under it, each stopping short on a via
+    const Xr = 98;
+    bundle([[74, a + 6], [Xr, a + 6], [Xr, F + 1], [50, F + 1]], 3, { 1: 3 * P }).forEach((w, k) => {
+      const stop = [66, 74, 82][k];
       cut(w, 2, stop).end = 'via';
       wires.push(w);
-      labels.push({ k: 'net', x: stop + 0.9, y: w.pts[3][1] + 0.25, t: `A013${i + 1}` });
+      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[3][1] + 0.25, t: `A013${3 - k}`, a: 'end' });
     });
-    // … three carry on to the end of the diagonal and go west under the name → U2
+    // the diagonal, then west under the name → U2
     wires.push(...bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3));
     // U2 → three lamps → common return
     const lamps = [a + 17, a + 20, a + 23];
@@ -44,10 +44,10 @@ const wide = {
     parts.push({ kind: 'R', x: 42, y: a });
     // ref = silkscreen designators · net = wire codes
     labels.push(
-      { k: 'ref', x: 62, y: a - 4.1, t: 'U1' }, { k: 'ref', x: u2.x0, y: u2.y1 + 1.3, t: 'U2' }, { k: 'ref', x: 88.6, y: 4.75, t: 'J1', a: 'end' },
+      { k: 'ref', x: 62, y: a - 4.1, t: 'U1' }, { k: 'ref', x: u2.x0, y: u2.y1 + 1.3, t: 'U2' }, { k: 'ref', x: 89.6, y: 4.75, t: 'J1', a: 'end' },
       { k: 'ref', x: 42, y: a - 0.95, t: 'R4', a: 'middle' },
       { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true },
-      { k: 'net', x: 98.8, y: 8.3, t: 'D0 – D7' },
+      { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4' },
     );
     return { rows: f(F + 5), chips, wires, parts, labels };
   },
