@@ -20,8 +20,9 @@ const wide = {
     wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via' }));
     // J1 → U1, five wide
     wires.push(...bundle([[93, 4.5], [93, a + 1], [74, a + 1]], 5));
-    // The long diagonal: the far half of a six-wide bundle, which keeps it where it sat when all six ran it.
-    const X = 49.5, yc = a + 4.5, Yd = yc + 10, shoulder = 96;
+    // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
+    // six-wide bundle, centred on yc, so its traces land on those pads.
+    const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
     const F = f(m.top + m.h + 5.3);             // the row of the trace nearest the copy's last line
     // the rail: east from U1's right side, down the copy's right and back under it, each stopping short on a via
     const Xr = 94;
