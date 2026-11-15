@@ -12,18 +12,20 @@ const wide = {
     const vx = f(m.p1.hx + 1.5);                // the first accent's via, just past the name
     const wires = [], labels = [], parts = [];
     const chips = [
-      { id: 'U3', x0: 64, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
       { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
     ];
     // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
-    wires.push(wire([[64, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
     // U3 → down → the long diagonal between the rows → west into U4
     const drop = 5;                             // rows the bus runs straight down before the diagonal starts
-    wires.push(...bundle([[66, a1 + 8], [66, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    wires.push(...bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    // About's rail, picked up at the top edge in the same columns, into U3's top right pads
+    wires.push(...bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3));
     // U3 → two lamps hanging under it → common return
     const ly = a1 + 8;
-    wires.push(wire([[71, ly], [71, ly + 10], [81, ly + 10]], { legs: [0, 8, 0], end: 'via' }), wire([[75, ly], [75, ly + 10]]));
-    [71, 75].forEach((c, i) => {
+    wires.push(wire([[69, ly], [69, ly + 10], [79, ly + 10]], { legs: [0, 8, 0], end: 'via' }), wire([[73, ly], [73, ly + 10]]));
+    [69, 73].forEach((c, i) => {
       parts.push({ kind: 'R', x: c, y: ly + 3, dir: 'v' }, { kind: 'LED', x: c, y: ly + 6.8, dir: 'v', delay: [0, 1.3][i] });
       labels.push({ k: 'ref', x: c + 1.1, y: ly + 3.25, t: `R${7 + i}` }, { k: 'ref', x: c + 1.2, y: ly + 7.05, t: `D${4 + i}` });
     });
@@ -37,7 +39,7 @@ const wide = {
     parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
     // ref = silkscreen designators · net = wire codes
     labels.push(
-      { k: 'ref', x: 64, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
+      { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
       { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
       { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
     );

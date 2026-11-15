@@ -23,15 +23,11 @@ const wide = {
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
     const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
-    const F = f(m.copy.bot + 5.3);             // the row of the trace nearest the copy's last line
-    // the rail: east from U1's right side, down the copy's right and back under it, each stopping short on a via
+    const rows = f(m.copy.bot + 10.3);
+    // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
+    // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
-    bundle([[74, a + 6], [Xr, a + 6], [Xr, F + 1], [50, F + 1]], 3, { 1: 3 * P }).forEach((w, k) => {
-      const stop = [66, 74, 82][k];
-      cut(w, 2, stop).end = 'via';
-      wires.push(w);
-      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[3][1] + 0.25, t: `A013${3 - k}`, a: 'end' });
-    });
+    wires.push(...bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3));
     // the diagonal, then west under the name → U2
     wires.push(...bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3));
     // U2 → three lamps → common return
@@ -50,7 +46,7 @@ const wide = {
       { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true },
       { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4' },
     );
-    return { rows: f(F + 5), chips, wires, parts, labels };
+    return { rows, chips, wires, parts, labels };
   },
 };
 
