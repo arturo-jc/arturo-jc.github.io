@@ -32,6 +32,13 @@
   .board svg { display: block; width: 100%; height: auto; overflow: visible; }
   /* --u is one drawing unit, so the copy scales with the drawing */
   .board.drawn .copy { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
+  /* Below this width a section draws its narrow layout: see NARROW in the script, which must match.
+     The narrow drawing grows with the screen up to 448px and is centred beyond that. */
+  @media (max-width: 1099px) {
+    main { padding: 20px 0 28px; }
+    .board { max-width: 448px; margin: 0 auto; }
+    .board:not(.drawn) .copy { padding: 0 24px; }
+  }
 
   .copy { --u: 1px; }
   .copy h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; margin: 0 0 calc(30 * var(--u)); }
@@ -184,9 +191,45 @@ function part(p) {
   return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
 }
 
-// Draw a circuit into a .board and seat its copy in the space left for it.
-function drawBoard(board, c) {
-  const W = c.cols * P, H = c.rows * P;
+// What a layout cannot know in advance about its copy, in cells: `h` is the copy's height, `hw` the width
+// of the heading's word, and `cap` the distance from the copy's top to the middle of the heading's capitals.
+function measureCopy(copy, u) {
+  const top = copy.getBoundingClientRect().top;
+  const h2 = copy.querySelector('h2'), word = document.createRange();
+  word.selectNodeContents(h2);
+  const hw = word.getBoundingClientRect().width;
+  const probe = document.createElement('span');          // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  h2.append(probe);
+  const baseline = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  const cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${getComputedStyle(h2).fontWeight} 1000px ${getComputedStyle(h2).fontFamily}`;
+  const capHeight = cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(getComputedStyle(h2).fontSize);
+  return {
+    h: (copy.querySelector(':scope > :last-child').getBoundingClientRect().bottom - top) / u / P,
+    hw: hw / u / P,
+    cap: (baseline - capHeight / 2 - top) / u / P,
+  };
+}
+
+// A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, where the copy
+// sits in `text`, and `build(m)`, which returns the circuit; `m` is the copy as measured by measureCopy.
+const NARROW = matchMedia('(max-width: 1099px)');
+
+// Draw a section's circuit into its .board and seat the copy in the space left for it.
+function drawBoard(board, layouts) {
+  const l = NARROW.matches ? layouts.narrow : layouts.wide;
+  const W = l.cols * P;
+  const copy = board.querySelector('.copy');
+  board.querySelector('svg')?.remove();
+  board.style.setProperty('--w', W);
+  copy.style.left = `${100 * l.text.x / l.cols}%`;
+  copy.style.width = `${100 * l.text.w / l.cols}%`;
+  copy.style.top = `calc(${l.text.y * P} * var(--u))`;
+  board.classList.add('drawn');
+
+  const c = l.build(measureCopy(copy, board.getBoundingClientRect().width / W));
   const traces = [], ends = [];
   for (const w of c.wires) {
     traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
@@ -195,21 +238,25 @@ function drawBoard(board, c) {
   }
   const labels = c.labels.map(l =>
     `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
-  board.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">
+  board.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${f(c.rows * P)}" aria-hidden="true">
     <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
     <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
-  const copy = board.querySelector('.copy');
-  board.style.setProperty('--w', W);
-  copy.style.left = `${100 * c.text.x / c.cols}%`;
-  copy.style.top = `${100 * c.text.y / c.rows}%`;
-  copy.style.width = `${100 * c.text.w / c.cols}%`;
-  board.classList.add('drawn');
+}
+
+// Draw a section, and again whenever its width changes or the fonts arrive: the copy wraps
+// differently at another width or in another face, and the narrow layout is built round its height.
+function mountBoard(board, layouts) {
+  let drawnAt = 0;
+  const draw = () => { drawnAt = board.getBoundingClientRect().width; drawBoard(board, layouts); };
+  draw();
+  new ResizeObserver(() => { if (board.getBoundingClientRect().width !== drawnAt) draw(); }).observe(board);
+  document.fonts.ready.then(draw);
 }
 
 /* ===========================================================================
    About
    =========================================================================== */
-const about = (() => {
+const aboutWide = (() => {
   const chips = [
     { id: 'U1', x0: 22, y0: 23, x1: 32, y1: 37, code: 'A0131', allPads: true },
     { id: 'U2', x0: 10, y0: 42, x1: 18, y1: 52, code: 'C0412', pins: { l: [45, 49], r: [44, 47, 50], t: [], b: [] } },
@@ -271,10 +318,48 @@ const about = (() => {
     { k: 'net', x: 46.7, y: 14.6, t: 'A0130', o: true },
   ];
 
-  return { cols: 107, rows: 57, text: { x: 52, y: 14, w: 36 }, chips, wires, parts, labels };
+  return { cols: 107, text: { x: 52, y: 14, w: 36 }, build: () => ({ rows: 57, chips, wires, parts, labels }) };
 })();
 
-drawBoard(document.getElementById('about'), about);
+// Narrow: J1, U1 and the accent net above the copy; three traces down its left that turn under it.
+const aboutNarrow = {
+  cols: 32, text: { x: 6, y: 13, w: 24 },
+  build(m) {
+    const T = this.text.y;
+    const chips = [
+      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
+      { id: 'U1', x0: 18, y0: 4, x1: 27, y1: 11, code: 'A0131', allPads: true },
+    ];
+    const wires = [], labels = [];
+    // J1 → U1, four wide
+    wires.push(...bundle([[7.5, 2.5], [7.5, 7.5], [18, 7.5]], 4));
+    // the accent net: out of U1 and in along the heading's row, ending just past its word
+    const ay = f(T + m.cap), vx = f(this.text.x + m.hw + 1.5);
+    wires.push(wire([[24, 11], [24, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
+    // J1 → down the left of the copy → under it; each stops short on a via
+    const under = f(T + m.h + 2);              // the row of the trace nearest the copy's last line
+    bundle([[3, 2.5], [3, under + 1], [26, under + 1]], 3).forEach((w, i) => {
+      const stop = [13, 19, 25][i];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: stop + 0.9, y: under + i + 0.25, t: `A013${i + 1}` });
+    });
+
+    const parts = [
+      { kind: 'R', x: 20, y: ay },
+      { kind: 'R', x: 2, y: f(T + 0.32 * m.h), dir: 'v' }, { kind: 'C', x: 4, y: f(T + 0.64 * m.h), dir: 'v' },
+    ];
+    labels.push(
+      { k: 'ref', x: 18, y: 3.2, t: 'U1' }, { k: 'ref', x: 10.6, y: 2.1, t: 'J1' },
+      { k: 'ref', x: 20, y: ay - 0.95, t: 'R4', a: 'middle' },
+      { k: 'net', x: 9.8, y: 5, t: 'D0 – D3' },
+      { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true },
+    );
+    return { rows: under + 4, chips, wires, parts, labels };
+  },
+};
+
+mountBoard(document.getElementById('about'), { wide: aboutWide, narrow: aboutNarrow });
 </script>
 </body>
 </html>
