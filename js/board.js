@@ -46,6 +46,9 @@ function drawBoard(board, layouts) {
   board.style.setProperty('--w', W);
   board.classList.add('drawn');
   const u = board.getBoundingClientRect().width / W;
+  // While DevTools or the device toolbar opens or closes, the viewport is briefly 0 wide; every
+  // measurement would divide by 0. Keep the old drawing; the next resize draws the new one.
+  if (!u) return;
   if (l.name) {
     name.style.setProperty('--fs', l.name.size);
     name.style.left = `${100 * l.name.x / l.cols}%`;
