@@ -82,7 +82,8 @@ The site is static files with no build step. It holds two sections. About opens 
 1. In `index.html`, add a `<section class="board" id="articles">` holding an `<h2 data-seat="head">` and the content, in one block or several, each with a `data-seat`. Give a block of running text the class `copy`, which styles its paragraphs and links.
 2. Create `js/sections/articles.js`. It imports what it needs from `../kit.js` and ends with `export default { wide, narrow }`. `js/sections/projects.js` is the model for a section with a heading and several blocks.
 3. In `js/main.js`, import it and add it to `sections`, under the section's id.
-4. Add to `styles.css` only what the content needs that `.copy` does not style yet. A new kind of part goes in `js/kit.js`, beside `chip()` and `part()`.
+4. Give every link `target="_blank" rel="noopener"`, so it opens in a new tab, unless the user says otherwise for that link.
+5. Add to `styles.css` only what the content needs that `.copy` does not style yet. A new kind of part goes in `js/kit.js`, beside `chip()` and `part()`.
 
 ### How a section is drawn
 
