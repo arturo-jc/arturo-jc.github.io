@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 02 · About on a phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1680px; margin: 0 auto; padding: 0 20px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .phones { display: flex; flex-wrap: wrap; gap: 64px 22px; padding: 56px 0 0; align-items: flex-start; }
+  .spec { width: 390px; flex: none; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 22px; min-height: 206px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .stats { font: 400 11.5px/1.5 var(--mono); color: var(--muted); margin: 0; }
+  /* the phone: 390 CSS px wide; the tick marks roughly where the first screen ends */
+  .phone { position: relative; width: 390px; outline: 1px solid var(--rule); padding: 20px 0 28px; }
+  .phone::after { content: "fold"; position: absolute; right: 0; top: 664px; width: 12px; border-top: 1px dashed var(--muted);
+                  font: 400 9.5px/1 var(--mono); color: var(--muted); text-indent: -28px; line-height: 0; }
+  .bench { padding: 88px 0 96px; }
+  .bench .cap { min-height: 0; max-width: 760px; }
+  .mixer { display: flex; flex-wrap: wrap; gap: 14px 26px; margin: 0 0 28px; }
+  .mixer fieldset { border: 0; padding: 0; margin: 0; }
+  .mixer legend { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 7px; }
+  .mixer .seg { display: inline-flex; border: 1px solid #25608a; border-radius: 4px; overflow: hidden; }
+  .mixer label { font: 400 12.5px/1 var(--mono); padding: 7px 10px; cursor: pointer; color: #c5d9e6; border-left: 1px solid #25608a; }
+  .mixer label:first-of-type { border-left: 0; }
+  .mixer input { position: absolute; opacity: 0; pointer-events: none; }
+  .mixer input:checked + label { background: var(--trace); color: #04202f; }
+  .mixer input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* ---- the designs: same rules as index.html ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .board .copy { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .copy h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; margin: 0 0 calc(30 * var(--u)); }
+  .copy p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0 0 calc(16 * var(--u)); }
+  .copy a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+            text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(3 * var(--u)); }
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 02</div>
+    <h1>About on a phone: where does the circuit go when there is no room beside the copy?</h1>
+    <p>Four versions of the About section at <b>390 px wide</b>. The copy, the type, the palette, the trace weight and the pitch are the same in all four, and the same as on the desktop page: one drawing unit is about one pixel here, so body text is 16.8 px. The orange net is also fixed: it leaves U1 and runs in along the heading's own row.</p>
+    <p>What changes is <b>how much circuit there is, and where</b>: above the copy, below it, and down its left side. Each option is built from three switches, and the bench at the bottom lets you set them yourself. The dashed tick on each one's right edge marks the fold: roughly where a phone's first screen ends.</p>
+  </header>
+  <main class="phones" id="specimens"></main>
+  <section class="bench" id="bench"></section>
+</div>
+
+<template id="copy">
+  <div class="copy">
+    <h2>About</h2>
+    <p>I am a software developer based in Winnipeg, Manitoba, with a background in academic philosophy. Over the course of my academic career, I developed a systematic, analytical approach to solving problems, which has served me well as a developer. You may find some of my <a href="#projects">projects below</a>.</p>
+    <p>I received my PhD from <a href="https://thecollege.syr.edu/philosophy/" target="_blank" rel="noopener">Syracuse University</a>, where I wrote a dissertation in the metaphysics of material objects. You may find my <a href="#research">publications below</a>.</p>
+  </div>
+</template>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from index.html. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+function bundle(center, n) {
+  const maxd = (n - 1) / 2;
+  const c0 = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];
+        legs.push(c0 + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${x - 4.8}" y="${y1 - 4.8}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${x}" cy="${y1}" r="4.9"/>`,
+             `<circle class="hole" cx="${x}" cy="${y1}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(Math.ceil(c.x0) + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+function svgOf(c) {
+  const W = c.cols * P, H = c.rows * P;
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(W)} ${f(H)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   About, on a 32-cell-wide board, from three switches:
+     top   'light' | 'heavy'            how much sits above the heading
+     rail  false | true                 three traces down the left of the copy
+     foot  'none' | 'lamps' | 'full'    what sits below the copy
+   The copy's height and the heading's width are measured, not assumed.
+   =========================================================================== */
+const COLS = 32;
+
+// where the copy sits; known before the copy is measured
+function seat(o) {
+  return { x: o.rail ? 6 : 2, w: o.rail ? 24 : 28, y: o.top === 'heavy' ? 17 : 13 };
+}
+
+// m.h = copy height, m.hw = width of the heading's word, m.cap = from the copy's top down to the middle
+// of the heading's capitals; all in cells
+function layout(o, m) {
+  const chips = [], wires = [], parts = [], labels = [];
+  const text = seat(o);
+  const heavy = o.top === 'heavy';
+  const T = text.y, uy = T - 9;                  // uy = top of U1
+
+  /* ---- above: J1 → bundle → U1, and the accent net from U1 to the heading ---- */
+  const n = heavy ? 6 : 4, half = (n - 1) / 2;
+  const jx = o.rail ? 7.5 : heavy ? 5.5 : 4.5;   // centreline of the J1 → U1 bundle
+  const jpins = o.rail ? rng(2, jx + half) : rng(jx - half, jx + half);
+  const jx1 = jpins[jpins.length - 1] + 1;
+  chips.push({ id: 'J1', conn: true, x0: jpins[0] - 1, y0: 1, x1: jx1, y1: 2.5, pins: { b: jpins } });
+  chips.push({ id: 'U1', x0: 18, y0: uy, x1: 27, y1: uy + 7, code: 'A0131', allPads: true });
+  wires.push(...bundle([[jx, 2.5], [jx, uy + 3.5], [18, uy + 3.5]], n));
+  labels.push({ k: 'ref', x: 18, y: uy - 0.8, t: 'U1' }, { k: 'ref', x: jx1 + 0.6, y: 2.1, t: 'J1' },
+              { k: 'net', x: jx + half + 0.8, y: heavy ? 6.5 : 5, t: `D0 – D${n - 1}` });
+
+  const ay = f(T + m.cap), vx = f(text.x + m.hw + 1.5);   // level with the middle of the heading's capitals
+  wires.push(wire([[24, uy + 7], [24, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
+  parts.push({ kind: 'R', x: 20, y: ay });
+  labels.push({ k: 'ref', x: 20, y: ay - 0.95, t: 'R4', a: 'middle' }, { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true });
+
+  if (heavy) {
+    // serpentine above U1, ending on a test point
+    wires.push(wire([[21, uy], [21, uy - 2], [29, uy - 2], [29, uy - 4], [14, uy - 4], [14, uy - 6], [27, uy - 6]], { end: 'via' }));
+    labels.push({ k: 'net', x: 27.9, y: uy - 5.75, t: 'TP1' });
+    // three outputs
+    [uy + 2, uy + 4, uy + 6].forEach(r => wires.push(wire([[27, r], [30, r]], { end: 'via' })));
+  }
+
+  /* ---- beside and below ---- */
+  const yb = f(T + m.h + 2);      // first row of traces under the copy
+  let under = null;               // the traces that run under the copy, nearest the copy first
+  let bottom = T + m.h;
+
+  if (o.rail) {
+    under = bundle([[3, 2.5], [3, yb + 1], [26, yb + 1]], 3);
+    parts.push({ kind: 'R', x: 2, y: f(T + 0.32 * m.h), dir: 'v' }, { kind: 'C', x: 4, y: f(T + 0.64 * m.h), dir: 'v' });
+  }
+  const lamps = o.foot !== 'none';
+  let y0 = 0;                     // top of U2
+  if (lamps) {
+    if (!under && o.foot === 'full') {
+      y0 = yb + 6;
+      under = bundle([[5.5, y0], [5.5, yb + 1.5], [26, yb + 1.5]], 4);
+    } else y0 = under ? yb + 5 : yb + 1;
+  }
+  if (under) {
+    const last = under.length - 1;
+    const stops = o.foot === 'full' ? (last === 3 ? [13, 19, 25] : [13, 21]) : [13, 19, 25];
+    stops.forEach((x, i) => {
+      cut(under[i], 1, x).end = 'via';
+      labels.push({ k: 'net', x: x + 0.9, y: under[i].pts[2][1] + 0.25, t: `A013${i + 1}` });
+    });
+    if (o.foot === 'full') {
+      // the lowest one turns down and bridges the three lamp lines
+      const w = cut(under[last], 1, 17);
+      w.legs[2] = 10; w.pts.push([17, y0 + 9.5]); w.legs.push(0);
+      w.hops = [{ seg: 2, at: [y0 + 1, y0 + 4, y0 + 7] }];
+      w.end = 'via';
+    }
+    wires.push(...under);
+    bottom = under[last].pts[1][1] + 1;
+  }
+  if (lamps) {
+    const rows = [y0 + 1, y0 + 4, y0 + 7];
+    chips.push({ id: 'U2', x0: 1.75, y0, x1: 9, y1: y0 + 8, code: 'C0412',
+                 pins: { l: [], r: rows, t: !o.rail && o.foot === 'full' ? [4, 5, 6, 7] : [], b: [] } });
+    wires.push(wire([[9, rows[0]], [26, rows[0]], [26, y0 + 9.5]], { legs: [0, 8, 0], end: 'via' }),
+               wire([[9, rows[1]], [26, rows[1]]]), wire([[9, rows[2]], [26, rows[2]]]));
+    rows.forEach((r, i) => {
+      parts.push({ kind: 'R', x: 13, y: r }, { kind: 'LED', x: 21.5, y: r, delay: [0, 1.3, 2.5][i] });
+      labels.push({ k: 'ref', x: 13, y: r - 0.95, t: `R${i + 1}`, a: 'middle' }, { k: 'ref', x: 21.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle' });
+    });
+    labels.push({ k: 'ref', x: 1.75, y: y0 - 0.8, t: 'U2' });
+    bottom = y0 + 10.5;
+  }
+  return { cols: COLS, rows: f(bottom + 1), text, chips, wires, parts, labels };
+}
+
+// cap height of the heading's face, as a fraction of its font size
+let CAP = 0.7;
+function measureCap() {
+  const cv = document.createElement('canvas').getContext('2d');
+  cv.font = '600 1000px "IBM Plex Sans"';
+  CAP = cv.measureText('H').actualBoundingBoxAscent / 1000;
+}
+
+// Seat the copy, measure it, then draw the circuit round it.
+function drawBoard(board, o) {
+  board.querySelector('svg')?.remove();
+  const copy = board.querySelector('.copy');
+  const text = seat(o), W = COLS * P;
+  board.style.setProperty('--w', W);
+  copy.style.left = `${100 * text.x / COLS}%`;
+  copy.style.width = `${100 * text.w / COLS}%`;
+  copy.style.top = `calc(${text.y * P} * var(--u))`;
+  const u = board.getBoundingClientRect().width / W;               // one drawing unit, in px
+  const top = copy.getBoundingClientRect().top;
+  const h2 = copy.querySelector('h2'), range = document.createRange();
+  range.selectNodeContents(h2);
+  const hw = range.getBoundingClientRect().width;
+  const probe = document.createElement('span');                    // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  h2.append(probe);
+  const baseline = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  const m = {
+    h: (copy.querySelector('p:last-of-type').getBoundingClientRect().bottom - top) / u / P,
+    hw: hw / u / P,
+    cap: (baseline - CAP * parseFloat(getComputedStyle(h2).fontSize) / 2 - top) / u / P,
+  };
+  const c = layout(o, m);
+  board.insertAdjacentHTML('afterbegin', svgOf(c));
+  return { headingPx: Math.round(text.y * P * u), heightPx: Math.round(c.rows * P * u), copyPx: Math.round(text.w * P * u) };
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const NAMES = {
+  top: { light: 'light', heavy: 'heavy' },
+  rail: { false: 'none', true: 'rail' },
+  foot: { none: 'none', lamps: 'lamps', full: 'lamps + bundle' },
+};
+const OPTIONS = [
+  { name: 'Light, above and below', top: 'light', rail: false, foot: 'lamps',
+    note: 'The copy has the full width. J1, a four-wide bundle and U1 open the section; the three lamps close it.' },
+  { name: 'Heavy, above and below', top: 'heavy', rail: false, foot: 'full',
+    note: 'The copy has the full width. The top gains a six-wide bundle, the serpentine and three outputs. The foot gains a bundle that stops short, and a trace bridging the lamp lines.' },
+  { name: 'Side rail', top: 'light', rail: true, foot: 'none',
+    note: 'Three traces leave J1, run down the left of the copy and turn under it, each stopping short. The copy is four cells narrower.' },
+  { name: 'Side rail and foot', top: 'light', rail: true, foot: 'full',
+    note: 'The same rail, and the lamps below it. The rail’s outer trace turns down and bridges the lamp lines.' },
+];
+
+const recipe = o => `<ul class="recipe">${['top', 'rail', 'foot'].map(k => `<li>${k === 'rail' ? 'side' : k} <b>${NAMES[k][o[k]]}</b></li>`).join('')}</ul>`;
+const stats = s => `heading at ${s.headingPx} px · section ${s.heightPx} px tall · copy ${s.copyPx} px wide`;
+const phone = () => `<div class="phone"><section class="board"></section></div>`;
+const copyTpl = document.getElementById('copy');
+
+const main = document.getElementById('specimens');
+OPTIONS.forEach((o, i) => main.insertAdjacentHTML('beforeend', `<section class="spec" id="opt-${'abcd'[i]}">
+  <div class="cap"><div class="num">Option ${'ABCD'[i]}</div><h2>${o.name}</h2><p>${o.note}</p>${recipe(o)}<p class="stats"></p></div>
+  ${phone()}</section>`));
+
+const mix = { top: 'heavy', rail: true, foot: 'lamps' };
+const bench = document.getElementById('bench');
+bench.innerHTML = `<div class="cap"><div class="num">Bench</div><h2>Mix your own</h2>
+  <p>The same three switches, for a combination that is not among the four.</p></div>
+  <form class="mixer">${['top', 'rail', 'foot'].map(k => `<fieldset><legend>${k === 'rail' ? 'side' : k}</legend><div class="seg">${
+    Object.entries(NAMES[k]).map(([v, txt]) => `<input type="radio" name="${k}" id="m-${k}-${v}" value="${v}"${String(mix[k]) === v ? ' checked' : ''}><label for="m-${k}-${v}">${txt}</label>`).join('')
+  }</div></fieldset>`).join('')}</form>
+  <div class="spec"><p class="stats" style="margin-bottom:14px"></p>${phone()}</div>`;
+
+document.querySelectorAll('.board').forEach(b => b.append(copyTpl.content.cloneNode(true)));
+
+function drawAll() {
+  measureCap();
+  OPTIONS.forEach((o, i) => {
+    const spec = document.getElementById(`opt-${'abcd'[i]}`);
+    spec.querySelector('.stats').textContent = stats(drawBoard(spec.querySelector('.board'), o));
+  });
+  drawMix();
+}
+function drawMix() {
+  bench.querySelector('.stats').textContent = stats(drawBoard(bench.querySelector('.board'), mix));
+}
+bench.querySelector('.mixer').addEventListener('change', e => {
+  const { name, value } = e.target;
+  mix[name] = name === 'rail' ? value === 'true' : value;
+  drawMix();
+});
+
+// the copy is measured, so the fonts have to be in first
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(drawAll);
+</script>
+</body>
+</html>
