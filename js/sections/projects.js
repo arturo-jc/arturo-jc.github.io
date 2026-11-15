@@ -6,7 +6,7 @@ import { P, bundle, cut, wire, f } from '../kit.js';
 // parallel to About's. Two lamps hang under U3; three traces leave U4 and stop down the left margin.
 const wide = {
   cols: 107,
-  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 64, y: f(m.p1.bot + 7), w: 36 }) },
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
   build(m) {
     const a1 = f(m.p1.cap), a2 = f(m.p2.cap);   // each accent's row; each chip is placed from its own
     const vx = f(m.p1.hx + 1.5);                // the first accent's via, just past the name
@@ -16,7 +16,7 @@ const wide = {
       { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
     ];
     // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
-    wires.push(wire([[64, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [62.5, a2]], { o: true, end: 'via' }));
+    wires.push(wire([[64, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
     // U3 → down → the long diagonal between the rows → west into U4
     const drop = 5;                             // rows the bus runs straight down before the diagonal starts
     wires.push(...bundle([[66, a1 + 8], [66, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
@@ -34,12 +34,12 @@ const wide = {
       wires.push(w);
       labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
     });
-    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 48, y: a2 });
+    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
     // ref = silkscreen designators · net = wire codes
     labels.push(
       { k: 'ref', x: 64, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
-      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 48, y: a2 - 0.95, t: 'R6', a: 'middle' },
-      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 62.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
     );
     return { rows: f(m.p2.bot + 4), chips, wires, parts, labels };
   },
