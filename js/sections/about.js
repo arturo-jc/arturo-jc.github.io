@@ -22,9 +22,9 @@ const wide = {
     wires.push(...bundle([[93, 4.5], [93, a + 1], [74, a + 1]], 5));
     // The long diagonal: the far half of a six-wide bundle, which keeps it where it sat when all six ran it.
     const X = 49.5, yc = a + 4.5, Yd = yc + 10, shoulder = 96;
-    const F = f(m.top + m.h + 2.2);             // the row of the trace nearest the copy's last line
+    const F = f(m.top + m.h + 5.3);             // the row of the trace nearest the copy's last line
     // the rail: east from U1's right side, down the copy's right and back under it, each stopping short on a via
-    const Xr = 98;
+    const Xr = 94;
     bundle([[74, a + 6], [Xr, a + 6], [Xr, F + 1], [50, F + 1]], 3, { 1: 3 * P }).forEach((w, k) => {
       const stop = [66, 74, 82][k];
       cut(w, 2, stop).end = 'via';
