@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 04 · Projects on a wide screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 56px 0 0; }
+  .spec:last-child { padding-bottom: 96px; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 40px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .stats { font: 400 11.5px/1.5 var(--mono); color: var(--muted); margin: 0; }
+
+  /* ---- the designs: same rules as styles.css, plus a project's name and stack ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* --u is one drawing unit, so the type scales with the drawing */
+  .board [data-b] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .board h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
+  .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
+  .project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); white-space: nowrap; }
+  .project p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0; }
+  .project .nb { white-space: nowrap; }
+  .project a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+               text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .project a:hover { color: var(--accent); }
+  .project a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 04</div>
+    <h1>Projects on a wide screen: side by side, in rows, or in one column?</h1>
+    <p>Three versions of the Projects section at desktop width. The heading, the two projects, their type, the column width, the palette, the pitch and the trace weight are the same in all three. The heading is set at the size the About heading had; a project is its name, its stack, and its paragraph, and the name is the link to the repo.</p>
+    <p>The orange net's job is the same in all three as well: it is one net, and it ends on a via beside <b>each project's name</b>, level with the middle of its capitals. What changes is <b>where the two projects sit</b>, and so where the circuit finds its room.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<template id="content">
+  <h2 data-b="head">Projects</h2>
+  <article class="project" data-b="p1">
+    <h3><a href="https://github.com/arturo-jc/hardly-working">Hardly Working</a></h3>
+    <p class="stack">Electron · Angular · NgRx · SQLite · Drizzle</p>
+    <p>Alongside my <span class="nb">full-time</span> job I work as a contractor, which means billing my hours. Most trackers either make you start and stop a timer, which is easy to forget when you juggle several projects, or watch which windows are active, which is invasive and says little when most of your work happens inside a terminal and a browser. Hardly Working does neither. You link a project to a repo and a few URLs, and it records your edits and commits, reads your visits from the browser's own history (no extension needed), and reconstructs your hours from them. Nothing ever leaves your machine.</p>
+  </article>
+  <article class="project" data-b="p2">
+    <h3><a href="https://github.com/arturo-jc/step-by-step-strength-public">Step by Step Strength</a></h3>
+    <p class="stack">Angular · Node.js · GraphQL · PostgreSQL · TypeORM</p>
+    <p>Step by Step Strength is a workout tracker for programs like Starting Strength, which alternate two workouts, A and B, three days a week. When I ran the program myself, the trackers I tried only supported weekly schedules, so a <span class="nb">Monday-Wednesday-Friday</span> plan repeated a workout across each weekend instead of alternating. SBSS supports schedules that span several weeks, so an <span class="nb">A-B-A,</span> <span class="nb">B-A-B</span> rotation is just a <span class="nb">two-week</span> schedule.</p>
+  </article>
+</template>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+// n parallel traces round an orthogonal centreline, nested at every corner.
+// big = { cornerIndex: cut } overrides the size of that corner's 45° cut. Two corners whose cuts add up
+// to the length of the segment between them make one straight diagonal with no step in it.
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   The three layouts. Each is { cols, seats, build(m) }:
+     seats  where each block's top left sits and, for a project, its width. A seat can be a
+            function of the blocks seated before it, so one project can sit under another.
+     build  returns the circuit. m holds each block as measured, in cells from the board's
+            top left: x, top, bot and h; cap, the middle of the capitals of its heading (the
+            project's name); and hx, the column where the heading's last letter ends.
+   =========================================================================== */
+const lampsDown = (cols, y, ret, n0, wires, parts, labels) => {   // lamps hanging under a chip, with a common return
+  wires.push(wire([[cols[0], y], [cols[0], y + 10], [ret, y + 10]], { legs: [0, 8, 0], end: 'via' }));
+  cols.slice(1).forEach(c => wires.push(wire([[c, y], [c, y + 10]])));
+  cols.forEach((c, i) => {
+    parts.push({ kind: 'R', x: c, y: y + 3, dir: 'v' }, { kind: 'LED', x: c, y: y + 6.8, dir: 'v', delay: [0, 1.3, 2.5][i] });
+    labels.push({ k: 'ref', x: c + 1.1, y: y + 3.25, t: `R${n0 + i}` }, { k: 'ref', x: c + 1.2, y: y + 7.05, t: `D${n0 + i}` });
+  });
+};
+
+/* A: side by side. U3 sits at the top of the gap, level with both names, so the accent net leaves it
+   both ways in a straight line. A bus comes down the gap and turns under the shorter project to U4. */
+const optA = {
+  cols: 107,
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: { x: 62, y: 12, w: 36 } },
+  build(m) {
+    const a = f(m.p1.cap), vx = f(m.p1.hx + 1.5);
+    const R = f(m.p2.bot + 3);                  // the row of the trace nearest the shorter project's last line
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U3', x0: 47, y0: a - 2, x1: 55, y1: a + 6, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 70, y0: R - 1, x1: 78, y1: R + 6, code: 'C0412', pins: { l: [R, R + 1, R + 2], r: [R + 1, R + 4], t: [], b: [] } },
+      { id: 'J2', conn: true, x0: 59.2, y0: 1.5, x1: 64.8, y1: 3, pins: { b: rng(60, 64) } },
+    ];
+    // the accent net: out of U3 both ways, to each name
+    wires.push(wire([[47, a], [vx, a]], { o: true, end: 'via' }), wire([[55, a], [60.5, a]], { o: true, end: 'via' }));
+    // J2 → U3, five wide
+    wires.push(...bundle([[62, 3], [62, 6.5], [51, 6.5], [51, a - 2]], 5));
+    // U3 → down the gap → under the shorter project → U4
+    wires.push(...bundle([[51, a + 6], [51, R + 1], [70, R + 1]], 3));
+    // U4 → two lamps → common return
+    wires.push(wire([[78, R + 1], [94, R + 1], [94, R + 6]], { legs: [0, 8, 0], end: 'via' }), wire([[78, R + 4], [94, R + 4]]));
+    [R + 1, R + 4].forEach((r, i) => {
+      parts.push({ kind: 'R', x: 83, y: r }, { kind: 'LED', x: 89, y: r, delay: [0, 1.3][i] });
+      labels.push({ k: 'ref', x: 83, y: r - 0.95, t: `R${6 + i}`, a: 'middle' }, { k: 'ref', x: 89, y: r - 1.05, t: `D${4 + i}`, a: 'middle' });
+    });
+    parts.push({ kind: 'R', x: 33, y: a });
+    labels.push(
+      { k: 'ref', x: 46.4, y: a - 2.2, t: 'U3', a: 'end' }, { k: 'ref', x: 70, y: R + 7.3, t: 'U4' }, { k: 'ref', x: 65.4, y: 3.25, t: 'J2' },
+      { k: 'ref', x: 33, y: a - 0.95, t: 'R5', a: 'middle' },
+      { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'B0221', o: true }, { k: 'net', x: 60.5, y: a - 0.95, t: 'B0222', o: true, a: 'end' },
+      { k: 'net', x: 53.6, y: a + 12, t: 'E01 – E03' },
+    );
+    return { rows: f(Math.max(m.p1.bot, R + 6) + 4), chips, wires, parts, labels };
+  },
+};
+
+/* B: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
+   accent run is straight. A bus leaves U3 downward and crosses to U4 on a long diagonal between the rows. */
+const optB = {
+  cols: 107,
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 64, y: f(m.p1.bot + 7), w: 36 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap), vx = f(m.p1.hx + 1.5);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U3', x0: 64, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
+    ];
+    // the accent net: straight from each chip to its project's name
+    wires.push(wire([[64, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [62.5, a2]], { o: true, end: 'via' }));
+    // U3 → down → the long diagonal between the rows → west into U4
+    const drop = 5;                             // rows the bus runs straight down before the diagonal starts
+    wires.push(...bundle([[66, a1 + 8], [66, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    // U3 → two lamps hanging under it
+    lampsDown([71, 75], a1 + 8, 81, 6, wires, parts, labels);
+    // U4 → west → down the left margin; each stops at a different height
+    bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3).forEach((w, k) => {
+      const stop = a2 + [10, 15, 20][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
+    });
+    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 48, y: a2 });
+    labels.push(
+      { k: 'ref', x: 64, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R4', a: 'middle' }, { k: 'ref', x: 48, y: a2 - 0.95, t: 'R5', a: 'middle' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 62.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
+    );
+    return { rows: f(m.p2.bot + 4), chips, wires, parts, labels };
+  },
+};
+
+/* C: one column, under where About's copy sits. A six-wide bus comes down the left margin from J2 and
+   half of it peels off to each project's chip. Each accent run ends just before the name, like a bullet. */
+const optC = {
+  cols: 107,
+  seats: { head: { x: 54, y: 4 }, p1: { x: 54, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 6), w: 36 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
+    const F = f(m.p2.bot + 3);                  // the row of the trace nearest the last line
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'J2', conn: true, x0: 8.2, y0: 3, x1: 14.8, y1: 4.5, pins: { b: rng(9, 14) } },
+      { id: 'U3', x0: 28, y0: a1 - 3, x1: 40, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 30, y0: a2 - 3, x1: 40, y1: a2 + 6, code: 'C0412', allPads: true },
+    ];
+    // the accent net: straight from each chip to just before its project's name
+    wires.push(wire([[40, a1], [52.5, a1]], { o: true, end: 'via' }), wire([[40, a2], [52.5, a2]], { o: true, end: 'via' }));
+    // J2 → down the left margin, six wide; the near half turns in to U3, the far half carries on to U4
+    wires.push(...bundle([[11.5, 4.5], [11.5, a1 + 5.5], [28, a1 + 5.5]], 6).slice(0, 3),
+               ...bundle([[11.5, 4.5], [11.5, a2 + 0.5], [30, a2 + 0.5]], 6).slice(3));
+    // U3 → three lamps hanging under it
+    lampsDown([30, 34, 38], a1 + 8, 42, 6, wires, parts, labels);
+    // U4 → down → under the last project; each stops short on a via
+    bundle([[35, a2 + 6], [35, F + 1], [80, F + 1]], 3).forEach((w, k) => {
+      const stop = [78, 70, 62][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: stop + 0.9, y: w.pts[2][1] + 0.25, t: `C041${k + 3}` });
+    });
+    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 46, y: a2 });
+    labels.push(
+      { k: 'ref', x: 15.4, y: 4.75, t: 'J2' }, { k: 'ref', x: 28, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 30, y: a2 - 4.1, t: 'U4' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R4', a: 'middle' }, { k: 'ref', x: 46, y: a2 - 0.95, t: 'R5', a: 'middle' },
+      { k: 'net', x: 15.6, y: 9, t: 'D0 – D5' },
+    );
+    return { rows: f(F + 5), chips, wires, parts, labels };
+  },
+};
+
+/* ===========================================================================
+   Seating and measuring. Each block is seated, then measured, in order; the circuit is
+   built from the measurements.
+   =========================================================================== */
+// the baseline of the line that `el` starts, in px
+function baselineOf(el) {
+  const probe = document.createElement('span');  // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+// cap height of a heading's face, in px: measured at 1000px, because at text size the canvas reports whole pixels
+function capHeightOf(heading) {
+  const cs = getComputedStyle(heading), cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${cs.fontWeight} 1000px ${cs.fontFamily}`;
+  return cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+}
+
+function drawBoard(board, l) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const box = board.getBoundingClientRect(), u = box.width / W;
+  const cell = px => f(px / u / P);
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-b="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : 'auto';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    const heading = el.matches('h2') ? el : el.querySelector('h3');
+    const word = document.createRange();
+    word.selectNodeContents(heading);
+    const r = el.getBoundingClientRect();
+    m[key] = {
+      x: s.x, top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height),
+      cap: cell(baselineOf(heading) - capHeightOf(heading) / 2 - box.top),
+      hx: cell(word.getBoundingClientRect().right - box.left),
+    };
+  }
+  const c = l.build(m);
+  board.insertAdjacentHTML('afterbegin', svgOf(l.cols, c));
+  return { m, heightPx: Math.round(c.rows * P * u), copyPx: Math.round(36 * P * u), bodyPx: (16.5 * u).toFixed(1) };
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const OPTIONS = [
+  { name: 'Pair', layout: optA,
+    note: 'The two projects side by side under the heading. One chip sits at the top of the gap between them, level with both names, and the orange net leaves it both ways. A bus comes down the gap and turns under Step by Step Strength, which is the shorter of the two, into a second chip and two lamps that take up the room it leaves. The shortest of the three.',
+    recipe: [['projects', 'side by side'], ['main chip', 'in the gap'], ['between the projects', 'a bus, top to bottom'], ['closes with', 'chip + lamps under the shorter one']] },
+  { name: 'Rows', layout: optB,
+    note: 'A row each, on alternate sides, carrying on the zigzag that the name and About start. Each project has its own chip beside it where a screenshot used to be, level with its name, so each orange run is straight. A bus drops out of the first chip and crosses to the second on a long diagonal between the rows, parallel to About’s.',
+    recipe: [['projects', 'a row each, alternating'], ['main chip', 'one beside each project'], ['between the projects', 'diagonal bus'], ['closes with', 'staggered tail down the left']] },
+  { name: 'Column', layout: optC,
+    note: 'Both projects in one column, under where About’s copy sits, with the heading at the top of it. A bus comes down the left margin from a connector and half of it peels off at each project into that project’s chip. Each orange run ends just before the name, so the two vias line up like bullets. The one that would take a third project without redrawing.',
+    recipe: [['projects', 'one column, stacked'], ['main chip', 'one beside each project'], ['between the projects', 'nothing: the bus is in the margin'], ['closes with', 'staggered tail under the last one']] },
+];
+
+const main = document.getElementById('specimens');
+const tpl = document.getElementById('content');
+OPTIONS.forEach((o, i) => {
+  main.insertAdjacentHTML('beforeend', `<section class="spec" id="opt-${'abc'[i]}">
+    <div class="cap"><div class="num">Option ${'ABC'[i]}</div><h2>${o.name}</h2><p>${o.note}</p>
+      <ul class="recipe">${o.recipe.map(([k, v]) => `<li>${k} <b>${v}</b></li>`).join('')}</ul><p class="stats"></p></div>
+    <section class="board"></section></section>`);
+  main.lastElementChild.querySelector('.board').append(tpl.content.cloneNode(true));
+});
+
+function drawAll() {
+  OPTIONS.forEach((o, i) => {
+    const spec = document.getElementById(`opt-${'abc'[i]}`);
+    const s = drawBoard(spec.querySelector('.board'), o.layout);
+    spec.querySelector('.stats').textContent = `section ${s.heightPx} px tall · columns ${s.copyPx} px wide · body text ${s.bodyPx} px`;
+  });
+}
+
+// everything is measured, so the fonts have to be in first; and again when the width changes
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
