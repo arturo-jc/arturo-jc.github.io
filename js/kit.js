@@ -9,12 +9,15 @@ const left = ([dx, dy]) => [dy, -dx];
 const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
 export const f = n => +n.toFixed(2);
 const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
 
 // n parallel traces round an orthogonal centreline, nested at every corner.
 // `legs` is each corner's 45° cut, sized so the diagonals of neighbours stay one pitch apart.
-export function bundle(center, n) {
+// `big` = { cornerIndex: units } sets the size of that corner's cut, which makes a long 45° run. Two corners
+// whose cuts add up to the length of the segment between them make one straight diagonal with no step in it.
+export function bundle(center, n, big = {}) {
   const maxd = (n - 1) / 2;
-  const c0 = 6 + 0.586 * maxd * P;
+  const std = 6 + 0.586 * maxd * P;
   const out = [];
   for (let k = 0; k < n; k++) {
     const d = maxd - k;                                     // k = 0 is leftmost of travel
@@ -26,7 +29,7 @@ export function bundle(center, n) {
       if (din && dout) {
         pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
         const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
-        legs.push(c0 + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
       } else {
         const nn = nin || nout;
         pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
@@ -74,27 +77,27 @@ export function tracePath(w) {
 
 export const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
 
+// A chip may sit on fractional cells, so that one of its pads lands on a measured row.
 export function chip(c) {
   const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
   const s = [];
   if (c.conn) {             // a pin header: through-hole pads in a silkscreen outline
     c.pins.b.forEach((col, i) => {
       const x = col * P;
-      s.push(i === 0 ? `<rect class="pad" x="${x - 4.8}" y="${y1 - 4.8}" width="9.6" height="9.6" rx="1"/>`
-                     : `<circle class="pad" cx="${x}" cy="${y1}" r="4.9"/>`,
-             `<circle class="hole" cx="${x}" cy="${y1}" r="1.9"/>`);
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
     });
     s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
     return s.join('');
   }
-  const rng = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
-  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${x0 - 11}" y="${r * P - 3.5}" width="15" height="7" rx="1"/>`));
-  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${x1 - 4}" y="${r * P - 3.5}" width="15" height="7" rx="1"/>`));
-  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${q * P - 3.5}" y="${y0 - 11}" width="7" height="15" rx="1"/>`));
-  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${q * P - 3.5}" y="${y1 - 4}" width="7" height="15" rx="1"/>`));
-  s.push(`<rect class="body" x="${x0 + 3}" y="${y0 + 3}" width="${w - 6}" height="${h - 6}" rx="2.5"/>`,
-         `<circle cx="${x0 + 13}" cy="${y0 + 13}" r="2.6" fill="var(--trace-dim)"/>`,
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
          `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
   return s.join('');
 }

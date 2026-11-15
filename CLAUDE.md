@@ -27,7 +27,7 @@ On a phone the copy fills the screen, so there is no floating column for the cir
 
 - **The scale.** 32 cells wide, at the same pitch, trace weight and type sizes as the wide layout, so that at 390px one unit is about one pixel and body text about 16.8px. It is never the wide drawing shrunk.
 - **Room for the copy.** The copy keeps at least 24 of the 32 cells. Circuit beside it goes on one side only, three traces at most.
-- **A short top.** About 12 rows above the heading, so the heading and the first lines of copy are on the first screen.
+- **A short top.** 12 to 14 rows above the heading, so the heading and the first lines of copy are on the first screen.
 - **The same circuit, pared down.** It is a reduction of the section's wide drawing, not a new one: the main chip, the accent net, and the same designators and codes. Most of the bundles and the outlying chips go.
 - **The accent net** still ends on a via beside the heading, level with the middle of its capitals.
 - **A beginning and an end.** Something sits above the heading and something past the last line.
@@ -35,7 +35,7 @@ On a phone the copy fills the screen, so there is no floating column for the cir
 
 ### What changes from one section to the next
 
-Sections stack on a phone, so one layout repeated down the page reads as a template. About's narrow layout is an example, not the pattern: J1 and U1 above, three traces down the left that turn under the copy and stop at staggered lengths, the accent net coming in from the right along the heading's row. The choices that are free:
+Sections stack on a phone, so one layout repeated down the page reads as a template. About's narrow layout is an example, not the pattern: J1 and U1 above, three traces down the left of the name and the copy that turn under the copy and stop at staggered lengths, the accent net coming down out of U1 and in from the right along the name's first line. The choices that are free:
 
 - **The rail's side:** left or right.
 - **Where the rail starts and ends:** from a connector or from a chip; ending by turning under the copy, by stopping short at staggered heights, or by running into a small part.
@@ -47,7 +47,7 @@ Before drawing a narrow layout, look at the narrow layouts of the sections direc
 
 **Decorative parts are optional.** Lamps, a serpentine or a bridge go in where the routing leads to them naturally. Do not bend a layout to fit one in; a narrow layout with no lamps is fine.
 
-These rules come from About, which is a heading and two paragraphs. A section whose content is a list, such as projects or articles, may need something they do not cover. Propose it rather than forcing the list into About's shape.
+These rules come from About, which is the name and two paragraphs. A section whose content is a list, such as projects or articles, may need something they do not cover. Propose it rather than forcing the list into About's shape.
 
 ## How design questions get settled
 
@@ -61,24 +61,24 @@ Studies double as a parts bin of working code:
 
 - `studies/01-board-vs-schematic.html` holds the other idioms: plain blocks, schematic symbols, right-angle routing, via crossings.
 - `studies/02-mobile-about.html` holds narrow-layout pieces that About does not use: a heavier top with a serpentine and outputs, a lamp cluster as a foot, a trace that turns down and bridges the lamp lines, and a full-width copy with no rail.
-- `studies/03-name-and-about.html` holds three wide layouts with the name as an `h1` seated apart from the copy, and what they needed: a second seat with per-line measurements, a copy whose top is found by levelling its first baseline with the name's, `bundle()`'s `big` option for a long 45° run, one bundle split in two by slicing it, and a chip placed on a measured row so a trace leaves it straight.
+- `studies/03-name-and-about.html` holds the two wide layouts for the name and About that the site does not use, both with the name on three lines: Riser, where a bus climbs between the name and the copy, crosses over the copy into a chip and comes back down its right and under it; and Cradle, where the chip sits under the gap with lamps hanging below it and only the accent net between the two blocks. It also holds a copy whose top is found by levelling its first baseline with the name's.
 
 ## The code
 
-The site is static files with no build step. It holds the About section only.
+The site is static files with no build step. It holds one section, About, which opens the page: the name, which is the page's `h1`, and the About copy.
 
 | File | What is in it |
 |---|---|
-| `index.html` | The markup: each section's `.board` and its `.copy`, in page order. |
-| `styles.css` | All the styles: the tokens, the page frame, the copy's type, the drawing's classes. |
+| `index.html` | The markup: each section's `.board` and its `.copy`, in page order. About's board also holds the `.name`. |
+| `styles.css` | All the styles: the tokens, the page frame, the name's and the copy's type, the drawing's classes. |
 | `js/kit.js` | What a layout is written with (`bundle`, `cut`, `wire`), and how a trace, chip, part or via becomes SVG. It does not touch the page. |
-| `js/board.js` | `mountBoard()`: seats and measures the copy, draws the layout, and redraws when the width changes. |
+| `js/board.js` | `mountBoard()`: seats and measures the type, draws the layout, and redraws when the width changes. |
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
 | `js/main.js` | The list of sections. It mounts each one on the `.board` with its id. |
 
 ### Adding a section
 
-1. In `index.html`, add a `<section class="board" id="projects">` holding a `<div class="copy">` with the content. The copy needs an `h2`, which `measureCopy()` measures.
+1. In `index.html`, add a `<section class="board" id="projects">` holding a `<div class="copy">` with the content. The copy needs an `h2`, which `measure()` measures.
 2. Create `js/sections/projects.js`. It imports what it needs from `../kit.js` and ends with `export default { wide, narrow }`. `js/sections/about.js` is the model.
 3. In `js/main.js`, import it and add it to `sections`, under the section's id.
 4. Add to `styles.css` only what the content needs that `.copy` does not style yet. A new kind of part goes in `js/kit.js`, beside `chip()` and `part()`.
@@ -87,12 +87,13 @@ The site is static files with no build step. It holds the About section only.
 
 - **Units.** Geometry is in grid cells; one cell is one trace pitch (`P` units). A section's drawing is a `cols` × `rows` grid.
 - **A section** is a `.board` element containing its `.copy`, mounted with `mountBoard(board, { wide, narrow })`. Without the scripts the copy is an ordinary column.
-- **A layout** is `{ cols, text, build(m) }`. `text` is the cell where the copy's top left sits and the copy's width. `drawBoard()` seats the copy there, measures it, and passes the measurements to `build(m)`, which returns the circuit and its `rows`. `m` is in cells: `m.h` is the copy's height, `m.hw` the width of the heading's word, `m.cap` the distance from the copy's top to the middle of the heading's capitals.
-- **About's narrow layout is built from `m`:** everything beside and below the copy hangs off `m.h`, and the accent net's row is `m.cap`. Build new layouts this way. About's wide layout ignores `m` and is placed by hand.
-- **`bundle(centreline, n)`** returns `n` parallel traces that nest correctly round every corner. Write the centreline with right-angle turns; the 45° cuts are computed. `cut()` ends a trace early. `wire()` is a single trace; `hops` marks where it bridges.
+- **About's heading is the name,** an `h1.name` beside the copy rather than an `h2` inside it, so that a layout can seat the two apart. Each of its three words is a span. `styles.css` sets it on two lines on a wide screen (Arturo / Javier-Castellanos) and on three on a narrow one, in the same media query that picks the layout.
+- **A layout** is `{ cols, text, build(m) }`, with a `name` as well in About. `text` is the cell where the copy's top left sits and the copy's width; in place of `y` it can give `under`, a number of rows below the name. `name` is the cell where the name's top left sits and its `size` in units. `drawBoard()` seats the type, measures it, and passes the measurements to `build(m)`, which returns the circuit and its `rows`. `m` is in cells from the board's top left: `m.top` is the copy's top and `m.h` its height, `m.cap` the row of the middle of the capitals of the heading's first line, `m.hx` the column where that line's last letter ends.
+- **About's layouts are built from `m`:** everything beside and below the copy hangs off `m.top` and `m.h`, and the accent net's row is `m.cap`. Build new layouts this way. In the wide layout U1 is placed from `m.cap` too, so that the accent net leaves its pad in a straight line; U1, and U2 and the bus that hang off it, therefore sit on fractional rows.
+- **`bundle(centreline, n)`** returns `n` parallel traces that nest correctly round every corner. Write the centreline with right-angle turns; the 45° cuts are computed. `cut()` ends a trace early. `wire()` is a single trace; `hops` marks where it bridges. A third argument, `{ cornerIndex: units }`, sets the size of a corner's cut and makes a long 45° run; two corners whose cuts add up to the length of the segment between them make one straight diagonal. To split a bus, build two bundles of the full width whose centrelines share their first corners and `slice()` a different half from each: About's wide layout does this at the bottom of its diagonal.
 - **Each layout is fixed** and scales as a whole, copy included. The narrow one is drawn below 1100px, grows with the screen up to 448px wide, and is centred beyond that, so a tablet gets the phone drawing with margins.
-- **The breakpoint is written twice** and the two must match: the `max-width: 1099px` media query in `styles.css` and `NARROW` in `js/board.js`.
-- **`mountBoard()` redraws** when the board's width changes and when the fonts arrive, because the copy wraps differently at another width or in another face. `build(m)` therefore runs many times: build fresh wires in it, or build them once outside it and never `cut()` them inside.
+- **The breakpoint is written twice** and the two must match: the `max-width: 1099px` media query in `styles.css`, which also sets the name's line breaks, and `NARROW` in `js/board.js`.
+- **`mountBoard()` redraws** when the board's width changes, when the page crosses the breakpoint and when the fonts arrive, because the copy wraps differently at another width or in another face. `build(m)` therefore runs many times: build fresh wires in it, or build them once outside it and never `cut()` them inside.
 
 ### Rules the drawing follows
 
@@ -102,14 +103,15 @@ The site is static files with no build step. It holds the About section only.
 
 ### Footguns
 
-- **About's wide layout does not know how tall the copy is.** Everything below and beside the copy is at a fixed row. Change the copy, its font or its size and the lower traces no longer sit where they should: move them, or rebuild that part from `m.h`. The copy is 335 units tall there, and the lower bundle's nearest trace is at row 44.
-- **Line the drawing up with the type by measuring, not by arithmetic.** The accent trace ends level with the middle of the heading's capitals, and working that out from font size and line height puts it in the wrong place. `measureCopy()` does the measuring and returns it as `m.cap`: a zero-size inline-block appended to the heading gives the baseline, and canvas `measureText('H').actualBoundingBoxAscent` gives the cap height. It measures the cap height at 1000px and scales it down, because at text size the canvas reports whole pixels. A measurement taken before the fonts arrive is of the fallback face.
+- **About's wide layout does not know how wide the name is or where U1 ends.** The diagonal passes about 3 cells from the end of the name's second line and about 3 from the copy's top left corner, and the copy's top is a fixed row, about 3 below U1's pads. Change the name's size or position and check all three; `X` and `shoulder` in `about.js` move the diagonal.
+- **Do not simplify how `drawBoard()` swaps the drawing.** It leaves the old `svg` in until the new one is built, because without it the page is shorter, a scrollbar can go, and the type is then measured at a width it is not shown at. Across the breakpoint it does the opposite and removes the old one first, because the other layout's drawing stretched to the new width can make the page tall enough to gain a scrollbar and fall back across the breakpoint.
+- **Line the drawing up with the type by measuring, not by arithmetic.** The accent trace ends level with the middle of the heading's capitals, and working that out from font size and line height puts it in the wrong place. `measure()` does the measuring and returns it as `m.cap`: a zero-size inline-block at the start of the heading's first line gives the baseline, and canvas `measureText('H').actualBoundingBoxAscent` gives the cap height. It measures the cap height at 1000px and scales it down, because at text size the canvas reports whole pixels. A measurement taken before the fonts arrive is of the fallback face.
 - **A bundle needs length between two corners.** Each corner's 45° cut is up to `6 + 0.586 × (n − 1) / 2 × P` units deep, and two corners share the segment between them. Give a 5-wide bundle at least 4 cells between turns and an 8-wide one at least 6. Shorter than that, the cuts are scaled down and the diagonals stop being parallel.
 - **An even-width bundle's centreline sits on half cells** (`10.5`), so that its traces land on whole cells and meet the pads. The first trace returned is the leftmost in the direction of travel.
 - **Parts and via holes are painted in the ground colour.** A resistor or lamp hides the trace under it with a `--bg` rectangle, and a via's hole is a `--bg` disc. Both break if the ground stops being one flat colour, and a part must sit on a straight run with nothing else passing under it.
 - **Near the copy's edge, align exactly or miss by a clear cell.** On the narrow grid most things sit close to the copy's left or right edge, and a 2px miss reads as a mistake. A chip's body is drawn 3 units inside its box and a connector's outline exactly on it, so a chip whose body should line up with copy at cell 2 has `x0: 1.75`.
 - **Labels collide silently.** A label character is about half a cell wide, and nothing checks a label against traces, parts or the copy. After adding or moving one, zoom in on the render.
-- **`--u` is defined on `.copy`, not `.board`.** It is built from a container-query unit, which resolves against an ancestor container, and `.board` is the container.
+- **`--u` is defined on `.name` and `.copy`, not `.board`.** It is built from a container-query unit, which resolves against an ancestor container, and `.board` is the container.
 - **The lamp halo's blur is in CSS pixels,** so unlike everything else it does not scale with the drawing.
 
 ### Looking at the page
@@ -119,7 +121,7 @@ Render the page and look at it; a description of the code is not evidence. The u
 - **The page has to be served.** The scripts are ES modules, which do not load from `file://`: opened that way, the page shows the copy and no drawing. The Chrome tools cannot open `file://` URLs either. Serve the directory and stop the server afterwards:
   `python3 -m http.server 8741 --bind 127.0.0.1` and `pkill -f "[h]ttp.server 8741"`. The brackets matter: without them `pkill -f` also matches the shell running it, and the rest of the command never runs.
 - **A section is taller than the screenshot.** Set `document.body.style.zoom` to fit it for an overview, then use the zoom action on bridges, labels and trace ends, where the problems are. Take measurements at zoom 1.
-- **Look at the narrow layout in iframes,** several widths side by side. On the served page, hide `main` and inject same-origin iframes of the page at 320, 390, 430 and 768px wide; media queries inside an iframe follow the iframe's width, and its `contentDocument` can be measured from outside. Check at each width that there is no horizontal scroll, that the accent via is level with the heading's cap middle, and that the gap under the copy's last line is the same. Then change one iframe's width across 1100px in both directions and check the drawing swaps.
+- **Look at the narrow layout in iframes,** several widths side by side. On the served page, hide `main` and inject same-origin iframes of the page at 320, 390, 430 and 768px wide; media queries inside an iframe follow the iframe's width, and its `contentDocument` can be measured from outside. Give each iframe `box-sizing: content-box` and more height than the page, or its border and a scrollbar come out of the width. Check at each width that there is no horizontal scroll, that the accent via is level with the heading's cap middle, and that the gap under the copy's last line is the same. Then change one iframe's width across 1100px in both directions and check the drawing swaps.
 - **Mood board images:** navigating a tab straight to an `i.pinimg.com` image hangs the screenshot tool, and `/originals/` URLs fail. Stay on the board page, read the pin image URLs from the DOM, swap `/236x/` for `/736x/`, and show the image in an element injected into that page.
 
 ## Facts and decoration
