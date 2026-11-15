@@ -61,6 +61,7 @@ Studies double as a parts bin of working code:
 
 - `studies/01-board-vs-schematic.html` holds the other idioms: plain blocks, schematic symbols, right-angle routing, via crossings.
 - `studies/02-mobile-about.html` holds narrow-layout pieces that About does not use: a heavier top with a serpentine and outputs, a lamp cluster as a foot, a trace that turns down and bridges the lamp lines, and a full-width copy with no rail.
+- `studies/03-name-and-about.html` holds three wide layouts with the name as an `h1` seated apart from the copy, and what they needed: a second seat with per-line measurements, a copy whose top is found by levelling its first baseline with the name's, `bundle()`'s `big` option for a long 45° run, one bundle split in two by slicing it, and a chip placed on a measured row so a trace leaves it straight.
 
 ## The code
 
