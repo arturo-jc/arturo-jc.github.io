@@ -23,7 +23,7 @@ const wide = {
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
     const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
-    const rows = f(m.copy.bot + 10.3);
+    const rows = f(m.copy.bot + 5);
     // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
     // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
