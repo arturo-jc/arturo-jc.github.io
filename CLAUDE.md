@@ -15,7 +15,7 @@ The drawing is a flat top-down view of a physical board, with two cues borrowed 
 - From the board: traces with weight that turn at 45°, chip footprints with pad rows, two-pad parts, vias at trace ends, silkscreen designators (`U1`, `R4`), and lamps that are lit and pulse slowly.
 - From the schematic: semicircular bridges where one trace crosses another, and wire codes (`A0131`).
 
-The palette is a dark blue ground, light blue traces and an orange accent; the tokens are in `:root` in `index.html`. Orange is for the one net that leads to the content, and for lit lamps. The mood board is https://ca.pinterest.com/arturojaviercastellanos/circuitboard-portfolio-mood-board/, and its US map is the main reference.
+The palette is a dark blue ground, light blue traces and an orange accent; the tokens are in `:root` in `styles.css`. Orange is for the one net that leads to the content, and for lit lamps. The mood board is https://ca.pinterest.com/arturojaviercastellanos/circuitboard-portfolio-mood-board/, and its US map is the main reference.
 
 ## Narrow screens
 
@@ -51,9 +51,9 @@ These rules come from About, which is a heading and two paragraphs. A section wh
 
 ## How design questions get settled
 
-When the user asks to settle a design question, build a **study**: a single page in `studies/` showing several options along one dimension, one after the other, with everything else held fixed so the choice is not biased by a font or a colour that happened to differ. The user picks, and the pick is built into `index.html`.
+When the user asks to settle a design question, build a **study**: a single page in `studies/` showing several options along one dimension, one after the other, with everything else held fixed so the choice is not biased by a font or a colour that happened to differ. The user picks, and the pick is built into the site.
 
-- Name studies `NN-question.html`. A study is self-contained and does not share code with `index.html`.
+- Name studies `NN-question.html`. A study is self-contained: one file, with its own copy of whatever it needs from `styles.css` and `js/`, and nothing imported from them.
 - Show only the part of the page the question is about. No header or navigation unless that is the question.
 - Building the options from one set of switches makes a "mix your own" panel at the bottom nearly free, and lets the user test a combination that is not among the options.
 
@@ -64,15 +64,33 @@ Studies double as a parts bin of working code:
 
 ## The code
 
-`index.html` is the whole site, with no build step. It holds the About section only.
+The site is static files with no build step. It holds the About section only.
+
+| File | What is in it |
+|---|---|
+| `index.html` | The markup: each section's `.board` and its `.copy`, in page order. |
+| `styles.css` | All the styles: the tokens, the page frame, the copy's type, the drawing's classes. |
+| `js/kit.js` | What a layout is written with (`bundle`, `cut`, `wire`), and how a trace, chip, part or via becomes SVG. It does not touch the page. |
+| `js/board.js` | `mountBoard()`: seats and measures the copy, draws the layout, and redraws when the width changes. |
+| `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
+| `js/main.js` | The list of sections. It mounts each one on the `.board` with its id. |
+
+### Adding a section
+
+1. In `index.html`, add a `<section class="board" id="projects">` holding a `<div class="copy">` with the content. The copy needs an `h2`, which `measureCopy()` measures.
+2. Create `js/sections/projects.js`. It imports what it needs from `../kit.js` and ends with `export default { wide, narrow }`. `js/sections/about.js` is the model.
+3. In `js/main.js`, import it and add it to `sections`, under the section's id.
+4. Add to `styles.css` only what the content needs that `.copy` does not style yet. A new kind of part goes in `js/kit.js`, beside `chip()` and `part()`.
+
+### How a section is drawn
 
 - **Units.** Geometry is in grid cells; one cell is one trace pitch (`P` units). A section's drawing is a `cols` × `rows` grid.
-- **A section** is a `.board` element containing its `.copy`, mounted with `mountBoard(board, { wide, narrow })`. Without the script the copy is an ordinary column.
+- **A section** is a `.board` element containing its `.copy`, mounted with `mountBoard(board, { wide, narrow })`. Without the scripts the copy is an ordinary column.
 - **A layout** is `{ cols, text, build(m) }`. `text` is the cell where the copy's top left sits and the copy's width. `drawBoard()` seats the copy there, measures it, and passes the measurements to `build(m)`, which returns the circuit and its `rows`. `m` is in cells: `m.h` is the copy's height, `m.hw` the width of the heading's word, `m.cap` the distance from the copy's top to the middle of the heading's capitals.
 - **About's narrow layout is built from `m`:** everything beside and below the copy hangs off `m.h`, and the accent net's row is `m.cap`. Build new layouts this way. About's wide layout ignores `m` and is placed by hand.
 - **`bundle(centreline, n)`** returns `n` parallel traces that nest correctly round every corner. Write the centreline with right-angle turns; the 45° cuts are computed. `cut()` ends a trace early. `wire()` is a single trace; `hops` marks where it bridges.
 - **Each layout is fixed** and scales as a whole, copy included. The narrow one is drawn below 1100px, grows with the screen up to 448px wide, and is centred beyond that, so a tablet gets the phone drawing with margins.
-- **The breakpoint is written twice** and the two must match: the `max-width: 1099px` media query in the CSS and `NARROW` in the script.
+- **The breakpoint is written twice** and the two must match: the `max-width: 1099px` media query in `styles.css` and `NARROW` in `js/board.js`.
 - **`mountBoard()` redraws** when the board's width changes and when the fonts arrive, because the copy wraps differently at another width or in another face. `build(m)` therefore runs many times: build fresh wires in it, or build them once outside it and never `cut()` them inside.
 
 ### Rules the drawing follows
@@ -97,7 +115,7 @@ Studies double as a parts bin of working code:
 
 Render the page and look at it; a description of the code is not evidence. The user notices misalignment and uneven spacing, so measure before reporting.
 
-- **The Chrome tools cannot open `file://` URLs.** Serve the directory and stop the server afterwards:
+- **The page has to be served.** The scripts are ES modules, which do not load from `file://`: opened that way, the page shows the copy and no drawing. The Chrome tools cannot open `file://` URLs either. Serve the directory and stop the server afterwards:
   `python3 -m http.server 8741 --bind 127.0.0.1` and `pkill -f "[h]ttp.server 8741"`. The brackets matter: without them `pkill -f` also matches the shell running it, and the rest of the command never runs.
 - **A section is taller than the screenshot.** Set `document.body.style.zoom` to fit it for an overview, then use the zoom action on bridges, labels and trace ends, where the problems are. Take measurements at zoom 1.
 - **Look at the narrow layout in iframes,** several widths side by side. On the served page, hide `main` and inject same-origin iframes of the page at 320, 390, 430 and 768px wide; media queries inside an iframe follow the iframe's width, and its `contentDocument` can be measured from outside. Check at each width that there is no horizontal scroll, that the accent via is level with the heading's cap middle, and that the gap under the copy's last line is the same. Then change one iframe's width across 1100px in both directions and check the drawing swaps.
@@ -109,7 +127,7 @@ Codes, designators and part values are texture and can be invented. Names, place
 
 ## Committing
 
-Commit without being asked after a significant batch of work: a section built, a study finished, a pick built into `index.html`.
+Commit without being asked after a significant batch of work: a section built, a study finished, a pick built into the site.
 
 Do not commit small adjustments made so the user can see how something looks, such as a font size, a colour or a spacing nudge. When the wording is exploratory ("let's try…", "what if…"), or the request is a vague tweak of the kind someone makes before they have made up their mind, leave it uncommitted. It goes into the next significant commit, or gets committed when the user says they are happy with it. When unsure which case applies, leave it uncommitted and say so.
 
