@@ -47,7 +47,7 @@ const wide = {
   },
 };
 
-// Narrow: U3 and its two lamps above the heading; three traces come down out of U3 on the right of the
+// Narrow: U3 above the heading, fed from above by About's rail; three traces come down out of U3 on the right of the
 // projects. The nearest is the accent net: it branches in along the first name's row and ends by turning in
 // along the second's. The other two carry on down to U4, under the last project, which closes the section.
 const narrow = {
@@ -67,21 +67,18 @@ const narrow = {
                wire([[28, a1], [v1, a1]], { o: true, end: 'via' }));
     // U3 → down the right of both projects → U4
     wires.push(wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]]));
-    // U3 → two lamps → common return
-    wires.push(wire([[22, 5], [7, 5], [7, 9.5]], { legs: [0, 8, 0], end: 'via' }), wire([[22, 8], [7, 8]]));
+    // About's rail, picked up at the top edge in the same columns, into U3's top pads
+    wires.push(...bundle([[24, 0], [24, 3]], 3));
     // U4 → two traces west, stopping short on vias
     [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
       wires.push(wire([[22, r], [stop, r]], { end: 'via' }));
       labels.push({ k: 'net', x: stop - 0.9, y: r + 0.25, t: `C041${i + 3}`, a: 'end' });
     });
     const parts = [
-      { kind: 'R', x: 17, y: 5 }, { kind: 'LED', x: 12, y: 5 }, { kind: 'R', x: 17, y: 8 }, { kind: 'LED', x: 12, y: 8, delay: 1.3 },
       { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v' },
     ];
     labels.push(
-      { k: 'ref', x: 22, y: 1.9, t: 'U3' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },
-      { k: 'ref', x: 17, y: 4.05, t: 'R7', a: 'middle' }, { k: 'ref', x: 12, y: 3.95, t: 'D4', a: 'middle' },
-      { k: 'ref', x: 17, y: 7.05, t: 'R8', a: 'middle' }, { k: 'ref', x: 12, y: 6.95, t: 'D5', a: 'middle' },
+      { k: 'ref', x: 31, y: 1.9, t: 'U3', a: 'end' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },
       { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: v2 + 0.9, y: a2 - 0.75, t: 'C0411', o: true },
     );
     return { rows: F + 9, chips, wires, parts, labels };

@@ -51,7 +51,8 @@ const wide = {
 };
 
 // Narrow: J1 and U1 above the name, which is on three lines; the accent net comes down out of U1 and in
-// along the name's first line; three traces run down the left of the name and the copy and turn under it.
+// along the name's first line; three traces run down the left of the name and the copy, turn under it and
+// drop into Projects' U3.
 const narrow = {
   cols: 32, seats: { name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }) },
   build(m) {
@@ -65,15 +66,12 @@ const narrow = {
     // the accent net: down out of U1 and in along the name's first line, ending just past it
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
     wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
-    // J1 → down the left of the name and the copy → under the copy; each stops short on a via
+    // J1 → down the left of the name and the copy → under the copy → down off the board's foot. Projects picks
+    // the three up at its top edge in the same columns and takes them into U3's top pads.
     const under = f(m.copy.bot + 2);           // the row of the trace nearest the copy's last line
-    bundle([[3, 2.5], [3, under + 1], [26, under + 1]], 3).forEach((w, i) => {
-      const stop = [13, 19, 25][i];
-      cut(w, 1, stop).end = 'via';
-      wires.push(w);
-      labels.push({ k: 'net', x: stop + 0.9, y: under + i + 0.25, t: `A013${i + 1}` });
-    });
-
+    const rows = under + 4;
+    wires.push(...bundle([[3, 2.5], [3, under + 1], [24, under + 1], [24, rows]], 3));
+    labels.push({ k: 'net', x: 6, y: under + 3.35, t: 'A0131 – A0133' });
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },
@@ -84,7 +82,7 @@ const narrow = {
       { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3' },
       { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true },
     );
-    return { rows: under + 4, chips, wires, parts, labels };
+    return { rows, chips, wires, parts, labels };
   },
 };
 
