@@ -67,11 +67,11 @@ const narrow = {
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
     wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
     // J1 → down the left of the name and the copy → under the copy → down off the board's foot. Projects picks
-    // the three up at its top edge in the same columns and takes them into U3's top pads.
+    // the three up at its top edge in the same columns and takes them into U3's top left-hand pads.
     const under = f(m.copy.bot + 2);           // the row of the trace nearest the copy's last line
     const rows = under + 4;
-    wires.push(...bundle([[3, 2.5], [3, under + 1], [24, under + 1], [24, rows]], 3));
-    labels.push({ k: 'net', x: 6, y: under + 3.35, t: 'A0131 – A0133' });
+    wires.push(...bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3));
+    labels.push({ k: 'net', x: 16, y: under + 3.35, t: 'A0131 – A0133' });
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },

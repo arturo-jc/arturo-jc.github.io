@@ -47,7 +47,7 @@ const wide = {
   },
 };
 
-// Narrow: U3 above the heading, fed from above by About's rail; three traces come down out of U3 on the right of the
+// Narrow: U3 above the heading, fed from its left by About's rail; three traces come down out of U3 on the right of the
 // projects. The nearest is the accent net: it branches in along the first name's row and ends by turning in
 // along the second's. The other two carry on down to U4, under the last project, which closes the section.
 const narrow = {
@@ -67,8 +67,8 @@ const narrow = {
                wire([[28, a1], [v1, a1]], { o: true, end: 'via' }));
     // U3 → down the right of both projects → U4
     wires.push(wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]]));
-    // About's rail, picked up at the top edge in the same columns, into U3's top pads
-    wires.push(...bundle([[24, 0], [24, 3]], 3));
+    // About's rail, picked up at the top edge in the same columns, east into U3's top left-hand pads
+    wires.push(...bundle([[14, 0], [14, 5], [22, 5]], 3));
     // U4 → two traces west, stopping short on vias
     [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
       wires.push(wire([[22, r], [stop, r]], { end: 'via' }));
