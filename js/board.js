@@ -17,8 +17,11 @@ function baselineOf(el) {
 // as Research's titles do, is not the right of its box. The heading is the block
 // itself when it is an h1 or h2, and otherwise its h3; its first line is its first span when it is set on
 // several lines, each in a span.
-function measure(el, box, u) {
-  const cell = px => px / u / P, r = el.getBoundingClientRect();
+// The board's box is read here, beside the block's, rather than once before seating: seating changes the page's
+// height, and when the page is scrolled to its foot the browser then pulls the scroll back, which moves every
+// box on screen. A board's box read before that, against a block's read after it, puts the block rows off.
+function measure(el, board, u) {
+  const box = board.getBoundingClientRect(), cell = px => px / u / P, r = el.getBoundingClientRect();
   const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height) };
   const heading = el.matches('h1, h2') ? el : el.querySelector('h3');
   if (!heading) return m;
@@ -48,7 +51,7 @@ function drawBoard(board, layouts) {
   const W = l.cols * P;
   board.style.setProperty('--w', W);
   board.classList.add('drawn');
-  const box = board.getBoundingClientRect(), u = box.width / W;
+  const u = board.getBoundingClientRect().width / W;
   // While DevTools or the device toolbar opens or closes, the viewport is briefly 0 wide; every
   // measurement would divide by 0. Keep the old drawing; the next resize draws the new one.
   if (!u) return;
@@ -59,7 +62,7 @@ function drawBoard(board, layouts) {
     el.style.left = `${100 * s.x / l.cols}%`;
     el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
     el.style.top = `calc(${s.y * P} * var(--u))`;
-    m[key] = measure(el, box, u);
+    m[key] = measure(el, board, u);
   }
 
   const c = l.build(m);
