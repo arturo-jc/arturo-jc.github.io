@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 05 · Research on a wide screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 56px 0 0; }
+  .spec:last-child { padding-bottom: 96px; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .stats { font: 400 11.5px/1.5 var(--mono); color: var(--muted); margin: 0; }
+  /* the foot of Projects, faded in at the top, so the join is in view */
+  .prev { position: relative; overflow: hidden; container-type: inline-size; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 140px); mask-image: linear-gradient(to bottom, transparent, #000 140px); }
+
+  /* ---- the designs: same rules as styles.css, plus an article's title and journal ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* --u is one drawing unit, so the type scales with the drawing */
+  .board [data-b] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .board h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
+  .board article p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0; }
+  .board .nb { white-space: nowrap; }
+  .board article a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+               text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .board article a:hover { color: var(--accent); }
+  .board article a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
+  .project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); white-space: nowrap; }
+  /* An article is its title, which links to the published paper, the journal, and a summary. The titles are
+     long, so unlike a project's name they wrap, balanced so the two lines are about even. */
+  .paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+  .paper .journal { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 05</div>
+    <h1>Research on a wide screen: one column, a grid, or two staggered columns?</h1>
+    <p>Three ways of arranging the four papers at desktop width. The heading, the papers, their type, the column width, the palette, the pitch and the trace weight are the same in all three. A paper is its title, which links to the published article, its journal, and its summary. The titles are long, so they wrap onto two lines.</p>
+    <p>Above each option is the foot of Projects, changed the same way in all three: a bus leaves U4 to the east and drops off the bottom of the board beside Step by Step Strength, and Research picks it up at its top edge in the same columns. So <b>the join is held fixed</b>; what changes is <b>where the four papers sit</b>, and so where the circuit finds its room once the bus arrives.</p>
+    <p>As in Projects, the orange net ends on a via beside <b>each paper's title</b>, level with the middle of its first line's capitals: just past the first line where it comes from the right, just before the title where it comes from the left.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<template id="projects">
+  <h2 data-b="head">Projects</h2>
+  <article class="project" data-b="p1">
+    <h3><a href="https://github.com/arturo-jc/hardly-working" target="_blank" rel="noopener">Hardly Working</a></h3>
+    <p class="stack">Electron · Angular · NgRx · SQLite · Drizzle</p>
+    <p>Alongside my <span class="nb">full-time</span> job I work as a contractor, which means billing my hours. Most trackers either make you start and stop a timer, which is easy to forget when you juggle several projects, or watch which windows are active, which is invasive and says little when most of your work happens inside a terminal and a browser. Hardly Working does neither. You link a project to a repo and a few URLs, and it records your edits and commits, reads your visits from the browser's own history (no extension needed), and reconstructs your hours from them. Nothing ever leaves your machine.</p>
+  </article>
+  <article class="project" data-b="p2">
+    <h3><a href="https://github.com/arturo-jc/step-by-step-strength-public" target="_blank" rel="noopener">Step by Step Strength</a></h3>
+    <p class="stack">Angular · Node.js · GraphQL · PostgreSQL · TypeORM</p>
+    <p>Step by Step Strength is a workout tracker for programs like Starting Strength, which alternate two workouts, A and B, three days a week. When I ran the program myself, the trackers I tried only supported weekly schedules, so a <span class="nb">Monday-Wednesday-Friday</span> plan repeated a workout across each weekend instead of alternating. SBSS supports schedules that span several weeks, so an <span class="nb">A-B-A,</span> <span class="nb">B-A-B</span> rotation is just a <span class="nb">two-week</span> schedule.</p>
+  </article>
+</template>
+
+<template id="research">
+  <h2 data-b="head">Research</h2>
+  <article class="paper" data-b="r1">
+    <h3><a href="https://link.springer.com/article/10.1007/s10670-021-00427-4" target="_blank" rel="noopener">Should the Number of Overlapping Experiencers Count?</a></h3>
+    <p class="journal">Erkenntnis (2021)</p>
+    <p>What happens if we take someone's brain, and transplant each hemisphere into a different body? At the end of the operation, you have two people with equally good claims to be the original patient, and yet they can't both be the original patient. A <span class="nb">well-known</span> solution to this puzzle says "the original patient" was actually two people all along, who start out sharing one body and then go their separate ways. Now suppose two patients report an equally bad headache, and you have only one painkiller. If you find out one of them is scheduled for the operation, does that give you more reason to give them the painkiller? Intuitively, the answer is no: why would an operation that hasn't happened yet give you more reason to relieve someone's headache <em>now</em>? But if this theory is right, the patient awaiting surgery is really two people in pain. Some philosophers respond to this by saying that the two people share a single pain, so helping them relieves no more pain than helping the other patient. I argue that this response fails, because what matters is not just how much pain there is, but how many beings experience it. If the theory is right, you really should favor the patient about to be split, and the theory's defenders have to either bite that bullet, or find another way out.</p>
+  </article>
+  <article class="paper" data-b="r2">
+    <h3><a href="https://academic.oup.com/pq/article-abstract/69/275/277/5126501" target="_blank" rel="noopener">Quantifier Variance, Ontological Pluralism and Ideal Languages</a></h3>
+    <p class="journal">Philosophical Quarterly (2019). 69/275: 277–293</p>
+    <p>A lot of metaphysics is about the irreducible features of reality. Can facts about what is past, present and future be explained in more basic terms? Or is reality irreducibly tensed? Many philosophers understand such debates as debates over the "ideal" language: the language that best matches the structure of reality. From this perspective, to ask whether tense is irreducible is to ask whether the ideal language needs words like "was" or "will". This paper focuses on the relationship between the ideal language and its most basic terms. Is the language ideal because its terms are special, "carving nature at its joints"? Or are the terms special because they feature in an ideal language? The most common, <em>atomist</em> approach says that the terms come first. I argue that this approach struggles to distinguish two views about existence: ontological pluralism, according to which things can exist in different ways, and quantifier variance, according to which there are many equally good ways of talking about what exists. For this reason, I recommend a <em>holistic</em> approach, which puts the entire language first.</p>
+  </article>
+  <article class="paper" data-b="r3">
+    <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.211" target="_blank" rel="noopener">Duplication and Collapse</a></h3>
+    <p class="journal">Thought: A Journal of Philosophy (2016). 5/3: 196–202</p>
+    <p>Composition as Identity (CAI) is the view that the whole is identical to its parts. Once you have fully described every part of, say, a person, you have fully described the person—or so goes the intuition behind it. Kris McDaniel argues that CAI is false because it rules out the possibility of strongly emergent properties: properties of a whole that are not fixed by its atoms. If, as some philosophers believe, consciousness were emergent, then a full description of a person's atoms would not tell you whether the person is conscious. Ted Sider replies that CAI has a strange consequence, which he calls collapse, that defuses this argument. Given CAI, there is no way to talk about a person's atoms and nothing else: any group that includes those atoms also includes everything they make up—hands, organs, etc.—up to the person themself. So phrases like "the person's atoms," which McDaniel's argument relies on, pick out nothing. In this paper, I argue that this response backfires. If collapse means you can't talk about a person's atoms on their own, it also means McDaniel's way of stating the intuition behind CAI doesn't capture it, since the intuition is about a whole's parts on their own. Defenders of CAI need another way to state it, and every obvious alternative rules out strong emergence again. They must give up either the intuition that motivated their view or the possibility of strong emergence.</p>
+  </article>
+  <article class="paper" data-b="r4">
+    <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.127" target="_blank" rel="noopener">Some Challenges to a Contrastive Treatment of Grounding</a></h3>
+    <p class="journal">Thought: A Journal of Philosophy (2014). 3/3: 184–92</p>
+    <p>Why did Joe Biden win the 2020 US presidential election? Because he received an absolute majority of electoral votes. This is a constitutive explanation, not a causal one: the majority didn't cause Joe Biden to win—it is what his winning <em>consisted in</em>. Many philosophers posit a <em>grounding</em> relation underlying such explanations, which is standardly assumed to be transitive: if A is grounded in B, and B is grounded in C, then A must be grounded in C. Jonathan Schaffer has offered the following putative counterexample (among others): the fact that something is meowing is grounded in the fact that a particular cat, Cadmus, is meowing, and the fact that Cadmus is meowing is grounded in the fact that he came from a specific pair of sperm and egg (that's part of what makes it <em>Cadmus</em> meowing as opposed to some other cat), but the fact that something is meowing has nothing to do with Cadmus's origins. Schaffer's diagnosis is that grounding is contrastive, always a matter of "this rather than that," and that the chain breaks because the contrast quietly shifts in the middle. In this paper, I show how to tweak Cadmus's case to break the chain even when we hold the contrast fixed, and conclude that Schaffer's contrastive account can draw no support from the original case.</p>
+  </article>
+</template>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+// n parallel traces round an orthogonal centreline, nested at every corner.
+// big = { cornerIndex: cut } overrides the size of that corner's 45° cut. Two corners whose cuts add up
+// to the length of the segment between them make one straight diagonal with no step in it.
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   Pieces the layouts share
+   =========================================================================== */
+const chipAt = (id, x0, y0, x1, y1, code, extra = { allPads: true }) => ({ id, x0: f(x0), y0: f(y0), x1: f(x1), y1: f(y1), code, ...extra });
+const ref = (x, y, t, a) => ({ k: 'ref', x, y, t, ...(a ? { a } : {}) });
+const net = (x, y, t, a, o) => ({ k: 'net', x, y, t, ...(a ? { a } : {}), ...(o ? { o } : {}) });
+// an n-wide bus that leaves (xa, ya) going down and arrives at (xb, yb) going down, crossing over on one
+// straight 45° diagonal halfway between: the two corners' cuts add up to the length of the run between them
+function zig(xa, ya, xb, yb, n = 3) {
+  const Y = f((ya + yb) / 2), half = Math.abs(xb - xa) * P / 2;
+  return bundle([[xa, ya], [xa, Y], [xb, Y], [xb, yb]], n, { 1: half, 2: half });
+}
+// two lamps on a chip's side, each a resistor and a lamp, with a common return; mirrored when `w` is -1
+function lampsSide(x, rows, w, n0, d0, wires, parts, labels) {
+  const X = d => f(x + w * d);
+  wires.push(wire([[x, rows[0]], [X(16), rows[0]], [X(16), rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [X(16), rows[1]]]));
+  rows.forEach((r, i) => {
+    parts.push({ kind: 'R', x: X(5), y: r }, { kind: 'LED', x: X(11), y: r, delay: [0, 1.3][i] });
+    labels.push(ref(X(5), r - 0.95, `R${n0 + i}`, 'middle'), ref(X(11), r - 1.05, `D${d0 + i}`, 'middle'));
+  });
+}
+// three lamps hanging under a chip, with a common return
+function lampsDown(cols, y, ret, n0, d0, wires, parts, labels) {
+  wires.push(wire([[cols[0], y], [cols[0], y + 10], [ret, y + 10]], { legs: [0, 8, 0], end: 'via' }));
+  cols.slice(1).forEach(c => wires.push(wire([[c, y], [c, y + 10]])));
+  cols.forEach((c, i) => {
+    parts.push({ kind: 'R', x: c, y: y + 3, dir: 'v' }, { kind: 'LED', x: c, y: y + 6.8, dir: 'v', delay: [0, 1.3, 2.5][i] });
+    labels.push(ref(c + 1.1, y + 3.25, `R${n0 + i}`), ref(c + 1.2, y + 7.05, `D${d0 + i}`));
+  });
+}
+const caps = m => ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
+const vias = m => ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].hx + 1.5));   // just past each title's first line
+
+/* ===========================================================================
+   Projects' wide layout, copied from js/sections/projects.js, with one addition held fixed across the
+   options: a bus out of U4's three lowest right-hand pads, east and down off the board's foot at
+   columns 48 to 50. Research picks it up at its top edge in the same columns.
+   =========================================================================== */
+const BUS = 49;                                 // the bus's centre column where the two boards meet
+const projects = {
+  cols: 107,
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
+    const vx = f(m.p1.hx + 1.5);
+    const rows = f(m.p2.bot + 4);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
+    ];
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
+    const drop = 5;
+    wires.push(...bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    wires.push(...bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3));
+    const ly = a1 + 8;
+    wires.push(wire([[69, ly], [69, ly + 10], [79, ly + 10]], { legs: [0, 8, 0], end: 'via' }), wire([[73, ly], [73, ly + 10]]));
+    [69, 73].forEach((c, i) => {
+      parts.push({ kind: 'R', x: c, y: ly + 3, dir: 'v' }, { kind: 'LED', x: c, y: ly + 6.8, dir: 'v', delay: [0, 1.3][i] });
+      labels.push({ k: 'ref', x: c + 1.1, y: ly + 3.25, t: `R${7 + i}` }, { k: 'ref', x: c + 1.2, y: ly + 7.05, t: `D${4 + i}` });
+    });
+    bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3).forEach((w, k) => {
+      const stop = a2 + [10, 15, 20][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
+    });
+    // the addition: U4 → east → down off the foot, into Research
+    wires.push(...bundle([[32, a2 + 5], [BUS, a2 + 5], [BUS, rows]], 3));
+    labels.push(net(BUS - 2, rows - 3, 'E0501 – E0503', 'end'));
+    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
+    labels.push(
+      { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
+    );
+    return { rows, chips, wires, parts, labels, crop: f(a2 - 16) };
+  },
+};
+
+/* ===========================================================================
+   The three layouts. Each is { cols, seats, build(m) }, as in the site. m holds each block as measured,
+   in cells from the board's top left: top, bot and h; cap, the middle of the capitals of its title's first
+   line; and hx, the column where that first line ends. Research is r1 to r4, newest first.
+   =========================================================================== */
+
+/* A: one column, on the left under the heading. The circuit takes the right-hand side: a chip level with each
+   title, alternately near the column and out in the margin, joined by five-wide diagonals, so the bus zigzags
+   down beside the papers. Lamps on the first chip out in the margin; lamps and a staggered tail under the last close it. */
+const optA = {
+  cols: 107,
+  seats: {
+    head: { x: 6, y: 4 }, r1: { x: 6, y: 12, w: 36 },
+    r2: m => ({ x: 6, y: f(m.r1.bot + 7), w: 36 }), r3: m => ({ x: 6, y: f(m.r2.bot + 7), w: 36 }), r4: m => ({ x: 6, y: f(m.r3.bot + 7), w: 36 }),
+  },
+  build(m) {
+    const [a1, a2, a3, a4] = caps(m), [v1, v2, v3, v4] = vias(m);
+    const rows = f(m.r4.bot + 5);
+    const wires = [], labels = [], parts = [];
+    const near = (id, a, code) => chipAt(id, 46, a - 3, 56, a + 7, code), far = (id, a, code) => chipAt(id, 74, a - 3, 86, a + 7, code);
+    const chips = [near('U5', a1, 'E0510'), far('U6', a2, 'E0520'), near('U7', a3, 'E0530'), far('U8', a4, 'E0540')];
+    // the bus from Projects, straight down into U5
+    wires.push(...bundle([[BUS, 0], [BUS, a1 - 3]], 3));
+    // the accent net: out of each chip's left side, west to just past the title's first line
+    [[46, a1, v1], [74, a2, v2], [46, a3, v3], [74, a4, v4]].forEach(([x, a, v]) => wires.push(wire([[x, a], [v, a]], { o: true, end: 'via' })));
+    parts.push({ kind: 'R', x: 64, y: a2 }, { kind: 'R', x: 64, y: a4 });
+    // chip to chip, on diagonals
+    wires.push(...zig(51, a1 + 7, 80, a2 - 3, 5), ...zig(80, a2 + 7, 51, a3 - 3, 5), ...zig(51, a3 + 7, 80, a4 - 3, 5));
+    // U6 → two lamps out in the margin
+    lampsSide(86, [a2 + 1, a2 + 4], 1, 11, 6, wires, parts, labels);
+    // the close: three lamps under U8, and three traces east and down the margin, stopping short
+    lampsDown([76, 80, 84], a4 + 7, 90, 13, 8, wires, parts, labels);
+    bundle([[86, a4 + 4], [98, a4 + 4], [98, rows]], 3).forEach((w, k) => {
+      const stop = f(a4 + [22, 29, 36][k]);
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push(net(w.pts[2][0] + 0.9, stop + 0.25, `E054${k + 1}`));
+    });
+    labels.push(
+      ref(46, a1 - 4.1, 'U5'), ref(74, a2 - 4.1, 'U6'), ref(46, a3 - 4.1, 'U7'), ref(74, a4 - 4.1, 'U8'),
+      ref(64, a2 - 0.95, 'R9', 'middle'), ref(64, a4 - 0.95, 'R10', 'middle'),
+      net(v1 + 0.9, a1 - 0.75, 'E0511', 0, true), net(v2 + 0.9, a2 - 0.75, 'E0521', 0, true),
+      net(v3 + 0.9, a3 - 0.75, 'E0531', 0, true), net(v4 + 0.9, a4 - 0.75, 'E0541', 0, true),
+    );
+    return { rows, chips, wires, parts, labels };
+  },
+};
+
+/* B: a grid, two by two. A chip in the gap at the top of each row, level with both titles, and the accent net
+   leaves it both ways. The bus comes down the gap from one chip to the next, and on past the last lines,
+   where it turns under the shorter paper into a chip and two lamps. */
+const optB = {
+  cols: 107,
+  seats: {
+    head: { x: 6, y: 4 }, r1: { x: 6, y: 12, w: 36 }, r2: { x: 62, y: 12, w: 36 },
+    r3: m => ({ x: 6, y: f(Math.max(m.r1.bot, m.r2.bot) + 8), w: 36 }), r4: m => ({ x: 62, y: f(Math.max(m.r1.bot, m.r2.bot) + 8), w: 36 }),
+  },
+  build(m) {
+    const [a1, , a3] = caps(m), [v1, , v3] = vias(m);
+    const wires = [], labels = [], parts = [];
+    const chips = [chipAt('U5', 47, a1 - 3, 57, a1 + 7, 'E0510'), chipAt('U6', 47, a3 - 3, 57, a3 + 7, 'E0530')];
+    wires.push(...bundle([[BUS, 0], [BUS, a1 - 3]], 3));
+    // the accent net: out of each chip both ways, past the left title's first line and to just before the right one
+    [[a1, v1], [a3, v3]].forEach(([a, v]) => wires.push(wire([[47, a], [v, a]], { o: true, end: 'via' }), wire([[57, a], [60.5, a]], { o: true, end: 'via' })));
+    // U5 → down the gap, stepping one way and back → U6
+    const Y = f((a1 + 7 + a3 - 3) / 2);
+    wires.push(...bundle([[54, a1 + 7], [54, Y - 6], [50, Y - 6], [50, Y + 6], [54, Y + 6], [54, a3 - 3]], 3, { 1: 2 * P, 2: 2 * P, 3: 2 * P, 4: 2 * P }));
+    // U6 → down the gap → under the shorter paper of the last row → U7 → two lamps
+    const east = m.r4.bot <= m.r3.bot, side = east ? 1 : -1, X = d => f(52 + side * d);
+    const R = f((east ? m.r4.bot : m.r3.bot) + 3);
+    const ux0 = X(east ? 18 : 26), ux1 = X(east ? 26 : 18);
+    chips.push(chipAt('U7', ux0, R - 1, ux1, R + 6, 'E0550', { pins: { l: east ? [R, R + 1, R + 2] : [R + 1, R + 4], r: east ? [R + 1, R + 4] : [R, R + 1, R + 2], t: [], b: [] } }));
+    wires.push(...bundle([[52, a3 + 7], [52, R + 1], [east ? ux0 : ux1, R + 1]], 3));
+    lampsSide(east ? ux1 : ux0, [R + 1, R + 4], side, 9, 6, wires, parts, labels);
+    const rows = f(Math.max(m.r3.bot, m.r4.bot, R + 6) + 4);
+    labels.push(
+      ref(47, a1 - 4.1, 'U5'), ref(47, a3 - 4.1, 'U6'), ref(ux0, R + 7.3, 'U7'),
+      net(v1 + 0.9, a1 - 0.75, 'E0511', 0, true), net(v3 + 0.9, a3 - 0.75, 'E0531', 0, true),
+      net(52.6, Y + 0.3, 'E0521 – E0523'),
+    );
+    return { rows, chips, wires, parts, labels };
+  },
+};
+
+/* C: two columns, the right one dropped by about half a paper, so the papers read in a zigzag and leave a
+   corner empty at each end. The bus crosses the top into U5 in the top right-hand corner, which feeds the
+   first paper across the gap and lights two lamps; from there a chain of chips runs down the gap, one level
+   with each title after it, and the last sends three traces under the bottom left-hand paper, stopping short. */
+const optC = {
+  cols: 107,
+  seats: {
+    head: { x: 6, y: 4 }, r1: { x: 6, y: 12, w: 36 },
+    r2: m => ({ x: 62, y: f(m.r1.cap + 32), w: 36 }),
+    r3: m => ({ x: 6, y: f(m.r1.bot + 8), w: 36 }), r4: m => ({ x: 62, y: f(m.r2.bot + 8), w: 36 }),
+  },
+  build(m) {
+    const [a1, a2, a3, a4] = caps(m), [v1, , v3] = vias(m);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      chipAt('U5', 66, a1 - 3, 78, a1 + 6, 'E0510'),
+      chipAt('U6', 45, a2 - 3, 55, a2 + 5, 'E0520'), chipAt('U7', 47, a3 - 3, 57, a3 + 5, 'E0530'), chipAt('U8', 45, a4 - 3, 55, a4 + 5, 'E0540'),
+    ];
+    // the bus from Projects, across the top into U5
+    wires.push(...bundle([[BUS, 0], [BUS, 5.5], [72, 5.5], [72, a1 - 3]], 3));
+    // the accent net: U5 across the gap to the first paper; each chip in the gap to the paper level with it
+    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via' }),
+               wire([[47, a3], [v3, a3]], { o: true, end: 'via' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via' }));
+    parts.push({ kind: 'R', x: 56, y: a1 });
+    // U5 → two lamps in the corner over the second paper
+    lampsSide(78, [a1 + 1, a1 + 4], 1, 10, 6, wires, parts, labels);
+    // U5 → west → down the gap → U6 → U7 → U8
+    wires.push(...bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3), ...bundle([[50, a2 + 5], [50, a3 - 3]], 3), ...bundle([[51, a3 + 5], [51, a4 - 3]], 3));
+    // U8 → down the gap → west under the third paper, stopping short
+    const L = f(m.r3.bot + 4);
+    bundle([[50, a4 + 5], [50, L], [6, L]], 3).forEach((w, k) => {
+      const stop = [34, 26, 18][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push(net(stop - 0.9, w.pts[2][1] + 0.25, `E054${k + 1}`, 'end'));
+    });
+    const rows = f(Math.max(m.r4.bot, L + 1) + 5);
+    labels.push(
+      ref(66, a1 - 4.1, 'U5'), ref(45, a2 - 4.1, 'U6'), ref(47, a3 - 4.1, 'U7'), ref(45, a4 - 4.1, 'U8'),
+      ref(56, a1 - 0.95, 'R9', 'middle'),
+      net(v1 + 0.9, a1 - 0.75, 'E0511', 0, true), net(v3 + 0.9, a3 - 0.75, 'E0531', 0, true),
+    );
+    return { rows, chips, wires, parts, labels };
+  },
+};
+
+/* ===========================================================================
+   Seating and measuring. Each block is seated, then measured, in order; the circuit is
+   built from the measurements.
+   =========================================================================== */
+function baselineOf(el) {
+  const probe = document.createElement('span');  // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+function capHeightOf(heading) {
+  const cs = getComputedStyle(heading), cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${cs.fontWeight} 1000px ${cs.fontFamily}`;
+  return cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+}
+// the right-hand end of a heading's first line: the titles wrap, so the whole heading's box will not do
+function firstLineRight(heading) {
+  const range = document.createRange();
+  range.selectNodeContents(heading);
+  const rects = [...range.getClientRects()].filter(r => r.width > 0);
+  const top = rects[0].top;
+  return Math.max(...rects.filter(r => Math.abs(r.top - top) < 2).map(r => r.right));
+}
+
+function drawBoard(board, l) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const box = board.getBoundingClientRect(), u = box.width / W;
+  const cell = px => f(px / u / P);
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-b="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : 'auto';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    const heading = el.matches('h2') ? el : el.querySelector('h3');
+    const r = el.getBoundingClientRect();
+    m[key] = {
+      x: s.x, top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height),
+      cap: cell(baselineOf(heading) - capHeightOf(heading) / 2 - box.top),
+      hx: cell(firstLineRight(heading) - box.left),
+    };
+  }
+  const c = l.build(m);
+  board.insertAdjacentHTML('afterbegin', svgOf(l.cols, c));
+  return { m, c, u, heightPx: Math.round(c.rows * P * u), copyPx: Math.round(36 * P * u), bodyPx: (16.5 * u).toFixed(1) };
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const OPTIONS = [
+  { name: 'Column', layout: optA,
+    note: 'The four papers in one column under the heading, on the left where the first project sits. The circuit has the whole right-hand side: a chip level with each title, alternately close to the column and out in the margin, joined by long diagonals, so the bus zigzags down beside the papers and each orange run is straight. Three lamps and a staggered tail under the last chip close the section. The tallest of the three by far, and the one that takes a fifth paper without redrawing.',
+    recipe: [['papers', 'one column, stacked'], ['main chip', 'one beside each paper'], ['the bus', 'zigzags down the right'], ['closes with', 'lamps + staggered tail']] },
+  { name: 'Grid', layout: optB,
+    note: 'Two papers to a row, the second row starting under the taller of the first. A chip sits in the gap at the top of each row, level with both titles, and the orange net leaves it both ways. The bus from Projects drops straight into the first chip and carries on down the gap to the second, stepping aside once on the way, then turns under the shorter paper of the last row into a chip and two lamps. The shortest of the three.',
+    recipe: [['papers', 'two by two'], ['main chip', 'one per row, in the gap'], ['the bus', 'down the gap'], ['closes with', 'chip + lamps under the shorter one']] },
+  { name: 'Stagger', layout: optC,
+    note: 'Two columns, the right one dropped by about half a paper, so the papers read in a zigzag, carrying on the alternation About and Projects start. That leaves a corner empty at each end of the section. The bus crosses the top into a chip in the top right-hand corner, which reaches the first paper across the gap and lights two lamps; a chain of chips then runs down the gap, one level with each title after it. The last sends three traces into the bottom left-hand corner, stopping short.',
+    recipe: [['papers', 'two columns, offset'], ['main chip', 'top right corner, then a chain in the gap'], ['the bus', 'across the top, then down the gap'], ['closes with', 'staggered tail, bottom left corner']] },
+];
+
+const main = document.getElementById('specimens');
+OPTIONS.forEach((o, i) => {
+  main.insertAdjacentHTML('beforeend', `<section class="spec" id="opt-${'abc'[i]}">
+    <div class="cap"><div class="num">Option ${'ABC'[i]}</div><h2>${o.name}</h2><p>${o.note}</p>
+      <ul class="recipe">${o.recipe.map(([k, v]) => `<li>${k} <b>${v}</b></li>`).join('')}</ul><p class="stats"></p></div>
+    <div class="prev"><section class="board"></section></div><section class="board research"></section></section>`);
+  const spec = main.lastElementChild;
+  spec.querySelector('.prev .board').append(document.getElementById('projects').content.cloneNode(true));
+  spec.querySelector('.research').append(document.getElementById('research').content.cloneNode(true));
+});
+
+function drawAll() {
+  OPTIONS.forEach((o, i) => {
+    const spec = document.getElementById(`opt-${'abc'[i]}`);
+    // the foot of Projects: drawn whole, then cropped to what is below `crop`
+    const prev = spec.querySelector('.prev'), pb = prev.querySelector('.board');
+    // in cqw of .prev, which is as wide as the board, and as an aspect ratio, so that it holds at any zoom
+    pb.style.marginTop = '0';
+    const p = drawBoard(pb, projects), cqw = rows => `${f(rows * P / (projects.cols * P) * 100)}cqw`;
+    pb.style.marginTop = `-${cqw(p.c.crop)}`;
+    prev.style.aspectRatio = `${projects.cols} / ${f(p.c.rows - p.c.crop)}`;
+    const s = drawBoard(spec.querySelector('.research'), o.layout);
+    spec.querySelector('.stats').textContent = `section ${s.heightPx} px tall · columns ${s.copyPx} px wide · body text ${s.bodyPx} px`;
+  });
+}
+
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', 'italic 400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
