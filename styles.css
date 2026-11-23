@@ -17,12 +17,12 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
 
 /* A board is one section: a drawing, and the type sitting in the space the drawing leaves. Each block of
    type that a layout seats has a data-seat: the name and the copy in About, the heading and each project in
-   Projects. Without the script there is no drawing and the blocks are an ordinary column. */
+   Projects, the heading and each paper in Research. Without the script there is no drawing and the blocks are an ordinary column. */
 .board { position: relative; container-type: inline-size; }
 .board [data-seat] { max-width: 432px; margin: 0 auto; }
 .board .name { margin-bottom: 28px; }
 .board h2[data-seat] { margin-top: 64px; margin-bottom: 24px; }
-.board .project { margin-bottom: 36px; }
+.board .project, .board .paper { margin-bottom: 36px; }
 .board svg { display: block; width: 100%; height: auto; overflow: visible; }
 /* --u is one drawing unit, so the type scales with the drawing */
 .board.drawn [data-seat] { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
@@ -53,6 +53,11 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
 .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
 .project h3 a { text-underline-offset: calc(4 * var(--u)); }
 .project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
+/* A paper is its title, which links to the published article, its journal, and a summary. The titles are long,
+   so unlike a project's name they wrap, balanced so the lines are about even. */
+.paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+.paper h3 a { text-underline-offset: calc(4 * var(--u)); }
+.paper .journal { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
 
 /* the drawing */
 .t { fill: none; stroke: var(--trace); }

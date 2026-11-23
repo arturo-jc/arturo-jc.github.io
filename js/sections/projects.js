@@ -3,13 +3,15 @@ import { P, bundle, cut, wire, f } from '../kit.js';
 
 // Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
 // accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
-// parallel to About's. Two lamps hang under U3; three traces leave U4 and stop down the left margin.
+// parallel to About's. Two lamps hang under U3; three traces leave U4 and stop down the left margin, and three
+// more leave its right side and drop off the board's foot into Research.
 const wide = {
   cols: 107,
   seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
   build(m) {
     const a1 = f(m.p1.cap), a2 = f(m.p2.cap);   // each accent's row; each chip is placed from its own
     const vx = f(m.p1.hx + 1.5);                // the first accent's via, just past the name
+    const rows = f(m.p2.bot + 4);
     const wires = [], labels = [], parts = [];
     const chips = [
       { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
@@ -36,6 +38,10 @@ const wide = {
       wires.push(w);
       labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
     });
+    // U4 → east → down off the board's foot. Research picks the three up at its top edge in the same columns.
+    const bus = 49;
+    wires.push(...bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3));
+    labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end' });
     parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
     // ref = silkscreen designators · net = wire codes
     labels.push(
@@ -43,13 +49,14 @@ const wide = {
       { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
       { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
     );
-    return { rows: f(m.p2.bot + 4), chips, wires, parts, labels };
+    return { rows, chips, wires, parts, labels };
   },
 };
 
 // Narrow: U3 above the heading, fed from its left by About's rail; three traces come down out of U3 on the right of the
 // projects. The nearest is the accent net: it branches in along the first name's row and ends by turning in
-// along the second's. The other two carry on down to U4, under the last project, which closes the section.
+// along the second's. The other two carry on down to U4, under the last project, which closes the section and
+// sends three traces off the board's foot into Research.
 const narrow = {
   cols: 32,
   seats: { head: { x: 2, y: 14 }, p1: { x: 2, y: 19.5, w: 24 }, p2: m => ({ x: 2, y: f(m.p1.bot + 4.5), w: 24 }) },
@@ -59,7 +66,7 @@ const narrow = {
     const F = f(m.p2.bot + 2.5);                // U4's top
     const chips = [
       { id: 'U3', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
-      { id: 'U4', x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [] } },
+      { id: 'U4', x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
     ];
     const wires = [], labels = [];
     // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
@@ -69,6 +76,8 @@ const narrow = {
     wires.push(wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]]));
     // About's rail, picked up at the top edge in the same columns, east into U3's top left-hand pads
     wires.push(...bundle([[14, 0], [14, 5], [22, 5]], 3));
+    // U4 → down off the board's foot. Research picks the three up at its top edge in the same columns.
+    wires.push(...bundle([[26, F + 6], [26, F + 9]], 3));
     // U4 → two traces west, stopping short on vias
     [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
       wires.push(wire([[22, r], [stop, r]], { end: 'via' }));

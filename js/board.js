@@ -13,7 +13,8 @@ function baselineOf(el) {
 
 // What a layout cannot know in advance about a seated block, in cells from the board's top left: `top`, `bot`
 // and `h` are its box. A block with a heading also has `cap`, the row of the middle of the capitals of the
-// heading's first line, and `hx`, the column where that line's last letter ends. The heading is the block
+// heading's first line, and `hx`, the column where that line's last letter ends, which for a heading that wraps,
+// as Research's titles do, is not the right of its box. The heading is the block
 // itself when it is an h1 or h2, and otherwise its h3; its first line is its first span when it is set on
 // several lines, each in a span.
 function measure(el, box, u) {
@@ -28,7 +29,8 @@ function measure(el, box, u) {
   cv.font = `${getComputedStyle(heading).fontWeight} 1000px ${getComputedStyle(heading).fontFamily}`;
   const capHeight = cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(getComputedStyle(heading).fontSize);
   m.cap = cell(baselineOf(line) - capHeight / 2 - box.top);
-  m.hx = cell(word.getBoundingClientRect().right - box.left);
+  const rects = [...word.getClientRects()].filter(r => r.width > 0);
+  m.hx = cell(Math.max(...rects.filter(r => Math.abs(r.top - rects[0].top) < 2).map(r => r.right)) - box.left);
   return m;
 }
 

@@ -2,7 +2,8 @@
 import { mountBoard } from './board.js';
 import about from './sections/about.js';
 import projects from './sections/projects.js';
+import research from './sections/research.js';
 
-const sections = { about, projects };
+const sections = { about, projects, research };
 
 for (const [id, layouts] of Object.entries(sections)) mountBoard(document.getElementById(id), layouts);
