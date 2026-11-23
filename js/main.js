@@ -7,3 +7,5 @@ import research from './sections/research.js';
 const sections = { about, projects, research };
 
 for (const [id, layouts] of Object.entries(sections)) mountBoard(document.getElementById(id), layouts);
+
+document.querySelector('.foot .year').textContent = new Date().getFullYear();

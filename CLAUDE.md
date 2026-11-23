@@ -64,19 +64,21 @@ Studies double as a parts bin of working code:
 - `studies/03-name-and-about.html` holds the two wide layouts for the name and About that the site does not use, both with the name on three lines: Riser, where a bus climbs between the name and the copy, crosses over the copy into a chip and comes back down its right and under it; and Cradle, where the chip sits under the gap with lamps hanging below it and only the accent net between the two blocks. It also holds a copy whose top is found by levelling its first baseline with the name's.
 - `studies/04-projects-wide.html` holds the two wide layouts for Projects that the site does not use: Pair, with the projects side by side, one chip in the gap feeding both names and a bus down the gap; and Column, with the projects stacked in one column, a six-wide bus down the left margin that splits into a chip for each, and lamps hanging under a chip.
 - `studies/05-research-wide.html` holds the two wide layouts for Research that the site does not use: Column, with the papers stacked in one column and a five-wide bus zigzagging down the right between a chip level with each title; and Grid, two papers to a row with a chip in the gap at the top of each row, the accent net leaving it both ways.
+- `studies/06-footer.html` holds four footers drawn as boards, which the user found too loud: contacts fed by a chip's fan-out, ending in schematic off-page flags, rising from an edge connector's fingers, and each behind a lit lamp.
+- `studies/07-quiet-footer.html` holds the plain-band arrangements the site does not use: a row of names with handles, a one-line bar, the contacts listed down Research's right column with a via each, and the email address as the lead link. Its panel also has two other band tones: lighter than the board, and trace blue with dark ink.
 
 ## The code
 
-The site is static files with no build step. It holds three sections. About opens the page: the name, which is the page's `h1`, and the About copy. Projects follows: its heading and two projects, each a name that links to its repo, a stack and a paragraph. Research closes it: its heading and four papers, newest first, each a title that links to the published article, the journal and a summary.
+The site is static files with no build step. It holds three sections and a footer. About opens the page: the name, which is the page's `h1`, and the About copy. Projects follows: its heading and two projects, each a name that links to its repo, a stack and a paragraph. Research is the last: its heading and four papers, newest first, each a title that links to the published article, the journal and a summary. Under it, outside `main`, is the footer: a band in `--foot`, darker than the board, edge to edge, with no drawing in it, holding the original portfolio's three icons (email, GitHub, LinkedIn) and the copyright, centred.
 
 | File | What is in it |
 |---|---|
-| `index.html` | The markup: each section's `.board` and the blocks of type in it, in page order. Each block a layout seats has a `data-seat`. |
-| `styles.css` | All the styles: the tokens, the page frame, the type of the name, a heading, the copy, a project and a paper, the drawing's classes. |
+| `index.html` | The markup: each section's `.board` and the blocks of type in it, in page order, then the footer. Each block a layout seats has a `data-seat`. |
+| `styles.css` | All the styles: the tokens, the page frame, the type of the name, a heading, the copy, a project and a paper, the footer, the drawing's classes. |
 | `js/kit.js` | What a layout is written with (`bundle`, `cut`, `wire`), and how a trace, chip, part or via becomes SVG. It does not touch the page. |
 | `js/board.js` | `mountBoard()`: seats and measures the type, draws the layout, and redraws when the width changes. |
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
-| `js/main.js` | The list of sections. It mounts each one on the `.board` with its id. |
+| `js/main.js` | The list of sections. It mounts each one on the `.board` with its id, and fills in the footer's year. |
 
 ### Adding a section
 
@@ -96,7 +98,8 @@ The site is static files with no build step. It holds three sections. About open
 - **Projects' and Research's accent nets end beside each item's name or title,** not beside the section's heading: just past it where the net comes from the right, just before it (`x − 1.5`) where it comes from the left. Research's titles wrap, so "just past" means past the first line: `hx` is that line's end, not the right of the heading's box.
 - **`bundle(centreline, n)`** returns `n` parallel traces that nest correctly round every corner. Write the centreline with right-angle turns; the 45° cuts are computed. `cut()` ends a trace early. `wire()` is a single trace; `hops` marks where it bridges. A third argument, `{ cornerIndex: units }`, sets the size of a corner's cut and makes a long 45° run; two corners whose cuts add up to the length of the segment between them make one straight diagonal. To split a bus, build two bundles of the full width whose centrelines share their first corners and `slice()` a different half from each. About's wide diagonal is one such half, `slice(3)` of a six-wide bundle.
 - **Each layout is fixed** and scales as a whole, copy included. The narrow one is drawn below 1100px, grows with the screen up to 448px wide, and is centred beyond that, so a tablet gets the phone drawing with margins.
-- **The breakpoint is written twice** and the two must match: the `max-width: 1099px` media query in `styles.css`, which also sets the name's line breaks, and `NARROW` in `js/board.js`.
+- **The breakpoint is written three times** and all must match: the two `max-width: 1099px` media queries in `styles.css`, the boards' (which also sets the name's line breaks) and the footer's, and `NARROW` in `js/board.js`.
+- **The footer is on the boards' grid without being a board.** It has no layout or script; its CSS scales with the same units, 1284 wide and 384 narrow, and centres the icons on cells 6 to 98, Research's two columns, which puts them under the gap between them rather than at the window's middle. `main` has no bottom padding, so Research's drawing ends straight onto the band.
 - **`mountBoard()` redraws** when the board's width changes, when the page crosses the breakpoint and when the fonts arrive, because the copy wraps differently at another width or in another face. `build(m)` therefore runs many times: build fresh wires in it, or build them once outside it and never `cut()` them inside.
 
 ### Rules the drawing follows

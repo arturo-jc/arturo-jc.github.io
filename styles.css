@@ -7,13 +7,15 @@
   --chip: #072235;
   --accent: #f7a52b;
   --text: #e7f0f6;
+  --muted: #8fb4cb;
+  --foot: #061b2a;
   --sans: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
-main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
+main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
 
 /* A board is one section: a drawing, and the type sitting in the space the drawing leaves. Each block of
    type that a layout seats has a data-seat: the name and the copy in About, the heading and each project in
@@ -29,7 +31,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
 /* Below this width a section draws its narrow layout: see NARROW in js/board.js, which must match.
    The narrow drawing grows with the screen up to 448px and is centred beyond that. */
 @media (max-width: 1099px) {
-  main { padding: 20px 0 28px; }
+  main { padding: 20px 0 0; }
   .board { max-width: 448px; margin: 0 auto; }
   .board:not(.drawn) [data-seat] { padding: 0 24px; }
   .name span { display: block; }
@@ -73,6 +75,28 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px; }
 .lb.ref { fill: var(--silk); font-weight: 500; }
 .lb.mark { fill: var(--trace-dim); font-size: 9px; }
 .lb.o { fill: var(--accent); }
+/* The footer: a band of its own colour under the last board, edge to edge, with no drawing in it. Inside, the
+   icons and the copyright are centred on the boards' grid, which they share and scale with: 107 cells wide,
+   centred on Research's two columns (cells 6 to 98) rather than the window; below the breakpoint, 32 cells. */
+.foot { background: var(--foot); }
+.foot-in { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+.foot-grid { container-type: inline-size; }
+.foot-body { --u: calc(100cqw / 1284); --c: calc(12 * var(--u)); text-align: center;
+             padding: calc(6 * var(--c)) calc(9 * var(--c)) calc(4 * var(--c)) calc(6 * var(--c)); }
+.foot .contacts { display: flex; justify-content: center; align-items: center; gap: calc(8 * var(--c)); }
+.foot .contacts a { display: block; }
+.foot .contacts svg { display: block; width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: var(--pad); transition: fill .15s; }
+.foot .contacts .mail { width: calc(33 * var(--u)); height: calc(21 * var(--u)); }
+.foot .contacts .in { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+.foot .contacts a:hover svg { fill: var(--accent); }
+.foot .contacts a:focus-visible { outline: 2px solid var(--accent); outline-offset: calc(5 * var(--u)); border-radius: 2px; }
+.foot .cr { font: 400 calc(11 * var(--u))/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); margin: calc(4 * var(--c)) 0 0; white-space: nowrap; }
+@media (max-width: 1099px) {
+  .foot-in { max-width: 448px; padding: 0; }
+  .foot-body { --u: calc(100cqw / 384); padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
+  .foot .contacts { gap: calc(4 * var(--c)); }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .pulse { animation: pulse 3.6s ease-in-out infinite; }
   @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
