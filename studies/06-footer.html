@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 06 · The footer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --off: #061b2a;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 72px 0 0; }
+  .spec:last-child { padding-bottom: 96px; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .sub { font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .phone-row { display: flex; gap: 40px; align-items: flex-start; margin-top: 48px; flex-wrap: wrap; }
+  .phone { width: 390px; flex: none; outline: 1px solid var(--rule); }
+  .phone-note { max-width: 420px; font: 400 14px/1.5 var(--sans); color: #c5d9e6; }
+  .phone-note p { margin: 0 0 10px; }
+  /* the foot of Research, faded in at the top, so the join is in view */
+  .prev { position: relative; overflow: hidden; container-type: inline-size; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 120px); mask-image: linear-gradient(to bottom, transparent, #000 120px); }
+
+  /* ---- the designs: same rules as styles.css, plus a contact and the copyright ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* --u is one drawing unit, so the type scales with the drawing */
+  .board [data-b] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .board h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
+  .board article p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0; }
+  .board .nb { white-space: nowrap; }
+  .board article a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+               text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+  .paper .journal { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad) !important; margin: 0 0 calc(14 * var(--u)) !important; }
+  /* A contact is one link: its name, set like a project's, and its handle under it, set like a stack. */
+  .contact { display: block; color: inherit; text-decoration: none; }
+  .contact .cn { display: block; font: 600 calc(20 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
+                 text-decoration: underline; text-decoration-color: var(--accent);
+                 text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .contact .handle { display: block; font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad);
+                     margin-top: calc(5 * var(--u)); white-space: nowrap; }
+  .contact:hover .cn { color: var(--accent); }
+  .contact:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  /* the copyright, set like silkscreen */
+  .cr { font: 400 calc(11 * var(--u))/1.4 var(--mono); letter-spacing: .06em; color: var(--pad); white-space: nowrap; }
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; }
+  .offboard { fill: var(--off); }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 06</div>
+    <h1>The footer: what do the contacts plug into?</h1>
+    <p>Four footers, each a board of its own under Research. The content is the same in all four: three contacts, each a <b>name</b> that is the link and a <b>handle</b> under it, set like a project's name and stack, and a copyright line set like silkscreen. The type, the palette, the pitch and the trace weight are the same too.</p>
+    <p>What changes is <b>what the circuit does at each contact</b>, and so how the contacts are arranged. Two options stack them in a column and two set them in a row, so each pair is a like-for-like comparison: a chip fanning out to vias against a rail of lit lamps, and schematic off-page flags against an edge connector along the bottom of the page.</p>
+    <p>Above each option is the foot of Research as it is on the site. Every option has a wide drawing and, below it, a narrow one at 390px. The narrow ones all run their rail down the right, where Research's runs down the left.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<template id="research">
+  <h2 data-b="head">Research</h2>
+  <article class="paper" data-b="r1">
+    <h3><a href="https://link.springer.com/article/10.1007/s10670-021-00427-4" target="_blank" rel="noopener">Should the Number of Overlapping Experiencers Count?</a></h3>
+    <p class="journal">Erkenntnis (2021)</p>
+    <p>What happens if we take someone's brain, and transplant each hemisphere into a different body? At the end of the operation, you have two people with equally good claims to be the original patient, and yet they can't both be the original patient. A <span class="nb">well-known</span> solution to this puzzle says "the original patient" was actually two people all along, who start out sharing one body and then go their separate ways. Now suppose two patients report an equally bad headache, and you have only one painkiller. If you find out one of them is scheduled for the operation, does that give you more reason to give them the painkiller? Intuitively, the answer is no: why would an operation that hasn't happened yet give you more reason to relieve someone's headache <em>now</em>? But if this theory is right, the patient awaiting surgery is really two people in pain. Some philosophers respond to this by saying that the two people share a single pain, so helping them relieves no more pain than helping the other patient. I argue that this response fails, because what matters is not just how much pain there is, but how many beings experience it. If the theory is right, you really should favor the patient about to be split, and the theory's defenders have to either bite that bullet, or find another way out.</p>
+  </article>
+  <article class="paper" data-b="r2">
+    <h3><a href="https://academic.oup.com/pq/article-abstract/69/275/277/5126501" target="_blank" rel="noopener">Quantifier Variance, Ontological Pluralism and Ideal Languages</a></h3>
+    <p class="journal">Philosophical Quarterly (2019). 69/275: 277–293</p>
+    <p>A lot of metaphysics is about the irreducible features of reality. Can facts about what is past, present and future be explained in more basic terms? Or is reality irreducibly tensed? Many philosophers understand such debates as debates over the "ideal" language: the language that best matches the structure of reality. From this perspective, to ask whether tense is irreducible is to ask whether the ideal language needs words like "was" or "will". This paper focuses on the relationship between the ideal language and its most basic terms. Is the language ideal because its terms are special, "carving nature at its joints"? Or are the terms special because they feature in an ideal language? The most common, <em>atomist</em> approach says that the terms come first. I argue that this approach struggles to distinguish two views about existence: ontological pluralism, according to which things can exist in different ways, and quantifier variance, according to which there are many equally good ways of talking about what exists. For this reason, I recommend a <em>holistic</em> approach, which puts the entire language first.</p>
+  </article>
+  <article class="paper" data-b="r3">
+    <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.211" target="_blank" rel="noopener">Duplication and Collapse</a></h3>
+    <p class="journal">Thought: A Journal of Philosophy (2016). 5/3: 196–202</p>
+    <p>Composition as Identity (CAI) is the view that the whole is identical to its parts. Once you have fully described every part of, say, a person, you have fully described the person—or so goes the intuition behind it. Kris McDaniel argues that CAI is false because it rules out the possibility of strongly emergent properties: properties of a whole that are not fixed by its atoms. If, as some philosophers believe, consciousness were emergent, then a full description of a person's atoms would not tell you whether the person is conscious. Ted Sider replies that CAI has a strange consequence, which he calls collapse, that defuses this argument. Given CAI, there is no way to talk about a person's atoms and nothing else: any group that includes those atoms also includes everything they make up—hands, organs, etc.—up to the person themself. So phrases like "the person's atoms," which McDaniel's argument relies on, pick out nothing. In this paper, I argue that this response backfires. If collapse means you can't talk about a person's atoms on their own, it also means McDaniel's way of stating the intuition behind CAI doesn't capture it, since the intuition is about a whole's parts on their own. Defenders of CAI need another way to state it, and every obvious alternative rules out strong emergence again. They must give up either the intuition that motivated their view or the possibility of strong emergence.</p>
+  </article>
+  <article class="paper" data-b="r4">
+    <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.127" target="_blank" rel="noopener">Some Challenges to a Contrastive Treatment of Grounding</a></h3>
+    <p class="journal">Thought: A Journal of Philosophy (2014). 3/3: 184–92</p>
+    <p>Why did Joe Biden win the 2020 US presidential election? Because he received an absolute majority of electoral votes. This is a constitutive explanation, not a causal one: the majority didn't cause Joe Biden to win—it is what his winning <em>consisted in</em>. Many philosophers posit a <em>grounding</em> relation underlying such explanations, which is standardly assumed to be transitive: if A is grounded in B, and B is grounded in C, then A must be grounded in C. Jonathan Schaffer has offered the following putative counterexample (among others): the fact that something is meowing is grounded in the fact that a particular cat, Cadmus, is meowing, and the fact that Cadmus is meowing is grounded in the fact that he came from a specific pair of sperm and egg (that's part of what makes it <em>Cadmus</em> meowing as opposed to some other cat), but the fact that something is meowing has nothing to do with Cadmus's origins. Schaffer's diagnosis is that grounding is contrastive, always a matter of "this rather than that," and that the chain breaks because the contrast quietly shifts in the middle. In this paper, I show how to tweak Cadmus's case to break the chain even when we hold the contrast fixed, and conclude that Schaffer's contrastive account can draw no support from the original case.</p>
+  </article>
+</template>
+
+<template id="footer">
+  <a class="contact" data-b="c1" href="mailto:a.javier.castellanos@gmail.com"><span class="cn">Email</span><span class="handle">a.javier.castellanos@gmail.com</span></a>
+  <a class="contact" data-b="c2" href="https://github.com/arturo-jc" target="_blank" rel="noopener"><span class="cn">GitHub</span><span class="handle">arturo-jc</span></a>
+  <a class="contact" data-b="c3" href="https://www.linkedin.com/in/arturo-javier-castellanos-551006197/" target="_blank" rel="noopener"><span class="cn">LinkedIn</span><span class="handle">arturo-javier-castellanos</span></a>
+  <p class="cr" data-b="cr">© 2026 Arturo Javier-Castellanos</p>
+</template>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+/* ---- new parts for this study ---- */
+// A schematic off-page connector: a flag at the end of a net, pointing where the net goes next. `tip` is the
+// column of its point; it points east when `dir` is 1 and west when it is -1. Its tail is 4 cells back from
+// the tip, which is where the trace that feeds it ends.
+const FLAG = 4;
+function flag(tip, y, dir, code) {
+  const X = c => f((tip - dir * c) * P), Y = r => f(y * P + r), h = 6.6;
+  return `<path class="flag" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text>`;
+}
+// An edge connector's fingers: pads running off the board's edge at row `edge`, one per column.
+const FINGER = 2.6;
+const fingers = (cols, edge) => cols.map(c =>
+  `<rect class="pad" x="${f(c * P - 3.5)}" y="${f((edge - FINGER) * P)}" width="7" height="${f(FINGER * P)}" rx="1.5"/>`).join('');
+// past the edge, the board ends
+const offboard = (cols, edge, depth) => `<rect class="offboard" x="0" y="${f(edge * P)}" width="${f(cols * P)}" height="${f(depth * P)}"/>`;
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g>${(c.under || []).join('')}</g>
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.art || []).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   Pieces the layouts share
+   =========================================================================== */
+const chipAt = (id, x0, y0, x1, y1, code, extra = { allPads: true }) => ({ id, x0: f(x0), y0: f(y0), x1: f(x1), y1: f(y1), code, ...extra });
+const ref = (x, y, t, a) => ({ k: 'ref', x, y, t, ...(a ? { a } : {}) });
+const net = (x, y, t, a, o) => ({ k: 'net', x, y, t, ...(a ? { a } : {}), ...(o ? { o } : {}) });
+// three lamps (or two) hanging under a chip, with a common return
+function lampsDown(cols, y, ret, n0, d0, wires, parts, labels) {
+  wires.push(wire([[cols[0], y], [cols[0], y + 10], [ret, y + 10]], { legs: [0, 8, 0], end: 'via' }));
+  cols.slice(1).forEach(c => wires.push(wire([[c, y], [c, y + 10]])));
+  cols.forEach((c, i) => {
+    parts.push({ kind: 'R', x: c, y: y + 3, dir: 'v' }, { kind: 'LED', x: c, y: y + 6.8, dir: 'v', delay: [0, 1.3, 2.5][i] });
+    labels.push(ref(c + 1.1, y + 3.25, `R${n0 + i}`), ref(c + 1.2, y + 7.05, `D${d0 + i}`));
+  });
+}
+const KEYS = ['c1', 'c2', 'c3'];
+const caps = m => KEYS.map(k => f(m[k].cap));
+const past = m => KEYS.map(k => f(m[k].hx + 1.5));            // just past each name
+// the contacts stacked in one column, from row y
+const column = (x, y) => ({ c1: { x, y }, c2: m => ({ x, y: f(m.c1.bot + 2.5) }), c3: m => ({ x, y: f(m.c2.bot + 2.5) }) });
+
+/* ===========================================================================
+   Research, copied from js/sections/research.js, as it is on the site. Only its foot is shown.
+   =========================================================================== */
+function lampsR(x, rows, n0, d0, wires, parts, labels) {
+  wires.push(wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]]));
+  rows.forEach((r, i) => {
+    parts.push({ kind: 'R', x: x + 5, y: r }, { kind: 'LED', x: x + 11, y: r, delay: [0, 1.3][i] });
+    labels.push(ref(x + 5, r - 0.95, `R${n0 + i}`, 'middle'), ref(x + 11, r - 1.05, `D${d0 + i}`, 'middle'));
+  });
+}
+const research = {
+  wide: {
+    cols: 107,
+    seats: {
+      head: { x: 6, y: 4 }, r1: { x: 6, y: 12, w: 36 },
+      r2: m => ({ x: 62, y: f(m.r1.cap + 32), w: 36 }),
+      r3: m => ({ x: 6, y: f(m.r1.bot + 8), w: 36 }), r4: m => ({ x: 62, y: f(m.r2.bot + 8), w: 36 }),
+    },
+    build(m) {
+      const [a1, a2, a3, a4] = ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
+      const v1 = f(m.r1.hx + 1.5), v3 = f(m.r3.hx + 1.5);
+      const wires = [], labels = [], parts = [];
+      const chips = [
+        chipAt('U5', 66, a1 - 3, 78, a1 + 6, 'E0510'), chipAt('U6', 45, a2 - 3, 55, a2 + 5, 'E0520'),
+        chipAt('U7', 47, a3 - 3, 57, a3 + 5, 'E0530'), chipAt('U8', 45, a4 - 3, 55, a4 + 5, 'E0540'),
+      ];
+      wires.push(...bundle([[49, 0], [49, 5.5], [72, 5.5], [72, a1 - 3]], 3));
+      wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via' }),
+                 wire([[47, a3], [v3, a3]], { o: true, end: 'via' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via' }));
+      parts.push({ kind: 'R', x: 56, y: a1 });
+      lampsR(78, [a1 + 1, a1 + 4], 10, 6, wires, parts, labels);
+      wires.push(...bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3), ...bundle([[50, a2 + 5], [50, a3 - 3]], 3),
+                 ...bundle([[51, a3 + 5], [51, a4 - 3]], 3));
+      const L = f(m.r3.bot + 4);
+      bundle([[50, a4 + 5], [50, L], [6, L]], 3).forEach((w, k) => {
+        const stop = [34, 26, 18][k];
+        cut(w, 1, stop).end = 'via';
+        wires.push(w);
+        labels.push(net(stop - 0.9, w.pts[2][1] + 0.25, `E054${k + 1}`, 'end'));
+      });
+      labels.push(ref(66, a1 - 4.1, 'U5'), ref(45, a2 - 4.1, 'U6'), ref(47, a3 - 4.1, 'U7'), ref(45, a4 - 4.1, 'U8'),
+                  ref(56, a1 - 0.95, 'R9', 'middle'), net(v1 + 0.9, a1 - 0.75, 'E0511', 0, true), net(v3 + 0.9, a3 - 0.75, 'E0531', 0, true));
+      const rows = f(Math.max(m.r4.bot, L + 1) + 5);
+      return { rows, chips, wires, parts, labels, crop: f(m.r4.bot - 12) };
+    },
+  },
+  narrow: {
+    cols: 32,
+    seats: {
+      head: { x: 6, y: 13 }, r1: { x: 6, y: 18.5, w: 24 },
+      r2: m => ({ x: 6, y: f(m.r1.bot + 4.5), w: 24 }), r3: m => ({ x: 6, y: f(m.r2.bot + 4.5), w: 24 }), r4: m => ({ x: 6, y: f(m.r3.bot + 4.5), w: 24 }),
+    },
+    build(m) {
+      const [a1, a2, a3, a4] = ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
+      const L = f(m.r4.bot + 3.5);
+      const chips = [chipAt('U5', 9, 2, 18, 9, 'E0510')];
+      const wires = [], labels = [], parts = [];
+      wires.push(...bundle([[26, 0], [26, 5], [18, 5]], 3));
+      const [acc, inner, outer] = bundle([[9, 7], [2, 7], [2, a4]], 3);
+      acc.pts.push([4.5, a4]); acc.legs.splice(-1, 1, 6, 0);
+      wires.push({ ...acc, o: true, end: 'via' });
+      [a1, a2, a3].forEach(a => wires.push(wire([[3, a], [4.5, a]], { o: true, end: 'via' })));
+      inner.pts.splice(-1, 1, [2, L], [20, L], [20, L + 6]); inner.legs.splice(-1, 1, 8, 8, 0);
+      outer.pts.splice(-1, 1, [1, L + 3], [20, L + 3]); outer.legs.splice(-1, 1, 8, 0);
+      wires.push({ ...inner, end: 'via' }, outer);
+      [L, L + 3].forEach((r, i) => {
+        parts.push({ kind: 'R', x: 8, y: r }, { kind: 'LED', x: 14, y: r, delay: [0, 1.3][i] });
+        labels.push(ref(8, r - 0.95, `R${10 + i}`, 'middle'), ref(14, r - 1.05, `D${6 + i}`, 'middle'));
+      });
+      parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
+      labels.push(ref(8.4, 2.2, 'U5', 'end'), ref(3.9, f(m.r2.top + 0.5 * m.r2.h + 0.25), 'R9'));
+      return { rows: f(L + 9), chips, wires, parts, labels, crop: f(m.r4.bot - 14) };
+    },
+  },
+};
+
+/* ===========================================================================
+   The four footers. Each is { wide, narrow }, and each layout is { cols, seats, build(m) }, as in the site.
+   m has c1 to c3, the contacts (Email, GitHub, LinkedIn), and cr, the copyright, measured in cells from the
+   board's top left: top, bot and h; and for a contact, cap, the middle of its name's capitals, and hx, the
+   column where its name ends. Designators run on from Research: U9, U10, J2, R12 on, D8 on.
+   =========================================================================== */
+
+/* A. Pinout: the contacts in a column on the right. U9 sits to their left, level with the middle one, and three
+   orange traces fan out of three neighbouring pads, one straight and two on 45° runs, to a via before each name.
+   J2's bus comes down the left into U9, and two lamps hang under it. */
+const optA = {
+  wide: {
+    cols: 107,
+    seats: { ...column(62, 7), cr: m => ({ x: 6, y: f(m.c2.cap + 12.5) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m);
+      const wires = [], labels = [], parts = [];
+      const chips = [
+        chipAt('U9', 40, a2 - 5, 52, a2 + 5, 'F0910'),
+        { id: 'J2', conn: true, x0: 14.2, y0: 3, x1: 19.8, y1: 4.5, pins: { b: [15, 16, 17, 18, 19] } },
+      ];
+      wires.push(...bundle([[17, 4.5], [17, a2], [40, a2]], 5));
+      // the fan: each outer trace is one straight diagonal, its two corners' cuts adding up to the rise
+      const fan = (from, to) => {
+        const D = Math.abs(to - from), X = f(53.5 + D / 2);
+        return wire([[52, from], [X, from], [X, to], [60.5, to]], { o: true, legs: [0, D * P / 2, D * P / 2, 0], end: 'via' });
+      };
+      wires.push(fan(a2 - 1, a1), wire([[52, a2], [60.5, a2]], { o: true, end: 'via' }), fan(a2 + 1, a3));
+      lampsDown([44, 48], a2 + 5, 52, 12, 8, wires, parts, labels);
+      labels.push(ref(40, a2 - 6.1, 'U9'), ref(13.6, 4.75, 'J2', 'end'), net(20.2, f(a2 - 3), 'F0901 – F0905'),
+                  net(56, a2 - 0.75, 'F0912', 'middle', true));
+      return { rows: f(Math.max(m.cr.bot, a2 + 15) + 4), chips, wires, parts, labels };
+    },
+  },
+  // J2 and U9 above; three traces leave U9 and run down the right. The nearest is orange and steps in along
+  // each name, a via just past it; the other two turn under the copyright into two lamps.
+  narrow: {
+    cols: 32,
+    seats: { ...column(2, 11), cr: m => ({ x: 2, y: f(m.c3.bot + 3) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m), [v1, v2, v3] = past(m);
+      const T = f(m.cr.bot + 2.5);
+      const wires = [], labels = [], parts = [];
+      const chips = [
+        chipAt('U9', 11, 2, 20, 8, 'F0910'),
+        { id: 'J2', conn: true, x0: 2.2, y0: 1, x1: 5.8, y1: 2.5, pins: { b: [3, 4, 5] } },
+      ];
+      wires.push(...bundle([[4, 2.5], [4, 5], [11, 5]], 3));
+      const [outer, mid, acc] = bundle([[20, 5], [28, 5], [28, a3]], 3);
+      acc.pts.splice(-1, 1, [27, a3], [v3, a3]); acc.legs.splice(-1, 1, 8, 0);
+      wires.push({ ...acc, o: true, end: 'via' }, wire([[27, a1], [v1, a1]], { o: true, end: 'via' }), wire([[27, a2], [v2, a2]], { o: true, end: 'via' }));
+      mid.pts.splice(-1, 1, [28, T], [6, T], [6, T + 5]); mid.legs.splice(-1, 1, 8, 8, 0);
+      outer.pts.splice(-1, 1, [29, T + 3], [6, T + 3]); outer.legs.splice(-1, 1, 8, 0);
+      wires.push({ ...mid, end: 'via' }, outer);
+      [T, T + 3].forEach((r, i) => {
+        parts.push({ kind: 'R', x: 22, y: r }, { kind: 'LED', x: 16, y: r, delay: [0, 1.3][i] });
+        labels.push(ref(22, r - 0.95, `R${12 + i}`, 'middle'), ref(16, r - 1.05, `D${8 + i}`, 'middle'));
+      });
+      labels.push(ref(20.6, 1.9, 'U9'), ref(6.4, 2.75, 'J2'));
+      return { rows: f(T + 7), chips, wires, parts, labels };
+    },
+  },
+};
+
+/* B. Off-page: the contacts in a row. A bus leaves U9 in the top left, steps down once, and runs east into U10;
+   its lowest trace is orange and drops a branch to each contact, ending in a schematic off-page flag that
+   points at the name: the net leaves this page here. Two lamps hang under U10. */
+const optB = {
+  wide: {
+    cols: 107,
+    seats: { c1: { x: 22, y: 13 }, c2: { x: 51, y: 13 }, c3: { x: 77, y: 13 }, cr: m => ({ x: 6, y: f(m.c1.bot + 3.5) }) },
+    build(m) {
+      const a = f(m.c1.cap);
+      const wires = [], labels = [], parts = [], art = [];
+      const chips = [chipAt('U9', 4, 2, 12, 10, 'F0910'), chipAt('U10', 94, 3, 102, 11, 'F0920')];
+      const [n, mid, o] = bundle([[12, 6], [30, 6], [30, 8], [94, 8]], 3, { 1: P, 2: P });
+      o.pts.splice(-1, 1, [70, 9], [70, a], [72, a]); o.legs.splice(-1, 1, 8, 6, 0);
+      wires.push(n, mid, { ...o, o: true },
+                 wire([[15, 7], [15, a], [17, a]], { o: true, legs: [0, 6, 0] }), wire([[44, 9], [44, a], [46, a]], { o: true, legs: [0, 6, 0] }));
+      [[21, 'F0911'], [50, 'F0912'], [76, 'F0913']].forEach(([tip, code]) => art.push(flag(tip, a, 1, code)));
+      lampsDown([96, 100], 11, 104, 12, 8, wires, parts, labels);
+      labels.push(ref(4, 0.9, 'U9'), ref(94, 1.9, 'U10'), net(14, 4.3, 'F0901 – F0903'));
+      return { rows: f(Math.max(m.cr.bot, 22) + 3), chips, wires, parts, labels, art };
+    },
+  },
+  // U9 alone in the top right; three traces drop out of its foot down the right. The nearest is orange and
+  // ends in a flag just past each name, pointing back at it; the other two run on into U10, beside the copyright.
+  narrow: {
+    cols: 32,
+    seats: { ...column(2, 11), cr: m => ({ x: 2, y: f(m.c3.bot + 3.5) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m), [v1, v2, v3] = past(m).map(v => f(v - 0.5));
+      const wires = [], labels = [], parts = [], art = [];
+      const U = f(m.cr.bot + 1.5);
+      const chips = [chipAt('U9', 21, 1.5, 30, 7.5, 'F0910'), chipAt('U10', 22, U, 30, U + 5, 'F0920')];
+      const [b2, b1, acc] = bundle([[26, 7.5], [26, U]], 3);
+      acc.pts.splice(-1, 1, [25, a3], [f(v3 + FLAG), a3]); acc.legs = [0, 8, 0];
+      wires.push({ ...acc, o: true }, b1, b2,
+                 wire([[25, a1], [f(v1 + FLAG), a1]], { o: true }), wire([[25, a2], [f(v2 + FLAG), a2]], { o: true }));
+      [[v1, a1, 'F0911'], [v2, a2, 'F0912'], [v3, a3, 'F0913']].forEach(([tip, y, code]) => art.push(flag(tip, y, -1, code)));
+      labels.push(ref(20.4, 1.1, 'U9', 'end'), ref(21.4, U + 6.3, 'U10'));
+      return { rows: f(U + 8), chips, wires, parts, labels, art };
+    },
+  },
+};
+
+/* C. Edge connector: the contacts in a row, and the page ends at the board's edge, in a row of fingers. An
+   orange trace rises from a finger to a via before each name; five fingers feed U9 in the top right, and the
+   rest each run a short stub up to a via, staggered. Past the fingers, off the board. */
+function edgeStubs(cols, edge, skip, heights) {
+  const top = edge - FINGER, out = [];
+  cols.forEach((c, i) => {
+    const h = heights[i % heights.length];
+    if (h && !skip.includes(c)) out.push(wire([[c, top], [c, f(top - h)]], { end: 'via' }));
+  });
+  return out;
+}
+const optC = {
+  wide: {
+    cols: 107,
+    seats: { c1: { x: 10.5, y: 6 }, c2: { x: 40.5, y: 6 }, c3: { x: 66.5, y: 6 }, cr: m => ({ x: 66.5, y: f(m.c3.bot + 3.5) }) },
+    build(m) {
+      const a = f(m.c1.cap), E = f(m.c1.bot + 15), top = E - FINGER;
+      const wires = [], labels = [], parts = [], art = [];
+      const chips = [chipAt('U9', 88, 2, 98, 10, 'F0910')];
+      const cols = [...rng(4, 33), ...rng(38, 102)];
+      const acc = [9, 39, 65], bus = [91, 92, 93, 94, 95];
+      acc.forEach(c => wires.push(wire([[c, top], [c, a]], { o: true, end: 'via' })));
+      wires.push(...bundle([[93, top], [93, 10]], 5));
+      wires.push(...edgeStubs(cols, E, [...acc, ...bus, ...acc.map(c => c - 1), ...acc.map(c => c + 1), 90, 96], [1.3, 2.6, 0]));
+      art.push(fingers(cols, E));
+      labels.push(ref(87.4, 1.6, 'U9', 'end'), ref(35.5, f(E - 0.8), 'J2', 'middle'), net(96.6, f((10 + top) / 2 - 1.5), 'F0901 – F0905'),
+                  net(9.9, f(a + 5), 'F0911', 0, true), net(39.9, f(a + 5), 'F0912', 0, true), net(65.9, f(a + 5), 'F0913', 0, true));
+      return { rows: f(E + 3), chips, wires, parts, labels, art, under: [offboard(107, E, 3)] };
+    },
+  },
+  // the fingers along the foot; three traces rise up the right from them. The nearest is orange and steps in
+  // along each name, a via just past it; the other two carry on up past the first into U9.
+  narrow: {
+    cols: 32,
+    seats: { ...column(2, 11), cr: m => ({ x: 2, y: f(m.c3.bot + 3) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m), [v1, v2, v3] = past(m);
+      const E = f(m.cr.bot + 7.5), top = E - FINGER;
+      const wires = [], labels = [], parts = [], art = [];
+      const chips = [chipAt('U9', 20, 2, 30, 8, 'F0910')];
+      const cols = [...rng(2, 14), ...rng(18, 30)];
+      wires.push(wire([[27, top], [27, a1], [v1, a1]], { o: true, end: 'via' }),
+                 wire([[27, a2], [v2, a2]], { o: true, end: 'via' }), wire([[27, a3], [v3, a3]], { o: true, end: 'via' }));
+      wires.push(wire([[28, top], [28, 8]]), wire([[29, top], [29, 8]]));
+      wires.push(...edgeStubs(cols, E, [26, 27, 28, 29, 30], [1.3, 2.4, 0]));
+      art.push(fingers(cols, E));
+      labels.push(ref(19.4, 1.6, 'U9', 'end'), ref(16, f(E - 0.8), 'J2', 'middle'));
+      return { rows: f(E + 2), chips, wires, parts, labels, art, under: [offboard(32, E, 2)] };
+    },
+  },
+};
+
+/* D. Indicators: the contacts in a column on the right, as in A, but read as a front panel. A rail comes out of
+   U9 and down the contacts' left; its nearest trace is orange and branches in to each name through a lit lamp,
+   ending on a via before it. The other two turn under the last contact and stop short. */
+const optD = {
+  wide: {
+    cols: 107,
+    seats: { ...column(62, 7), cr: m => ({ x: 6, y: f(m.c2.cap + 12.5) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m);
+      const T = f(m.c3.bot + 2.5);
+      const wires = [], labels = [], parts = [];
+      const chips = [
+        chipAt('U9', 40, a1 - 4, 50, a1 + 4, 'F0910'),
+        { id: 'J2', conn: true, x0: 14.2, y0: 3, x1: 19.8, y1: 4.5, pins: { b: [15, 16, 17, 18, 19] } },
+      ];
+      wires.push(...bundle([[17, 4.5], [17, a1], [40, a1]], 5));
+      const [acc, k1, k2] = bundle([[50, a1 - 2], [54, a1 - 2], [54, T], [86, T]], 3);
+      acc.pts.splice(2, 2, [55, a3], [60.5, a3]); acc.legs.splice(2, 2, 8, 0);
+      wires.push({ ...acc, o: true, end: 'via' }, wire([[55, a1], [60.5, a1]], { o: true, end: 'via' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via' }));
+      [a1, a2, a3].forEach((a, i) => parts.push({ kind: 'LED', x: 57.6, y: a, delay: [0, 1.3, 2.5][i] }));
+      [[k1, 72], [k2, 80]].forEach(([w, stop], i) => {
+        cut(w, 2, stop).end = 'via';
+        wires.push(w);
+        labels.push(net(stop + 0.9, w.pts[3][1] + 0.25, `F091${4 + i}`));
+      });
+      labels.push(ref(40, f(a1 - 5.1), 'U9'), ref(13.6, 4.75, 'J2', 'end'), net(20.2, f(a1 + 4.5), 'F0901 – F0905'),
+                  ref(57.6, f(a1 - 1.05), 'D8', 'middle'), ref(57.6, f(a2 - 1.05), 'D9', 'middle'), ref(57.6, f(a3 - 1.05), 'D10', 'middle'));
+      return { rows: f(Math.max(m.cr.bot, T + 1) + 4), chips, wires, parts, labels };
+    },
+  },
+  // U9 at the top; three traces leave it and run down the right. The nearest is orange and steps in along each
+  // name through a lamp to a via just past it; the other two turn under the copyright and stop short.
+  narrow: {
+    cols: 32,
+    seats: { ...column(2, 11), cr: m => ({ x: 2, y: f(m.c3.bot + 3) }) },
+    build(m) {
+      const [a1, a2, a3] = caps(m), [v1, v2, v3] = past(m);
+      const T = f(m.cr.bot + 2.5);
+      const wires = [], labels = [], parts = [];
+      const chips = [chipAt('U9', 13, 1.5, 22, 7.5, 'F0910')];
+      const [outer, mid, acc] = bundle([[22, 4.5], [28, 4.5], [28, T], [2, T]], 3);
+      acc.pts.splice(2, 2, [27, a3], [v3, a3]); acc.legs.splice(2, 2, 8, 0);
+      wires.push({ ...acc, o: true, end: 'via' }, wire([[27, a1], [v1, a1]], { o: true, end: 'via' }), wire([[27, a2], [v2, a2]], { o: true, end: 'via' }));
+      [v1, v2, v3].forEach((v, i) => parts.push({ kind: 'LED', x: f(v + 2.6), y: [a1, a2, a3][i], delay: [0, 1.3, 2.5][i] }));
+      [[mid, 16], [outer, 9]].forEach(([w, stop], i) => {
+        cut(w, 2, stop).end = 'via';
+        wires.push(w);
+        labels.push(net(stop - 0.9, w.pts[3][1] + 0.25, `F091${4 + i}`, 'end'));
+      });
+      labels.push(ref(12.4, 1.6, 'U9', 'end'),
+                  ref(f(v1 + 2.6), f(a1 - 1.05), 'D8', 'middle'), ref(f(v2 + 2.6), f(a2 - 1.05), 'D9', 'middle'), ref(f(v3 + 2.6), f(a3 - 1.05), 'D10', 'middle'));
+      return { rows: f(T + 4), chips, wires, parts, labels };
+    },
+  },
+};
+
+/* ===========================================================================
+   Seating and measuring. Each block is seated, then measured, in order; the circuit is built from the
+   measurements. A seat gives its block's left column in x, or its right column in r.
+   =========================================================================== */
+function baselineOf(el) {
+  const probe = document.createElement('span');  // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+function capHeightOf(heading) {
+  const cs = getComputedStyle(heading), cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${cs.fontWeight} 1000px ${cs.fontFamily}`;
+  return cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+}
+function firstLineRight(heading) {
+  const range = document.createRange();
+  range.selectNodeContents(heading);
+  const rects = [...range.getClientRects()].filter(r => r.width > 0);
+  const top = rects[0].top;
+  return Math.max(...rects.filter(r => Math.abs(r.top - top) < 2).map(r => r.right));
+}
+
+function drawBoard(board, l) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const box = board.getBoundingClientRect(), u = box.width / W;
+  const cell = px => f(px / u / P);
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-b="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    el.style.left = s.r === undefined ? `${100 * s.x / l.cols}%` : 'auto';
+    el.style.right = s.r === undefined ? 'auto' : `${100 * (l.cols - s.r) / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : 'auto';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    const r = el.getBoundingClientRect();
+    m[key] = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height) };
+    const heading = el.matches('h2') ? el : el.querySelector('h3, .cn');
+    if (heading) {
+      m[key].cap = cell(baselineOf(heading) - capHeightOf(heading) / 2 - box.top);
+      m[key].hx = cell(firstLineRight(heading) - box.left);
+    }
+  }
+  const c = l.build(m);
+  board.insertAdjacentHTML('afterbegin', svgOf(l.cols, c));
+  return { m, c, u };
+}
+
+// the foot of Research, drawn whole, then cropped to what is below `crop`
+function drawPrev(prev, layout) {
+  const pb = prev.querySelector('.board');
+  pb.style.marginTop = '0';
+  const p = drawBoard(pb, layout);
+  pb.style.marginTop = `-${f(p.c.crop / layout.cols * 100)}cqw`;
+  prev.style.aspectRatio = `${layout.cols} / ${f(p.c.rows - p.c.crop)}`;
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const OPTIONS = [
+  { name: 'Pinout', o: optA,
+    note: 'The contacts stacked on the right. U9 sits to their left, level with GitHub, and three orange traces fan out of three neighbouring pads to a via before each name: the middle one straight, the outer two on 45° runs, the way a chip\'s pins are fanned out to something wider. J2\'s bus feeds U9 from the left, two lamps hang under it, and the copyright sits in the bottom left-hand corner. The closest to how Projects and Research already work.',
+    phone: 'J2 and U9 above. Three traces run down the right: the nearest steps in along each name to a via just past it, and the other two turn under the copyright into two lamps.',
+    recipe: [['contacts', 'stacked, right'], ['each ends on', 'a via'], ['fed by', 'a fan out of U9'], ['closes with', 'lamps under U9']] },
+  { name: 'Off-page', o: optB,
+    note: 'The contacts in a row. A bus leaves U9 in the top left, steps down once and runs east into U10. Its lowest trace is orange and drops a branch to each contact, which ends in a schematic off-page connector: the flag a schematic draws where a net leaves the sheet and carries on elsewhere. Here each one is a link out of the site. Two lamps under U10, the copyright in the bottom left-hand corner.',
+    phone: 'U9 alone in the top right. Three traces drop down the right: the nearest ends in a flag just past each name, pointing back at it, and the other two run into U10 beside the copyright.',
+    recipe: [['contacts', 'in a row'], ['each ends on', 'an off-page flag'], ['fed by', 'a bus across the top'], ['closes with', 'lamps under U10']] },
+  { name: 'Edge connector', o: optC,
+    note: 'The contacts in a row, and the page ends at the board\'s edge: a row of fingers, as on an expansion card, and past them the board stops. An orange trace rises from a finger to a via before each name; five fingers feed U9 in the top right, and the rest run short stubs up to vias, staggered. The only option that makes the footer look like the end of the board, rather than one more section on it.',
+    phone: 'Fingers along the foot. Three traces rise up the right from them: the nearest steps in along each name to a via just past it, and the other two carry on up into U9.',
+    recipe: [['contacts', 'in a row'], ['each ends on', 'a via'], ['fed by', 'risers from edge fingers'], ['closes with', 'the board\'s edge']] },
+  { name: 'Indicators', o: optD,
+    note: 'The contacts stacked on the right, as in Pinout, but read as a device\'s front panel: each has a lit lamp beside it. A rail leaves U9 and comes down the contacts\' left; its nearest trace is orange and branches in to each name through a lamp, ending on a via. The other two turn under LinkedIn and stop short at staggered lengths.',
+    phone: 'U9 at the top. Three traces run down the right: the nearest steps in along each name through a lamp to a via just past it, and the other two turn under the copyright and stop short.',
+    recipe: [['contacts', 'stacked, right'], ['each ends on', 'a lit lamp and a via'], ['fed by', 'a rail out of U9'], ['closes with', 'staggered tail']] },
+];
+
+const main = document.getElementById('specimens');
+OPTIONS.forEach((o, i) => {
+  const id = 'abcd'[i];
+  main.insertAdjacentHTML('beforeend', `<section class="spec" id="opt-${id}">
+    <div class="cap"><div class="num">Option ${id.toUpperCase()}</div><h2>${o.name}</h2><p>${o.note}</p>
+      <ul class="recipe">${o.recipe.map(([k, v]) => `<li>${k} <b>${v}</b></li>`).join('')}</ul></div>
+    <div class="prev wide"><section class="board"></section></div><footer class="board foot wide"></footer>
+    <div class="phone-row">
+      <div class="phone"><div class="prev narrow"><section class="board"></section></div><footer class="board foot narrow"></footer></div>
+      <div class="phone-note"><p class="sub">390 px</p><p>${o.phone}</p></div>
+    </div></section>`);
+  const spec = main.lastElementChild;
+  spec.querySelectorAll('.prev .board').forEach(b => b.append(document.getElementById('research').content.cloneNode(true)));
+  spec.querySelectorAll('.foot').forEach(b => b.append(document.getElementById('footer').content.cloneNode(true)));
+});
+
+function drawAll() {
+  OPTIONS.forEach((o, i) => {
+    const spec = document.getElementById(`opt-${'abcd'[i]}`);
+    drawPrev(spec.querySelector('.prev.wide'), research.wide);
+    drawBoard(spec.querySelector('.foot.wide'), o.o.wide);
+    drawPrev(spec.querySelector('.prev.narrow'), research.narrow);
+    drawBoard(spec.querySelector('.foot.narrow'), o.o.narrow);
+  });
+}
+
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', 'italic 400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
