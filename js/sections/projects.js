@@ -59,7 +59,7 @@ const wide = {
 // sends three traces off the board's foot into Research.
 const narrow = {
   cols: 32,
-  seats: { head: { x: 2, y: 14 }, p1: { x: 2, y: 19.5, w: 24 }, p2: m => ({ x: 2, y: f(m.p1.bot + 4.5), w: 24 }) },
+  seats: { head: { x: 2, y: 12 }, p1: { x: 2, y: 17.5, w: 24 }, p2: m => ({ x: 2, y: f(m.p1.bot + 4.5), w: 24 }) },
   build(m) {
     const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
     const v1 = f(m.p1.hx + 1.5), v2 = f(m.p2.hx + 1.5);
