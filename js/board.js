@@ -37,15 +37,15 @@ function measure(el, board, u) {
   return m;
 }
 
-// A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, a seat for each
-// block of type in `seats`, and `build(m)`, which returns the circuit. A seat is keyed by the block's
-// data-seat and gives the cell where its top left sits, its width `w` when it wraps, and its `size` in units
-// when the layout sets it, as it does for the name. A seat can be a function of the blocks seated before it,
-// so that one can sit under another. `m` is every block as measured by measure(), under the same keys.
 // The width here must match the media query in styles.css.
 const NARROW = matchMedia('(max-width: 1099px)');
 
-// Draw a section's circuit into its .board and seat the type in the space left for it.
+// Draw a section's circuit into its .board and seat the type in the space left for it. A section has two layouts,
+// `wide` and `narrow`. Each gives the grid's width in `cols`, a seat for each block of type in `seats`, and
+// `build(m)`, which returns the circuit. A seat is keyed by the block's data-seat and gives the cell where its top
+// left sits, its width `w` when it wraps, and its `size` in units when the layout sets it, as it does for the name.
+// A seat can be a function of the blocks seated before it, so that one can sit under another. `m` is every block
+// as measured by measure(), under the same keys.
 function drawBoard(board, layouts) {
   const l = NARROW.matches ? layouts.narrow : layouts.wide;
   const W = l.cols * P;
