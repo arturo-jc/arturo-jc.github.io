@@ -216,10 +216,20 @@ function grow() {
 }
 
 const later = () => { queued ||= requestAnimationFrame(update); };
-// A board's drawing is new after every redraw, and the runs' places on the page move with it.
+// A board's drawing is new after every redraw, and the runs' places on the page move with it. A new drawing is
+// fully drawn until update() has run, so it runs in the same turn as the redraw, before the browser can paint it:
+// once, in a microtask, however many boards were redrawn together.
+let fresh = false;
 document.addEventListener('boarddrawn', () => {
-  cancelAnimationFrame(queued);
-  queued = requestAnimationFrame(() => { collect(); update(); });
+  if (fresh) return;
+  fresh = true;
+  queueMicrotask(() => {
+    fresh = false;
+    cancelAnimationFrame(queued);
+    queued = 0;
+    collect();
+    update();
+  });
 });
 addEventListener('scroll', later, { passive: true });
 addEventListener('resize', later);

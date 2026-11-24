@@ -87,13 +87,33 @@ function drawBoard(board, layouts) {
 
 // Draw a section, and again whenever its width changes or the fonts arrive: the type wraps
 // differently at another width or in another face, and the layouts are built round its measurements.
+// Every board is redrawn in the same turn, so that js/rails.js puts the animation back on all of them at once,
+// before the next paint.
+const SETTLE = 150;                     // ms the width must be still before the boards are redrawn
+const boards = new Map();               // each board, with what draws it
+let settling = 0;
+const each = fn => { for (const [board, b] of boards) fn(board, b); };
+const draw = (board, b) => { b.at = board.getBoundingClientRect().width; drawBoard(board, b.layouts); };
+// While a window is dragged wider or narrower, a layout scales as a whole, its drawing by its viewBox and its type
+// by --u, so the boards are left to scale until the width has been still for SETTLE ms, and redrawn once then.
+// Redrawing every frame of the drag costs about 50ms a frame on the wide home page.
+const watch = new ResizeObserver(() => {
+  clearTimeout(settling);
+  settling = setTimeout(() => each((board, b) => { if (board.getBoundingClientRect().width !== b.at) draw(board, b); }), SETTLE);
+});
+// Across the breakpoint the layout changes, so the boards are redrawn at once, and the other layout's drawing goes
+// first. Left in, it is stretched to the new width for a frame, which can make the page tall enough to gain a
+// scrollbar and fall back across the breakpoint.
+NARROW.addEventListener('change', () => {
+  clearTimeout(settling);
+  each(board => board.querySelector('svg')?.remove());
+  each(draw);
+});
+document.fonts.ready.then(() => each(draw));
+
 export function mountBoard(board, layouts) {
-  let drawnAt = 0;
-  const draw = () => { drawnAt = board.getBoundingClientRect().width; drawBoard(board, layouts); };
-  draw();
-  new ResizeObserver(() => { if (board.getBoundingClientRect().width !== drawnAt) draw(); }).observe(board);
-  // Across the breakpoint the other layout's drawing goes first. Left in, it is stretched to the new width
-  // for a frame, which can make the page tall enough to gain a scrollbar and fall back across the breakpoint.
-  NARROW.addEventListener('change', () => { board.querySelector('svg')?.remove(); draw(); });
-  document.fonts.ready.then(draw);
+  const b = { layouts, at: 0 };
+  boards.set(board, b);
+  draw(board, b);
+  watch.observe(board);
 }
