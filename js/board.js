@@ -39,8 +39,7 @@ function measure(el, board, u) {
 
 // A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, a seat for each
 // block of type in `seats`, and `build(m)`, which returns the circuit. A seat is keyed by the block's
-// data-seat and gives the cell where its top left sits (or, with `r` in place of `x`, the column its right
-// edge sits on), its width `w` when it wraps, and its `size` in units
+// data-seat and gives the cell where its top left sits, its width `w` when it wraps, and its `size` in units
 // when the layout sets it, as it does for the name. A seat can be a function of the blocks seated before it,
 // so that one can sit under another. `m` is every block as measured by measure(), under the same keys.
 // The width here must match the media query in styles.css.
@@ -60,8 +59,7 @@ function drawBoard(board, layouts) {
   for (const [key, seat] of Object.entries(l.seats)) {
     const el = board.querySelector(`[data-seat="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
     if (s.size) el.style.setProperty('--fs', s.size);
-    el.style.left = s.r === undefined ? `${100 * s.x / l.cols}%` : 'auto';
-    el.style.right = s.r === undefined ? '' : `${100 * (l.cols - s.r) / l.cols}%`;
+    el.style.left = `${100 * s.x / l.cols}%`;
     el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
     el.style.top = `calc(${s.y * P} * var(--u))`;
     m[key] = measure(el, board, u);
