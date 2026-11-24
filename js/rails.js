@@ -17,6 +17,7 @@ const SWEEP = 0.8;                      // the seconds the reading line takes to
 const GROW = 900;                       // a branch's growth, in drawing units a second
 const RETRACT = 3600;                   // and how fast it draws back in, much faster
 const NET = 0.5;                        // the seconds a net takes to draw, whatever its length, so each lights on the same beat
+const LOAD = 0.8;                       // the seconds the runs drawn on load take, all of them, easing out like the sweep
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
@@ -93,6 +94,24 @@ function collect() {
       return r;
     }),
   ];
+  chains();
+}
+
+// The runs drawn on load: those after 'load', the net of a chip no run leads into, and every branch after one of
+// them. Each chain of them shares one clock, easing out, so that every chain finishes at once however long it is:
+// `lead` is how far along its chain a run starts, and its head's `chain` is the chain's length.
+function chains() {
+  const keyed = new Map(runs.map(r => [r.key, r]));
+  for (const r of runs)
+    if (r.after === 'load' || (r.net && !keyed.has(r.after))) Object.assign(r, { load: true, lead: 0, head: r, chain: 0 });
+  for (let more = true; more;) {
+    more = false;
+    for (const r of runs) {
+      const p = keyed.get(r.after);
+      if (!r.load && !r.net && p?.load) { Object.assign(r, { load: true, lead: p.lead + p.len, head: p.head }); more = true; }
+    }
+  }
+  for (const r of runs) if (r.load) r.head.chain = Math.max(r.head.chain, r.lead + r.len);
 }
 
 // Draw fraction `t` of a run. Every trace is drawn at the same speed, so traces that stop short at staggered
@@ -158,7 +177,7 @@ function aim() {
   const on = new Set(['load', ...reached]);
   for (const r of runs) if (r.net && !runs.some(q => q.key === r.after)) on.add(r.after);
   for (const r of runs) if (r.after && !r.net && (grown.get(r.key) ?? 0) >= 1) on.add(r.key);
-  for (const r of runs) if (r.after) r.goal = on.has(r.after) ? 1 : 0;
+  for (const r of runs) if (r.after) r.goal = r.load || on.has(r.after) ? 1 : 0;
 }
 
 // One frame of the branches' and nets' growth; it carries on each frame until every one has reached its goal.
@@ -171,9 +190,15 @@ function grow() {
   for (const r of runs) {
     if (!r.after) continue;
     let g = grown.get(r.key) ?? 0;
-    // a branch grows at a steady speed, and a net in a steady time, retracting as much faster as a branch does
-    const up = r.net ? dt / NET : dt * GROW / r.len, down = up * RETRACT / GROW;
-    g = still.matches ? r.goal : g < r.goal ? Math.min(r.goal, g + up) : Math.max(r.goal, g - down);
+    if (r.load) {
+      // a run drawn on load: its share of its chain, on the chain's clock
+      const s = still.matches ? 1 : clamp((now - born) / 1000 / LOAD);
+      g = clamp(((1 - (1 - s) ** 3) * r.head.chain - r.lead) / r.len);
+    } else {
+      // a branch grows at a steady speed, and a net in a steady time, retracting as much faster as a branch does
+      const up = r.net ? dt / NET : dt * GROW / r.len, down = up * RETRACT / GROW;
+      g = still.matches ? r.goal : g < r.goal ? Math.min(r.goal, g + up) : Math.max(r.goal, g - down);
+    }
     grown.set(r.key, g);
     paint(r, g);
     light(r, g);
