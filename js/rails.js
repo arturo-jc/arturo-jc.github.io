@@ -3,11 +3,13 @@
 // page, is drawn out of its source as the reader scrolls down, so that its tip reaches `to` as `to` comes up to the
 // reading line. The accent nets that leave `to`, marked `net: to`, are blue until then, and turn orange once it
 // arrives. A branch, marked `after`, leaves a chip on the main rail and stops short: it does not follow the scroll,
-// but grows by itself once the main rail reaches its chip, and draws back in if the reader scrolls back above it.
+// but grows by itself once the main rail reaches its chip, and draws back in, faster, if the reader scrolls back
+// above it.
 // The main rail's drawn length is worked out from the scroll position alone, and a branch's is kept by name, so a
 // redraw never puts either out of step.
 const READ = 0.7;                       // the reading line, as a fraction of the window's height down from its top
-const SPEED = 900;                      // a branch's growth, in drawing units a second
+const GROW = 900;                       // a branch's growth, in drawing units a second
+const RETRACT = 3600;                   // and how fast it draws back in, much faster
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = t => Math.min(1, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch is drawn, 0 to 1
@@ -97,14 +99,14 @@ function update() {
 
 // One frame of the branches' growth; it carries on each frame until every branch has reached its goal.
 function grow() {
-  const now = performance.now(), step = (now - then) / 1000 * SPEED;
+  const now = performance.now(), dt = (now - then) / 1000;
   then = now;
   ticking = 0;
   let moving = false;
   for (const r of rails) {
     if (!r.after) continue;
     let g = grown.get(r.to) ?? 0;
-    g = still.matches ? r.goal : g < r.goal ? Math.min(r.goal, g + step / r.len) : Math.max(r.goal, g - step / r.len);
+    g = still.matches ? r.goal : g < r.goal ? Math.min(r.goal, g + dt * GROW / r.len) : Math.max(r.goal, g - dt * RETRACT / r.len);
     grown.set(r.to, g);
     paint(r, g);
     if (g !== r.goal) moving = true;
