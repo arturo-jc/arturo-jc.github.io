@@ -8,15 +8,17 @@
 // - A chip's accent net: everything marked `net: to`. It grows out of `to` like a branch, in blue, but in the same
 //   time whatever its length, and turns orange once it reaches the content; it turns blue again and draws back in when `to` disconnects. Its parts, via and code
 //   appear as the tip reaches them.
-// A branch's and a net's drawn length is kept by name, so a redraw never puts any of them out of step.
+// A branch's and a net's drawn length is kept by name, so a redraw never puts any of them out of step. On load the
+// reading line sweeps down to its place, and everything follows it.
 const READ = 0.7;                       // the reading line, as a fraction of the window's height down from its top
+const SWEEP = 0.8;                      // the seconds the reading line takes to sweep down to its place on load
 const GROW = 900;                       // a branch's growth, in drawing units a second
 const RETRACT = 3600;                   // and how fast it draws back in, much faster
 const NET = 0.5;                        // the seconds a net takes to draw, whatever its length, so each lights on the same beat
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
-let runs = [], queued = 0, ticking = 0, then = 0;
+let runs = [], queued = 0, ticking = 0, then = 0, born = null;
 
 // A path's points every few units, in page coordinates, with how far along it each is.
 function samples(p, len) {
@@ -119,7 +121,13 @@ function light(r, g) {
 
 function update() {
   queued = 0;
-  const line = scrollY + READ * innerHeight;
+  // On load the reading line sweeps down from the top of the page to its place, easing out, so that the main rail
+  // grows to where the scroll puts it instead of starting half drawn. It sweeps a fraction of the way there, so it
+  // takes the same time however far down the page opens, and a scroll during it moves where it is heading.
+  born ??= performance.now();
+  const swept = still.matches ? 1 : clamp((performance.now() - born) / 1000 / SWEEP);
+  const line = (1 - (1 - swept) ** 3) * (scrollY + READ * innerHeight);
+  if (swept < 1) later();
   // a rail that ends too low for the reading line to reach at the foot of the page finishes at the foot
   const lowest = document.documentElement.scrollHeight - (1 - READ) * innerHeight - 1;
   const arrived = new Set();

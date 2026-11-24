@@ -129,6 +129,8 @@ The blog is two kinds of page, each with one board, and the board holds only the
 
 What sits on a run appears as the tip reaches it, so nothing floats ahead of its trace: a via, and a label marked `rail` or `net` with the run's name, when the nearest trace end is reached; a part marked the same way, when the tip passes it. Mark every part and label on an animated run, or it is drawn from the start.
 
+On load the reading line sweeps down from the top of the page to its place in `SWEEP` seconds, easing out, so the main rail grows out of U1 instead of appearing half drawn; everything else follows the line, so the sweep needs nothing from them. It covers a fraction of the way to the line's place, so it takes the same time however far down the page opens.
+
 A trace is drawn from its first point, so write a run's centreline from its source. A branch's and a net's drawn length is kept by name, so a redraw needs nothing from them. With reduced motion everything is drawn from the start.
 
 ### Rules the drawing follows
