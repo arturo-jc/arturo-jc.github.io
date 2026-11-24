@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 10 · The blog, decorated at the head</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 72px 0 0; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .sub { font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 14px; }
+  .phone-row { display: flex; gap: 40px; align-items: flex-start; margin-top: 8px; flex-wrap: wrap; }
+  .phone { width: 390px; flex: none; outline: 1px solid var(--rule); padding-top: 16px; }
+  .phone-note { max-width: 420px; font: 400 14px/1.5 var(--sans); color: #c5d9e6; }
+  .phone-note p { margin: 0 0 10px; }
+  /* a long article, cut off a few sections in and faded out */
+  .crop { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(to top, transparent, #000 160px); mask-image: linear-gradient(to top, transparent, #000 160px); }
+  .mix { padding: 72px 0 96px; }
+  .switches { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 0 0 8px; }
+  .switches label { display: grid; gap: 6px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .switches select { font: 400 14px/1.2 var(--sans); color: var(--text); background: var(--chip); border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; }
+
+  /* ---- the designs: same rules as styles.css, plus a blog index and an article ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .board [data-b] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  /* the index's heading, set like the name */
+  .big { font: 600 calc(var(--fs, 60) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
+  /* an article's title: long, so it wraps, balanced */
+  .title { font: 600 calc(var(--fs, 34) * var(--u))/1.18 var(--sans); letter-spacing: -.015em; text-wrap: balance; }
+  .date { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); }
+  /* a link set like a project's name: About's "Blog", and the article's way back */
+  .back { color: inherit; font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap; }
+  .back, .entry h3 a, .copy a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+    text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .back:hover, .entry h3 a:hover, .copy a:hover { color: var(--accent); }
+  .board:has(.back:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
+  /* an entry in the index: its title, which links to the post, the date and the excerpt */
+  .entry h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+  .entry .date { margin: 0 0 calc(12 * var(--u)); }
+  .entry .ex { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0; }
+  /* an article's body */
+  .copy p, .copy li { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); }
+  .copy p { margin: 0 0 calc(16 * var(--u)); }
+  .copy ul { margin: 0 0 calc(16 * var(--u)); padding-left: 1.3em; }
+  .copy h2 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: calc(44 * var(--u)) 0 calc(12 * var(--u)); text-wrap: balance; }
+  .copy h2:first-child { margin-top: 0; }
+  .copy code { font: 400 .88em/1 var(--mono); color: var(--pad); overflow-wrap: anywhere; }
+  .copy pre { font: 400 calc(12.5 * var(--u))/1.6 var(--mono); color: var(--silk); background: var(--chip); border-radius: calc(3 * var(--u));
+              padding: calc(12 * var(--u)) calc(14 * var(--u)); margin: 0 0 calc(16 * var(--u)); overflow-x: auto;
+              scrollbar-width: thin; scrollbar-color: var(--trace-dim) transparent; }
+  .copy pre code { font: inherit; color: inherit; }
+  .copy blockquote { margin: 0 0 calc(16 * var(--u)); padding-left: 1.2em; color: var(--muted); font-style: italic; }
+  .copy > :last-child { margin-bottom: 0; }
+
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 10</div>
+    <h1>The blog, with circuit only at the head</h1>
+    <p>The two blog pages again, built from your four posts. This time the circuit stays round the top of each page and the text under it is plain: one column, 36 cells wide on a wide screen and 24 on a phone, in the same place in every option. Nothing runs down beside it.</p>
+    <p>What every option keeps: on the <b>index</b>, a chip and the off-page flag A0140 arriving at the heading, the same net that leaves About beside its "Blog". On the <b>article</b>, the same chip with an orange net to the title, and a flag in the top left pointing at "Blog", which links back to the index. What changes is <b>where the rest of the head's circuit goes</b>: A drops it down the margin beside the head and stops it short, B runs a bus across the top from a connector on the edge, and C turns it under the head and stops it short.</p>
+    <p>Each option shows the index, then the DevOps post (the longest title) cut off after its second section. The panel at the bottom draws any post in full, and it can add a via before each heading in the text, with no trace to it.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<script>
+const POSTS = [{"title": "I'm a newcomer to DevOps. Here's how ChatGPT helped me deploy my full stack application to Google Kubernetes Engine over the weekend", "date": "2023-11-08 16:04:39 -0600", "excerpt": "Last week, I deployed an application to Google Kubernetes Engine with the help of ChatGPT-you can find it here. I was very impressed with the quality of ChatGPT's assistance, so I decided to write a short post describing my experience in some detail.", "slug": "im-a-newcomer-to-devops", "html": "<p>Last week, I deployed an application to Google Kubernetes Engine with the help of ChatGPT–you can find it <a href=\"https://stepbystepstrength.com/dashboard\">here<\/a>. I was very impressed with the quality of ChatGPT’s assistance, so I decided to write a short post describing my experience in some detail.<\/p>\n<h2 id=\"prior-devops-experience\">Prior DevOps experience<\/h2>\n<p>I said I was a newcomer to DevOps. But how much of a newcomer, exactly? Prior to this, I had deployed three applications to Heroku, and one to Netlify. I was familiar with environment variables. I knew some basic Docker commands, and I had a basic understanding of the core Kubernetes concepts: clusters, nodes, pods, deployments and services. I completed the <a href=\"https://kubernetes.io/docs/tutorials/hello-minikube/\">Hello Minikube tutorial<\/a>. I have played around the Google Cloud Console. So, while I was not an <em>absolute<\/em> newcomer, this was well beyond my comfort zone.<\/p>\n<h2 id=\"overview\">Overview<\/h2>\n<p>I would divide the process of deploying my application into the following stages:<\/p>\n<ul>\n<li>Writing build scripts<\/li>\n<li>Containerizing my applications<\/li>\n<li>Creating, testing out and debugging deployments and services in Minikube<\/li>\n<li>Setting up Google Cloud SDK<\/li>\n<li>Seeding my database<\/li>\n<li>Securing my application with HTTPS<\/li>\n<\/ul>\n<p>When I talk about “deploying” my application, I am using the word in an overly wide sense–I suppose some of these are not really part of deployment.<\/p>\n<h2 id=\"writing-build-scripts\">Writing build scripts<\/h2>\n<p>My backend is a Node.js server written in TypeScript. Since Node.js cannot execute TypeScript, TypeScript applications generally require a “build step” where all your code is compiled into JavaScript before it can be executed. Usually, this involves running the <code>tsc<\/code> command to tell the TypeScript compiler to compile your TypeScript code. This needs to be done any time the source code changes.<\/p>\n<p>As you can imagine, this gets old pretty fast when you are actively developing an application, which is why I use <a href=\"https://typestrong.org/ts-node/\"><code>ts-node<\/code><\/a> for development. Since I cannot use <code>ts-node<\/code> in production, that means I needed separate <code>npm<\/code> scripts for development and production.<\/p>\n<p>So, my first task before I could deploy my application was to write a <code>build<\/code> script.<\/p>\n<p>This is where I encountered my first two problems.<\/p>\n<p>When you compile TypeScript into JavaScript, the resulting JavaScript is placed in a different directory of your choosing. Since the structure of your output directory (typically <code>/dist<\/code>) perfectly mirrors the structure of your input directory (typically <code>/src<\/code>), this usually causes no issues, <em>except when your code uses relative paths for file imports<\/em>. Once your code is compiled and placed into the <code>/dist<\/code> directory, these paths may still be pointing to the <code>/src<\/code> directory. Learned that the hard way!<\/p>\n<p>The second problem happens when your codebase contains files that are not written in TypeScript. Since my backend has a GraphQL API, my codebase contains a number of <code>.graphql<\/code> files. The problem is that when you run <code>tsc<\/code>, <em>the TypeScript compiler does not copy non-TypeScript files to the output directory<\/em>. Therefore you need to add another command to your <code>build<\/code> script–in my case, <code>cp src/**/*.graphql dist/<\/code><\/p>\n<p>While I could have solved both problems on my own, this was nevertheless a place where ChatGPT really shined, successfully diagnosing both problems in one or two prompts, accelerating a process that would have otherwise taken me at least twice as long.<\/p>\n<h2 id=\"containerizing-my-applications\">Containerizing my applications<\/h2>\n<p>The functioning of your application should not depend on the peculiarities of the environment where it’s deployed. When deploying your application to production, therefore, you want to run your application as a <strong>container<\/strong>. This involves creating a <em>container image<\/em>, which is a standalone, executable package that contains everything you need to run your application. You need a container image for every part of your application–in my case, my frontend and backend.<\/p>\n<p>To create a container image, you want to write something called a “Dockerfile”, which is a set of instruction that tells the Docker Engine how to build a container image for your application.<\/p>\n<p>This is where I ran into one of the hardest problems I dealt with. I used Angular to build my frontend. Once Angular compiled my application into a bunch of static files, I needed something else to serve those static files. ChatGPT recommended Nginx. However, getting Nginx to work with my frontend as a container was way harder than I was expected.<\/p>\n<p>The difficulty was compounded by two decisions I made: (1) Nginx had to proxy requests to <code>/api<\/code> to my backend, (2) when building my Angular application, I used the <code>--base-href /app<\/code> flag because I was originally wanted to serve my application from the <code>/app<\/code> subpath in order to reserve the root for a static landing page for SEO purposes. The latter ended up being so difficult that I decided to scrap that idea.<\/p>\n<p>This being my first time working with Nginx, ChatGPT’s help proved invaluable. It actually felt like teamwork. It was surreal. We created a configuration file for Nginx, and when that wasn’t working, we simplified our configuration with the goal of expanding on that once we had a working baseline, each of us suggesting various changes.<\/p>\n<p>I say this felt like teamwork partly because I didn’t just blindly follow ChatGPT’s advice. When I first raised the issue that Nginx was not serving my Angular app, ChatGPT suggested that I <code>exec<\/code> into the Docker container and make changes to the configuration from there. I thought this was a bad idea, so I pushed back:<\/p>\n<blockquote>\n<p>ChatGPT: […] Once you’ve made these changes to your Nginx configuration inside the Docker container, you should be able to access any Angular route directly and have your API requests proxied correctly to your backend server.<\/p>\n<p>Arturo: Excellent. However, you said to make these changes to my Nginx configuration inside the Docker container. I do not currently have an Nginx configuration file in my frontend. I understand I can go into the container in interactive mode, but that seems inconvenient. Is there a way I can just add an Ngnix configuration file to my application prior to containerizing?<\/p>\n<p>ChatGPT: Yes, you can provide a custom Nginx configuration from outside the Docker container, which is a common and recommended practice. This approach ensures that your Nginx configuration is version controlled and can be easily replicated across different environments.<\/p>\n<p>Here’s a step-by-step guide to doing this: […]<\/p>\n<\/blockquote>\n<h2 id=\"creating-testing-out-and-debugging-deployments-and-services-in-minikube\">Creating, testing out and debugging deployments and services in Minikube<\/h2>\n<p>Once I had container images for all parts of my application, the next step was to create Kubernetes Deployments and Services, which is normally done by writing a Kubernetes manifest for each Service or Deployment.<\/p>\n<p>Each Deployment manifest references an image of some part of your application-for instance the frontend or the backend. When you use the manifest to create the desired Deployment, the container runtime pulls the image from a given registry and creates a container.<\/p>\n<p>ChatGPT pretty much wrote all my manifests for me. It also taught me how to use Minikube to test out the resulting Services and Deployments. While the container runtime normally pulls the specific image from a remote registry, Minikube has a local image registry. You can create and store an image to this registry. When you create a Kubernetes Deployment in Minikube that references that image, Minikube’s container runtime will then fetch the image <em>directly from the local registry<\/em>.<\/p>\n<p>This makes it super convenient to test out Deployments, as you do not need to push your images to a remote registry before you can use them in your pods. You can just build them directly on Minikube. To do this, all you have to do is run <code>eval $(minikube docker-env)<\/code>. This executes a number of <code>export<\/code> commands that point your Docker client to the Docker daemon inside the Minikube virtual machine. Since the docker client is not pointed to Minkube’s Docker daemon, when you later run <code>docker build -t some-image .<\/code>, <em>the image will be stored to Minikube’s local registry<\/em>. Pretty neat!<\/p>\n<p>This was definitely one of the hardest parts of the process of me, and I spent a ton of time <code>exec<\/code>-ing into various pods to debug various issues. Again, I was very glad to have ChatGPT by my side for this.<\/p>\n<h2 id=\"setting-up-google-cloud-sdk\">Setting up Google Cloud SDK<\/h2>\n<p>This was a breeze with ChatGPT’s intructions. No difficulties. ## Seeding my database<\/p>\n<p>For development purposes, I wrote a <code>seed<\/code> script that seeds the database with the initial data that the application needs to function. However, I assumed this approach would not work in production. Since my backend uses TypeORM to query the database, which has support for <a href=\"https://typeorm.io/migrations\">migrations<\/a>, I asked ChatGPT to help me re-write my seed script into a migration. However, ChatGPT talked me out of this by pointing out that migrations are not intended for seeding, but for schema changes. Instead, it taught me to use Kubernetes Jobs to execute my original <code>seed<\/code> scripts (with some modifications suggested by ChatGPT, such as making my script idempotent).<\/p>\n<h2 id=\"securing-my-application-with-https\">Securing my application with HTTPS<\/h2>\n<p>This was <em>by far<\/em> the most difficult part of the process. Just about everything went wrong the first time around. Not coincidentally, it was also the part of the process ChatGPT was the <em>least<\/em> useful at.<\/p>\n<p>To secure my application, ChatGPT suggested I install <code>cert-manager<\/code>, which is a Kubernetes add-on that manages TLS certificates from various sources. My problems started the moment I tried to install <code>cert-manager<\/code>. The first problem was that I deployed my application to a GKE Autopilot cluster. As the “autopilot” name suggests, Google completely manages the cluster, and therefore will not let you create any resources in the <code>kube-system<\/code> namespace. If you use <code>helm<\/code> to install <code>cert-manager<\/code>, however, <code>helm<\/code> will, as part of the installation process, try to create a number of resources in the <code>kube-system<\/code> namespace. Instead of giving you an error message like–I don’t know, “failed to create resource”–the installation will simply fail a 5-minute startup check with the very helpful message: “failed post-install: timed out waiting for the condition”.<\/p>\n<p>As detailed in <a href=\"https://github.com/cert-manager/cert-manager/issues/3713\">this issue<\/a>, the solution is to use the flag <code>--set global.leaderElection.namespace=cert-manager<\/code>, which tells <code>helm<\/code> to use the <code>cert-manager<\/code> namespace instead of the <code>kube-system<\/code> namespace.<\/p>\n<p>The other problem was a boostrapping, or “chicken and egg”-kind of problem where my Ingress controller was not setting my IP correctly because it was missing a valid certificate, but because the IP wasn’t set correctly, requests to the challenge URL that generates a valid certificate never reached the intended service, and the certificate was never generated! As suggested <a href=\"https://github.com/kubernetes/ingress-gce/issues/733\">here<\/a>, the solution was simply to update to a more recent version of <code>cert-manager<\/code>.<\/p>\n<p>This goes to show that as amazing as ChatGPT is, it is still not a full substitute for plain old Google, as otherwise I would not have found the solution to either of these issues.<\/p>\n"}, {"title": "Making my first React app", "date": "2022-01-06 16:04:39 -0600", "excerpt": "As I mentioned in my previous post, my plan for teaching myself web development is to build a largeish project after each course I complete. The last course I completed was Brad Traversy’s React Front to Back, and so around three weeks or four ago, I set out to build my first React app. Here are the results...", "slug": "making-my-first-react-app", "html": "<p>As I mentioned in my previous post, my plan for teaching myself web development is to build a largeish project after each course I complete. The last course I completed was Brad Traversy’s React Front to Back, and so around three weeks or four ago, I set out to build my first React app. Here are the <a href=\"http://groupreads.herokuapp.com/\">results<\/a>, and here is the <a href=\"https://github.com/arturo-jc/groupreads\">repo<\/a>.<\/p>\n<p>So, what did I learn making this project? Obviously, I learned the basics of React: how to create a component, how to import one component into another, etc. Too many things to list, to be honest. But the most valuable thing I learned, I think, is I got a big-picture sense of how React works. This is important because while Brad’s course spent a great deal of time on the nuts and bolts, he didn’t really say much about why use React in the first place, how React works, etc. (This is not meant as a criticism. I think Brad just assumes that if you’ve enrolled in his course, you already know why you want to use React.) Anyway, here’s the sense I got from building my own app. And as a disclaimer, what follows is just that: my current sense or understanding of the framework based on my limited experience with it. I’m sure my understanding will evolve as I get more practice.<\/p>\n<h2 id=\"the-big-picture\">The big picture<\/h2>\n<p>One of my first impressions after using React is how long it takes to build an app. I’m sure a lot it can be chalked up to my own inexperience, but I suspect a lot of it has to do with the sheer amount of things that need to get done. For a full stack app like I made, you need to build both a backend and a frontend. It really feels like making two apps. So, why bother with React? Because your content is rendered a lot faster.<\/p>\n<p>With traditional web applications, your server does double duty. It builds a user interface, and it does a bunch of other stuff such as talking to the database. Then it puts everything together, and sends a bunch of files (mainly HTML, CSS and JS) to the browser. And it does this pretty much every time it receives a request. So, every time your server receives a request, it sends a bunch of stuff back: it sends both instructions for how to render the UI, as well as the data the user needs.<\/p>\n<p>The advantage of using React is you don’t need to send the instructions for rendering the UI every time. Your server sends these instructions once, and upon further requests, all it sends is the data the user actually needs to see. Basically, it delegates the rendering of the UI to the browser so it can focus on other tasks like talking to the database, and so it doesn’t have to keep sending instruction for rendering the UI. No need to keep sending a bunch of HTML, CSS and JS files every time! Just the data the user actually needs–things like strings, numbers, and dates depending on the application. That’s a lot less information that’s being sent from your server to your browser, which accounts for why React apps are faster.<\/p>\n<h2 id=\"state\">State<\/h2>\n<p>So, that’s the basic picture I got of React itself. Now for this application, I had to use something called <strong>state<\/strong>. Often you want a component to be rendered differently at different times. Simple example: when a user clicks on “Delete account”, you don’t want to delete the account right away (what if they clicked by mistake?). Rather, you want to display a confirmation modal or something like that. This modal component needs to be rendered differently at different times: by default, it should not be displayed at all, but it should be displayed if the user clicks “Delete account”. The way you do this in React is you give the component a state (such as <code>show<\/code>), which is basically just a variable that can take a number of values (in this case, <code>true<\/code> or <code>false<\/code>) and whose value can be updated as needed (in this case, set to <code>true<\/code> if the user click on “Delete account”).<\/p>\n<p>Sometimes, only one component needs to have access to the state, but not always. For instance, I wanted both the navbar and the account page to display the user’s name, which I stored inside a user state. These are different components, so I needed two components to have access to the same user state. How do you do that? One way is to use <strong>props<\/strong>.<\/p>\n<p>React components have something called props, which (if you are using functional components) are parameters where you can pass in values as arguments. React will then use these values to render the component differently depending on which arguments you passed–for instance, setting the modal’s display to <code>block<\/code> if you set <code>show<\/code> to <code>true<\/code> and <code>none<\/code> if you set it to <code>false<\/code>. Usually, you pass these props in the component’s parent component. So, if your modal is inside your account page, for instance, you might write something like this in <code>Account.js<\/code>:<\/p>\n<pre class=\"jsx\"><code>    &lt;Modal show={show} /&gt;<\/code><\/pre>\n<p>Here, we are passing the value of the <code>show<\/code> state to the <code>Modal<\/code> component as a prop.<\/p>\n<p>So, props are passed from parent to child. If that’s how we pass states, however, we may end up with long chains of passing where one state is passed from one component to its child, and then from the child to its <em>own<\/em> child, and so on until the state reaches the desired component. This is known as <strong>prop drilling<\/strong>, and it can get quite obnoxious, which is why we use context.<\/p>\n<h2 id=\"context-reducers-and-actions\">Context, reducers, and actions<\/h2>\n<p>A context–and again, this is just my current, (possibly incomplete!) understanding–is basically a place where we store states that we then can access from anywhere within our app. There are different ways of implementing context, but I used a context manager called Redux.<\/p>\n<p>Whenever we use states, we need a way of updating those states–setting a modal’s <code>show<\/code> state to <code>true<\/code> when the user clicks on “Delete account”, or setting <code>user<\/code> to <code>null<\/code> when they log out. If we’re <em>using component-level<\/em> state–basically, a state that only one component needs access too–this is quite easy to do. React comes with a built-in <code>useState<\/code> function which initializes a <em>state<\/em> variable to a <code>defaultValue<\/code> and simultaneously creates a corresponding <code>setState<\/code> function that we can then use to update the state in question:<\/p>\n<pre class=\"javascript\"><code>const [ show, setShow ] = useState(defaultValue)<\/code><\/pre>\n<p>This is all done from within the component that needs access to the state, and since we are dealing with component-level state, there is no need to pass it around.<\/p>\n<p>If we are using <em>app-level state<\/em>–state that need to access from anywhere within our application–well, that’s a different story. If you use Redux like I did, you want to use something called <strong>reducers<\/strong>, whose sole purpose is to update your app’s state. However, you don’t want to call these reducers directly. Instead, you want to create something called actions, which are functions responsible for calling the reducers.<\/p>\n<p>Why the extra step? Because, often, your app’s state is not the only thing that needs updating. If a user deletes a post, for instance, and you have your posts stored in your app’s state, then, of course, you want to update the state, but you also want to update the database. Otherwise, that pesky post will not really be gone–it will show up again on the next session.<\/p>\n<p>So, often, you want to keep your state and your database in synch–and that’s where actions come in. Actions help you update your state and your database in parallel (or roughly in parallel). So, for instance, you might have a <code>deletePost<\/code> action which takes a post ID as an argument and makes a <code>DELETE<\/code> request to your server to tell it to delete the post from the database. Once the database is updated, your <code>deletePost<\/code> action can tell the reducer to delete the post from the state. So, <code>deletePost<\/code> is responsible for talking to both the database and the reducers, and this is how you can keep your database and state in synch.<\/p>\n<p>One of the most important things I learned in this project was probably how to make efficient use of actions. And one point, I was using <code>deletePost<\/code> to update the database only. It would make a <code>DELETE<\/code> request to the server, but it wouldn’t tell the reducer to update the state. Instead, I called another action <code>getPosts<\/code>, which made a <code>GET<\/code> request to the server to fetch all the relevant posts. The server would send those posts back to my frontend, which would then call the reducers to update the state. Only then would my app’s state update. I then realized this was stupid because I was making two separate calls to my server, and because I was requesting a lot of unnecessary data. When a user deletes a post, all other posts remain unchanged and so I don’t need to get all posts–I already have most of them stored in the app, and most of them are up to date. To update the state, all I need is the one post that got deleted–and not even that, just the ID. As soon as I realized this, I switched to the correct approach: use the same action to update both the database and the state. No separate calls.<\/p>\n<h2 id=\"next-steps\">Next steps<\/h2>\n<p>Well, I think that just about sums up the most important things I learned in making my first React app.<\/p>\n<p>I now have three apps, only two more to go until I have a working portfolio. I have been so busy making apps that I have neglected my personal website, so this feels like a good time to take a breaking from app-making to give my website a little upgrading, putting to use everything I’ve learned so far.<\/p>\n"}, {"title": "Making my first Express app", "date": "2021-12-06 16:04:39 -0600", "excerpt": "Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the results...", "slug": "making-my-first-express-app", "html": "<p>Two weeks ago, I completed Colt Steele’s web dev bootcamp and set out to build my own app applying what I learned. Here are the <a href=\"https://tidybuddy.herokuapp.com/\">results<\/a>, and here’s the <a href=\"https://github.com/arturo-jc/TidyBuddy\">repository<\/a><\/p>\n<p>(This is part of my larger plan to teach myself web development by doing one largeish project after each course I complete. Next up, Brad Traversy’s React Front to Back).<\/p>\n<p>Anyway, this time I made a point to write down each thing I learned as I worked on my project. Looking at my list, it may be broken down into three big topics:<\/p>\n<ul>\n<li>Express<\/li>\n<li>EJS<\/li>\n<li>Mongoose<\/li>\n<\/ul>\n<h2 id=\"express\">Express<\/h2>\n<p>One of the big things I learned about Express was how to handle errors in a more organized way—how to divide the labor between controllers, middleware and error-handler.<\/p>\n<p>In Colt Steele’s course, I learned how to use middleware to perform some basic checks—is the user logged in? Does the user own the resource in question? I copied this basic pattern, but at one point I found myself performing simple checks in the controllers themselves—for instance, checking if two passwords matched. I did this out of convenience—the logic was simple and didn’t reduce readability. I was both throwing errors and <em>handling<\/em> those errors in the controllers themselves—flashing and redirecting the user in some cases, calling next on the error in others. I was also handling errors directly in my middleware—again, flashing/redirecting in some middleware functions, calling next in others. But then I realized this was probably not a good idea in the long run.<\/p>\n<p>So, what did I do? I delegated <em>all<\/em> authorization checks to my middleware, and used my controllers exclusively for interacting with the DB and rendering templates—no errors thrown in my controllers. And then I moved <em>all<\/em> the error handling—all the decision-making as to how to handle this or that error—from my middleware to my… well, error-handler.<\/p>\n<p>This involved some creativity. When I was handling errors and failed checks directly in the controllers, this was easy—I could simply flash and redirect right from the controller, for instance. Now I had to tell the error-handler what to do with a given error via the middleware. How do I tell the error-handler that I want certain errors flashed and others rendered?<\/p>\n<p>To do this, I adapted a technique I learned from Colt Steele. Following Steele, I defined an <code>ExpressError<\/code> class that extends <code>Error<\/code> and has <code>message<\/code> and <code>statusCode<\/code> parameters, except I added an optional <code>name<\/code> parameter. Then I used this <code>name<\/code> parameter to communicate from my middleware to my error-handler how I wanted each error handled. So, for instance, some middleware functions would throw an <code>ExpressError<\/code> and pass in “AuthorizationErrorFlash” as its name, others would pass “AuthorizationErrorRender”, and my error-handler would handle them accordingly. Then, when I wanted an authorization error in a given route to result in a flash message, I would simply pass in the appropriate middleware to the route in question. If I change my mind later on, it’s as easy as passing in a different middleware.<\/p>\n<p>The other big thing I learned about Express was how to pass data directly from one controller to another—without the use of the DB.<\/p>\n<p>Here’s the problem I faced. My dashboard template contains a feed. Inside the feed there can be many activities. Each activity has a comment section that’s hidden by default. The user can decide to open the comment section and post a comment, at which point the page refreshes, which means all comment sections are again hidden by default. That’s bad user experience. If you post a comment, you want to see it right away. So whenever a user posts a comment, I had to render the template in such a way that all comment sections are hidden by default <em>except for<\/em> whichever activity the user just commented under.<\/p>\n<p>How do you do that? The first part was easy. From my <code>showHousehold<\/code> controllers which renders the dashboard, pass in a string to an <code>activityId<\/code> parameter in <code>res.render<\/code>, then when you’re rendering the comment sections below each activity, use EJS to include a “hidden” class if and only if the activity’s ID matches whatever string you passed as <code>activityId<\/code>:<\/p>\n<pre class=\"ejs\"><code>    &lt;div class=&quot;comment-section &lt;%= activity._id.toString() === activityId? &#39;&#39; : &#39;hidden&#39; %&gt;&quot;&gt;<\/code><\/pre>\n<p>The problem is, how do I get the ID of whichever activity the user just commented under? Well, comments are created in my <code>createComment<\/code> controller, so that’s where the ID had to come from.<\/p>\n<p>One option would have been to render the dashboard right from the <code>createComment<\/code> controller, but that wasn’t a good idea. There’s a good deal of logic that goes into rendering the dashboard, so rendering it from both <code>showHousehold<\/code> and <code>createComment<\/code> would have resulted in a lot of duplication.<\/p>\n<p>Rather than rendering, I had to redirect the user to my show household route so that my <code>showHousehold<\/code> controller could carry out all that logic, but I had to somehow pass the activity ID from <code>createComment<\/code> over to <code>showHousehold<\/code>.<\/p>\n<p>How do you do that? My solution was to pass it as a query string. Then I could simply catch the activity ID in <code>showHousehold<\/code> and pass it to <code>res.render<\/code> so that my app knows which comment sections to display and which to hide.<\/p>\n<h2 id=\"ejs\">EJS<\/h2>\n<p>Two big things, which are probably going to strike experienced users as quite basic.<\/p>\n<p>At one point, I needed to call a function that calculates the first day of the current week inside an EJS template. But I didn’t want to <em>define<\/em> the function inside the template—I didn’t want to clutter the template. Besides, I may need that function again in a different template. So, I learned that if you have some reusable JS code, you can always move it all to its dedicated EJS file, then include that file where needed. Handy!<\/p>\n<p>Another problem I faced was I wanted to loop over an array and create a todo-item for each element of the array. Since I wanted to reuse this code, I created a dedicated <code>item.ejs<\/code> partial I could include in different places. First, I tried:<\/p>\n<pre class=\"ejs\"><code>    for (let item of items){\n        &lt;%- include(&quot;./item&quot;) %&gt;\n    }<\/code><\/pre>\n<p>Bad news: item is undefined in <code>item.ejs<\/code>. Good news: the solution was not too far off. After a bit of googling, I discovered you can simply pass arguments to template parameters (such as item) by putting them inside an object and passing that object to <code>include<\/code>, so I made a new <code>items.ejs<\/code> partial and did:<\/p>\n<pre class=\"ejs\"><code>    for (let item of frequentItems){\n        &lt;%- include(&quot;./items&quot;, {items: frequentItems}) %&gt;\n    }<\/code><\/pre>\n<p>Now I can use the same <code>items.ejs<\/code> partial and just pass different arrays into the items parameter. Neat!<\/p>\n<h2 id=\"mongoose\">Mongoose<\/h2>\n<p>This is probably the topic I learned the most about.<\/p>\n<p>The most important thing I learned was probably populating a document several levels deep.<\/p>\n<p>In my app, every user should belong to a household. In order to render the dashboard, the user’s household document needs to be <em>fully<\/em> populated—every field and subfield.<\/p>\n<p>My household documents have an <code>activityTypes<\/code> field, which is meant to store an array of activity type documents. Easy enough to populate:<\/p>\n<pre class=\"javascript\"><code>    const household = await Household.findById(householdId)\n        .populate(&quot;activityTypes&quot;)<\/code><\/pre>\n<p>Problem is, activity type documents have a <code>completedBy<\/code> field, which is meant to store an array of activity documents. That needs to be populated as well. No big deal:<\/p>\n<pre class=\"javascript\"><code>    const household = await Household.findById(householdId)\n        .populate({\n            path: &quot;activityTypes&quot;,\n            populate: { path: &quot;completedBy&quot; }\n        });<\/code><\/pre>\n<p>So far, so good. But activity documents have a <code>user<\/code> field that itself needs to be populated. And that’s how I ended up with this monstruous-looking thing:<\/p>\n<pre class=\"javascript\"><code>    household = await Household.findById(householdId)\n        .populate({\n            path: &quot;activityTypes&quot;,\n            populate: {\n                path: &quot;completedBy&quot;,\n                populate: { path: &quot;user&quot; }\n                }\n            });<\/code><\/pre>\n<p>The second big thing I learned was how to delete subdocument arrays.<\/p>\n<p>In addition to the <code>user<\/code> field mentioned above, my activity documents also have a <code>comments<\/code> field, which is meant to store an array of—you guess it—comment documents. When an activity is deleted, there is nowhere for its comments to go, and so those comments should be automatically deleted along with it.<\/p>\n<p>Turns out Mongoose middleware is tailor-made for this. All I had to do was plug this in to my activity schema:<\/p>\n<pre class=\"javascript\"><code>    ActivitySchema.post(&quot;findOneAndDelete&quot;, async function (activity) {\n        if (activity) {\n            await Comment.deleteMany({ _id: { $in: activity.comments } })\n        }\n    });<\/code><\/pre>\n<p>This tells Mongoose that if it deletes an activity, it should also delete all comments whose Id is included in the activity’s comments field, which is just what I wanted.<\/p>\n<p>The third big thing I learned about Mongoose is how to delete “dead” references from documents. Here’s what I mean.<\/p>\n<p>My household documents have a <code>users<\/code> field, which is meant to store an array of user documents. Except it doesn’t actually store the documents inside the array—instead, it stores a <em>reference<\/em> to each document that Mongoose uses to fetch the documents in question.<\/p>\n<p>The problem is that when you delete a user document from the DB, the reference is not deleted from the users array. The array now contains a reference to a document that no longer exists. This is what I meant by a “dead” reference. This doesn’t cause problems in my limited experience, but I don’t like it all the same.<\/p>\n<p>Since Mongoose wouldn’t automatically remove these references for me, I had to learn how to do it myself. So now when I delete a user in my <code>deleteAccount<\/code> controller, I call:<\/p>\n<pre class=\"javascript\"><code>    await Household.updateMany(\n        { users: user },\n        { $pull: { users: user._id } }\n    );<\/code><\/pre>\n<p>In a StackOverFlow thread, someone suggested to use Mongoose middleware for this purpose. However, I ran into circularity issues when I tried this approach (I was requesting two models into each other and using them to define each other). For all I know, it may be possible to get around this problem, but I didn’t keep trying as I was satisfied with the solution above.<\/p>\n<p>The last Mongoose thing I learned was this. In my app, a user can request to join a household. When a user makes a request, I want to push the user into the household’s <code>pendingRequests<\/code> field, but <em>only if the user is not already in the field in question<\/em> (no point adding them twice over!)<\/p>\n<p>I spent an embarrassing amount of time searching how to perform this kind of logic with Mongoose’s <code>findByIdAndUpdate<\/code> method, but it was worth it in the end because I learned about Mongo’s <code>$addToSet<\/code> operator, which does exactly what I wanted:<\/p>\n<pre class=\"javascript\"><code>    await Household.findByIdAndUpdate(householdId,\n        {\n            $addToSet: { pendingRequests: req.user }\n        }\n    );<\/code><\/pre>\n<p>One last thing that’s not exactly about Mongoose, but about a Mongoose plugin. For authentication, I used <code>passport<\/code> in conjunction with <code>passport-local-mongoose<\/code>. What the last package does is it adds a number of methods to your <code>User<\/code> model. You can use these methods to create and pass a strategy to <code>passport<\/code> like so:<\/p>\n<pre class=\"javascript\"><code>    passport.use(new LocalStrategy(User.authenticate()));<\/code><\/pre>\n<p>(<code>LocalStrategy<\/code> comes from a further package called <code>passport-local<\/code>—more about it in a moment).<\/p>\n<p>However, I did not like the way <code>passport-local-mongoose<\/code> handles authentication by default. It fetches the user by username. I didn’t like that. Fortunately, you can tell <code>passport-local-mongoose<\/code> to use email instead:<\/p>\n<pre class=\"javascript\"><code>    UserSchema.plugin(passportLocalMongoose, { usernameField: &quot;email&quot; });<\/code><\/pre>\n<p>However, this is still not going to work—and this took me an embarrassingly long time to figure out. As I said, what this plug in does is add methods to your User model that you can then use to create and pass a strategy to passport. One of those methods is .authenticate, which works just fine if you’re happy with the way <code>passport-local-mongoose<\/code> handles authentication by default. But if you want it to use email instead (like I told it to above), you need to use a different method called <code>.authenticate<\/code> like so:<\/p>\n<pre class=\"javascript\"><code>    passport.use(User.createStrategy());<\/code><\/pre>\n<p>Notice I am no longer relying on <code>LocalStrategy<\/code>, which means I no longer need to require <code>passport-local<\/code>.<\/p>\n<p>And that’s it for now.<\/p>\n<p>Until next time!<\/p>\n"}, {"title": "Making my first web app with flask", "date": "2021-10-21 16:04:39 -0600", "excerpt": "I just completed my first web application using Flask, so I thought it would be a good idea to write down some reflections on my experience while the project is still fresh in my mind...", "slug": "making-my-first-web-app-with-flask", "html": "<p>I just completed my first web application using Flask, so I thought it would be a good idea to write down some reflections on my experience while the project is still fresh in my mind.<\/p>\n<p>My goal for the app was to have the user create a template, set some parameters such as starting date and starting weights, then have the app automatically generate a workout program based on the values entered by the user. Figuring how to generate the program and enter it into the database took some trial and error, but things went more or less smoothly. The real challenge was figuring out how to display the program.<\/p>\n<p>The way my application works, each program object has a number of child workout objects. In turn, each workout object has date and week attributes as well as a number of child exercise objects.<\/p>\n<p>The desired functionality was to have the user select a program and a week, and display all matching workouts along with their corresponding exercises in a table, each column representing a different day of the week.<\/p>\n<p>But how do you build such a table using Jinja (Flask’s templating language)? My first instinct was to build the table column by column. So, starting with the Monday column, I wanted to loop through the Monday workouts, and for each workout, create one cell for the workout’s name and one for each of its exercises, each cell sitting on top of the next. I wanted to create all these cells in the Monday column before moving on to the next column.<\/p>\n<p>It turns out you cannot do this. In HTML, you cannot build a table column by column–you can only build it row by row. This is because you need to close each tag before you open the next. This meant that for each row, I had to create all cells within that row before moving on to the next.<\/p>\n<p>So then I tried looping through all the workouts for the week, creating one row for each workout and one for each of its exercises. Inside each row, I created seven cells (corresponding to the seven days of the week) before closing the tag. If there was a workout scheduled for the corresponding day, the cell displayed the workout’s name or one of its exercises–otherwise the cell was blank.<\/p>\n<p>This method works, but it results in a lot of wasted space. Suppose your program has only one workout on Monday and one workout on Tuesday–call them A and B. You would expect A and B to sit at the same level in the table. But that’s not what you get with this method. Instead, each workout get its own “level”–that is, each workout gets its own set of rows. So, you get one set of rows displaying A on Monday but nothing on Tuesday, and another set of rows below displaying B on Tuesday but nothing on Monday. That’s no good.<\/p>\n<p>To get around these problems, I tried writing some convoluted Jinja code inside the HTML template before ultimately settling on a different kind of solution. The solution was to organize workouts into structures I called “layers” before passing them to the template. This approach is too convoluted to describe in any real detail here, but you can take a look at the solution if you search for “TABLE DATA” <a href=\"https://github.com/arturo-jc/musqlo/blob/master/main.py\">here<\/a>.<\/p>\n<p>So, what lessons can we draw from all this? I would say the main lesson is this. Even though you can use Jinja to write some logic inside the HTML template, you should really keep that to a minimum. Instead, you should stick all the logic inside your Flask application, and pass all the required data to the template in a format that makes it easy to work with inside the template.<\/p>\n<p>This is something I first heard about in Angela Yu’s Python Udemy course, but doing this project really drove the point home.<\/p>\n"}];
+
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {             // a pin header: through-hole pads in a silkscreen outline
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+// The off-page flag, from js/kit.js, which can now point either way: east when `dir` is 1, west when it is -1.
+// Its tail, FLAG cells back from the tip, is where the trace that feeds it ends. `go` marks the flag of a link.
+const FLAG = 4;
+function flag({ tip, y, code, dir = 1, go }) {
+  const X = c => f((tip - dir * c) * P), Y = r => f(y * P + r), h = 6.6;
+  return `<path class="flag${go ? ' go' : ''}" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text>`;
+}
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags || []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   The heads. The circuit is only round the top of each page: the index's heading and an article's way back, title
+   and date. The text under it is plain, in one column, 36 cells wide on a wide screen and 24 on a phone, at the same
+   place in every option. cfg has three switches:
+   head  'stop': three traces leave the chip and drop beside the head, stopping short at staggered heights
+         'mast': a connector on the top edge and a bus across the top into the chip, over the heading
+         'under': three traces leave the chip and run under the head, stopping short at staggered lengths
+   marks 'plain' · 'blue' or 'orange': a via before each post's title on the index and each section's heading in the
+         article, with no trace to it
+   post  which post the article shows
+   =========================================================================== */
+const ref = (x, y, t, a) => ({ k: 'ref', x, y, t, ...(a ? { a } : {}) });
+const net = (x, y, t, a, o) => ({ k: 'net', x, y, t, ...(a ? { a } : {}), ...(o ? { o } : {}) });
+const viaMark = (x, y, o) => wire([[x, y], [x, y]], { o, end: 'via', mark: true });
+
+// A tap off a vertical trace at column x, in to a via at column `via` on row c, on a 45° knee.
+function tap(x, c, via, o) {
+  const k = Math.min(1.5, via - x), pts = [[x, f(c - k)], [f(x + k), c]];
+  if (x + k < via) pts.push([via, c]);
+  return wire(pts, { legs: pts.map(() => 0), o, end: 'via' });
+}
+// End each trace of a bundle on the segment `seg` at its own stop, on a via, with its code beside it. `side` says
+// where the code goes: 'e' past the end of a run east, 'w' left of the end of a run down, 'e' right of it.
+function stops(ws, seg, at, codes, side, wires, labels) {
+  ws.forEach((w, k) => {
+    cut(w, seg, at[k]).end = 'via';
+    wires.push(w);
+    const [x, y] = w.pts[w.pts.length - 1];
+    if (!codes) return;
+    if (side === 'e') labels.push(net(f(x + 0.9), f(y + 0.25), codes[k]));
+    else labels.push(net(f(x - 0.8), f(y + 0.25), codes[k], 'end'));
+  });
+}
+
+/* ---- the index: the heading, then one entry per post, newest first. U101, J101. ---- */
+const ENTRIES = POSTS.map((_, i) => `e${i + 1}`);
+function indexWide(cfg) {
+  const seats = { head: { x: 36, y: 10, size: 60 } };
+  const first = cfg.head === 'under' ? 9 : 6;
+  ENTRIES.forEach((k, i) => { seats[k] = m => ({ x: 36, y: f(i ? m[ENTRIES[i - 1]].bot + 5 : m.head.bot + first), w: 36 }); });
+  return {
+    cols: 107, seats,
+    // U101 in the left margin, level with the heading; its net comes in through the off-page flag before it.
+    build(m) {
+      const a = f(m.head.cap), E = ENTRIES.map(k => m[k]), d = f(m.head.bot + 3.5);
+      const chips = [], wires = [], labels = [], parts = [], r = [a];
+      const tip = f(m.head.l - 0.8);
+      wires.push(wire([[28, a], [f(tip - FLAG), a]]));
+      const flags = [{ tip, y: a, code: 'A0140' }];
+      const chip = { id: 'U101', x0: 18, y0: f(a - 3), x1: 28, y1: f(a + 9), code: 'G0610', pins: { l: [], r, t: [], b: [] } };
+      if (cfg.head === 'stop') {
+        // three traces out of its right side and down the margin, stopping beside the first post
+        r.push(f(a + 4), f(a + 5), f(a + 6));
+        const t = E[0].top;
+        stops(bundle([[28, f(a + 5)], [32, f(a + 5)], [32, t + 9]], 3), 1, [f(t + 6), f(t + 3), f(t)], null, 'w', wires, labels);
+        labels.push(net(30.2, f(a + 11), 'H0621 – H0623', 'end'));
+      } else if (cfg.head === 'mast') {
+        // J101 on the top edge at the right, its bus across the top above the heading and down into U101's top
+        chip.pins.t = [22, 23, 24, 25]; chip.y1 = f(a + 5);
+        chips.push({ id: 'J101', conn: true, x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } });
+        wires.push(...bundle([[86.5, 1.5], [86.5, 5.5], [23.5, 5.5], [23.5, f(a - 3)]], 4));
+        labels.push(ref(83.6, 1.25, 'J101', 'end'), net(90, 5.75, 'D0 – D3'));
+      } else {
+        // three traces straight out of its right side, under the heading and across the column, stopping short
+        r.push(f(d - 1), d, f(d + 1));
+        stops(bundle([[28, d], [80, d]], 3), 0, [74, 66, 58], ['H0621', 'H0622', 'H0623'], 'e', wires, labels);
+      }
+      chips.push(chip);
+      marks(cfg, E.map(e => e.cap), 34.5, wires);
+      labels.push(ref(18, f(a - 4.1), 'U101'));
+      return { rows: f(E[E.length - 1].bot + 4), chips, wires, parts, labels, flags };
+    },
+  };
+}
+function indexNarrow(cfg) {
+  const seats = { head: { x: 6, y: 13, size: 50 } };
+  const first = cfg.head === 'under' ? 7.5 : 3.5;
+  ENTRIES.forEach((k, i) => { seats[k] = m => ({ x: 6, y: f(i ? m[ENTRIES[i - 1]].bot + 4.5 : m.head.bot + first), w: 24 }); });
+  return {
+    cols: 32, seats,
+    // U101 top right; its net comes down out of it and in along the heading's row into a flag pointing back at it.
+    build(m) {
+      const a = f(m.head.cap), E = ENTRIES.map(k => m[k]), d = f(m.head.bot + 3);
+      const chips = [], wires = [], labels = [], parts = [];
+      const chip = { id: 'U101', x0: 21, y0: 2, x1: 30, y1: 9, code: 'G0610', pins: { l: [], r: [], t: [], b: [25] } };
+      const tip = f(m.head.hx + 0.8);
+      wires.push(wire([[25, 9], [25, a], [f(tip + FLAG), a]], { legs: [0, 8, 0] }));
+      const flags = [{ tip, y: a, code: 'A0140', dir: -1 }];
+      if (cfg.head === 'stop') {
+        // three traces out of its left side, west and down the margin, stopping beside the heading and the first post
+        chip.pins.l = [5, 6, 7];
+        const t = E[0].top;
+        stops(bundle([[21, 6], [2, 6], [2, t + 6]], 3), 1, [f(t + 3), f(t), f(a + 1)], null, 'e', wires, labels);
+      } else if (cfg.head === 'mast') {
+        // J101 on the top edge at the left, its bus into U101's left side, as J1 feeds U1 on the home page
+        chip.pins.l = [4, 5, 6, 7];
+        chips.push({ id: 'J101', conn: true, x0: 1, y0: 0, x1: 9, y1: 1.5, pins: { b: [2, 3, 4, 5, 6, 7, 8] } });
+        wires.push(...bundle([[5.5, 1.5], [5.5, 5.5], [21, 5.5]], 4));
+        labels.push(ref(9.6, 1.1, 'J101'), net(9.5, 8.75, 'D0 – D3'));
+      } else {
+        // three traces out of its left side, down the margin and east under the heading, stopping short
+        chip.pins.l = [5, 6, 7];
+        stops(bundle([[21, 6], [2, 6], [2, d], [28, d]], 3), 2, [22, 16, 10], ['H0621', 'H0622', 'H0623'], 'e', wires, labels);
+      }
+      chips.push(chip);
+      marks(cfg, E.map(e => e.cap), 4.5, wires);
+      labels.push(ref(20.4, 2.2, 'U101', 'end'));
+      return { rows: f(E[E.length - 1].bot + 3), chips, wires, parts, labels, flags };
+    },
+  };
+}
+
+/* ---- the article: the way back, the title, the date and the body. U201, R201, J201. ---- */
+function articleWide(cfg) {
+  return {
+    cols: 107,
+    seats: {
+      back: { x: 6, y: 3 }, title: { x: 36, y: 11, w: 46, size: 34 },
+      date: m => ({ x: 36, y: f(m.title.bot + 1) }), body: m => ({ x: 36, y: f(m.date.bot + (cfg.head === 'under' ? 8 : 3.5)), w: 36 }),
+    },
+    // U201 in the left margin, level with the title. The way back leaves its left side into a flag pointing at
+    // "Blog" in the top left-hand corner; the accent net leaves its right side straight to the title.
+    build(m) {
+      const a = f(m.title.cap), bc = f(m.back.cap), d = f(m.date.bot + 3.5);
+      const chips = [], wires = [], labels = [], parts = [], r = [a];
+      const chip = { id: 'U201', x0: 18, y0: f(bc - 1.5), x1: 28, y1: f(a + 8), code: 'H0710', pins: { l: [bc], r, t: [], b: [] } };
+      const tip = f(m.back.hx + 0.8);
+      wires.push(wire([[f(tip + FLAG), bc], [18, bc]]));
+      const flags = [{ tip, y: bc, code: 'G0601', dir: -1, go: true }];
+      wires.push(wire([[28, a], [34.5, a]], { o: true, end: 'via' }));
+      parts.push({ kind: 'R', x: 31, y: a });
+      // the trio's pads: a few rows under the accent, but high enough to leave a short title room to turn under it
+      const py = f(Math.min(a + 5, d - 3.5));
+      if (cfg.head === 'stop') {
+        r.push(f(py - 1), py, f(py + 1));
+        const t = m.body.top;
+        stops(bundle([[28, py], [32, py], [32, t + 9]], 3), 1, [f(t + 5), f(t + 2), f(t - 1)], null, 'w', wires, labels);
+        labels.push(net(30.2, f(py + 4), 'H0721 – H0723', 'end'));
+      } else if (cfg.head === 'mast') {
+        // J201 on the top edge at the right, its bus across the top above the title and into U201's right side
+        r.push(5, 6, 7, 8); chip.y1 = f(a + 3);
+        chips.push({ id: 'J201', conn: true, x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } });
+        wires.push(...bundle([[86.5, 1.5], [86.5, 6.5], [28, 6.5]], 4));
+        labels.push(ref(83.6, 1.25, 'J201', 'end'), net(90, 6.75, 'D0 – D3'));
+      } else {
+        r.push(f(py - 1), py, f(py + 1));
+        stops(bundle([[28, py], [32, py], [32, d], [82, d]], 3), 2, [80, 72, 64], ['H0721', 'H0722', 'H0723'], 'e', wires, labels);
+      }
+      chips.push(chip);
+      marks(cfg, m.body.marks, 34.5, wires);
+      labels.push(ref(18, f(bc - 2.6), 'U201'), ref(31, f(a - 0.95), 'R201', 'middle'));
+      const mk = m.body.marks;
+      return { rows: f(m.body.bot + 4), chips, wires, parts, labels, flags, crop: mk.length > 1 ? f(mk[1] + 10) : null };
+    },
+  };
+}
+function articleNarrow(cfg) {
+  return {
+    cols: 32,
+    seats: {
+      back: { x: 6, y: 2 }, title: { x: 6, y: 11.5, w: 24, size: 26 },
+      date: m => ({ x: 6, y: f(m.title.bot + 1) }), body: m => ({ x: 6, y: f(m.date.bot + (cfg.head === 'under' ? 7 : 3)), w: 24 }),
+    },
+    // U201 top right; the way back leaves its left side into a flag pointing at "Blog". The accent net leaves its
+    // left side lower down, runs west and down the left and turns in to the title.
+    build(m) {
+      const a = f(m.title.cap), bc = f(m.back.cap), d = f(m.date.bot + 3);
+      const chips = [], wires = [], labels = [], parts = [];
+      const tip = f(m.back.hx + 0.8);
+      const flags = [{ tip, y: bc, code: 'G0601', dir: -1, go: true }];
+      if (cfg.head === 'mast') {
+        // U201 lower, under J201 on the top edge, whose bus drops straight into its top; the way back steps up to
+        // the link's row; the accent net runs alone
+        const y0 = 4;
+        chips.push({ id: 'J201', conn: true, x0: 22.2, y0: 0, x1: 26.8, y1: 1.5, pins: { b: [23, 24, 25, 26] } },
+                   { id: 'U201', x0: 20, y0, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } });
+        wires.push(...bundle([[24.5, 1.5], [24.5, y0]], 4));
+        wires.push(wire([[20, 5.5], [17.5, 5.5], [f(17.5 - (5.5 - bc)), bc], [f(tip + FLAG), bc]], { legs: [0, 0, 0, 0] }));
+        wires.push({ ...tap(3, a, 4.5, true), pts: [[20, 8.5], [3, 8.5], [3, f(a - 1.5)], [4.5, a]], legs: [0, 8, 0, 0] });
+        labels.push(ref(27.4, 1.1, 'J201'), ref(29.2, 3.5, 'U201', 'end'), net(21.6, 3.05, 'D0 – D3', 'end'));
+      } else {
+        chips.push({ id: 'U201', x0: 20, y0: f(bc - 1.5), x1: 29, y1: f(bc + 6.5), code: 'H0710', pins: { l: [bc, f(bc + 3), f(bc + 4), f(bc + 5)], r: [], t: [], b: [] } });
+        wires.push(wire([[f(tip + FLAG), bc], [20, bc]]));
+        const tail = cfg.head === 'stop' ? [[20, f(bc + 4)], [2, f(bc + 4)], [2, f(m.body.top + 6)]]
+                                        : [[20, f(bc + 4)], [2, f(bc + 4)], [2, d], [26, d]];
+        const [acc, k1, k2] = bundle(tail, 3);
+        acc.pts.splice(2, acc.pts.length - 2, [3, f(a - 1.5)], [4.5, a]); acc.legs.splice(2, acc.legs.length - 2, 0, 0);
+        wires.push({ ...acc, o: true, end: 'via' });
+        if (cfg.head === 'stop') stops([k1, k2], 1, [f(m.body.top + 3), f(m.date.top + m.date.h / 2)], null, 'e', wires, labels);
+        else stops([k1, k2], 2, [24, 17], ['H0722', 'H0723'], 'e', wires, labels);
+        labels.push(ref(29, f(bc - 2.6), 'U201', 'end'));
+      }
+      marks(cfg, m.body.marks, 4.5, wires);
+      const mk = m.body.marks;
+      return { rows: f(m.body.bot + 3), chips, wires, parts, labels, flags, crop: mk.length > 1 ? f(mk[1] + 10) : null };
+    },
+  };
+}
+// the optional vias before each heading in the text: a via each, with no trace
+function marks(cfg, rows, x, wires) {
+  if (cfg.marks === 'plain') return;
+  rows.forEach(c => wires.push(viaMark(x, c, cfg.marks === 'orange')));
+}
+
+/* ===========================================================================
+   Seating and measuring, as in js/board.js, plus `marks`: for a block of running text, the row of the middle of
+   the capitals of each h2 in it.
+   =========================================================================== */
+function baselineOf(el) {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+function capHeight(el) {
+  const cs = getComputedStyle(el), cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${cs.fontWeight} 1000px ${cs.fontFamily}`;
+  return cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+}
+function measure(el, board, u) {
+  const box = board.getBoundingClientRect(), cell = px => f(px / u / P), r = el.getBoundingClientRect();
+  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height), l: cell(r.left - box.left) };
+  if (el.classList.contains('copy')) m.marks = [...el.querySelectorAll('h2')].map(h => cell(baselineOf(h) - capHeight(h) / 2 - box.top));
+  const heading = el.matches('h1, h2, a') ? el : el.querySelector('h3');
+  if (!heading) return m;
+  m.cap = cell(baselineOf(heading) - capHeight(heading) / 2 - box.top);
+  const word = document.createRange();
+  word.selectNodeContents(heading);
+  const rects = [...word.getClientRects()].filter(r => r.width > 0);
+  m.hx = cell(Math.max(...rects.filter(r => Math.abs(r.top - rects[0].top) < 2).map(r => r.right)) - box.left);
+  return m;
+}
+function drawBoard(board, l) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const u = board.getBoundingClientRect().width / W;
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-b="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    if (s.size) el.style.setProperty('--fs', s.size);
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : 'auto';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    m[key] = measure(el, board, u);
+  }
+  const c = l.build(m);
+  board.insertAdjacentHTML('afterbegin', svgOf(l.cols, c));
+  return { m, c };
+}
+
+/* ===========================================================================
+   The pages' markup, as Jekyll would write it
+   =========================================================================== */
+const day = p => new Date(p.date.slice(0, 10) + 'T12:00').toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+const indexHTML = () => `<h1 class="big" data-b="head">Blog</h1>` + POSTS.map((p, i) =>
+  `<article class="entry" data-b="e${i + 1}"><h3><a href="#">${p.title}</a></h3><p class="date">${day(p)}</p><p class="ex">${p.excerpt}</p></article>`).join('');
+function articleHTML(p) {
+  const body = p.html.replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
+  return `<a class="back" data-b="back" href="#">Blog</a><h1 class="title" data-b="title">${p.title}</h1>`
+       + `<p class="date" data-b="date">${day(p)}</p><div class="copy" data-b="body">${body}</div>`;
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const DEVOPS = POSTS.findIndex(p => p.slug.startsWith('im-a-newcomer'));
+const OPTIONS = [
+  { name: 'Stops short', cfg: { head: 'stop', marks: 'plain', post: DEVOPS },
+    note: 'The chip sits in the left margin, level with the heading. Three traces leave it a little lower, drop down the margin beside the date, and stop at staggered heights where the text begins. This is the start of study 09\'s rail, with the rest of it gone.',
+    phone: 'The three traces run west out of the chip and down the left margin. On the article, the one nearest the text is the orange net and turns in to the title; the other two stop beside the date and the first lines. On the index, all three stop beside the heading and the first post.',
+    recipe: [['circuit', 'chip + drop'], ['ends', 'staggered stops, beside']] },
+  { name: 'Masthead', cfg: { head: 'mast', marks: 'plain', post: DEVOPS },
+    note: 'A connector on the top edge, at the right, feeds a four-wide bus that runs across the top of the page, over the heading, and into the chip. That is how About opens the home page, with J1 and U1. Nothing comes down past the heading, so the text starts right under the date. It is also the only option with circuit on the right of a wide page.',
+    phone: 'On the index, the connector is at the top left and the bus runs into the chip from the left, as About does. On the article, the back link is in the top left, so the connector sits over the chip and its bus drops straight in. The chip sits lower to make room, and the way back steps up to the link\'s row.',
+    recipe: [['circuit', 'connector + bus + chip'], ['ends', 'at the top edge']] },
+  { name: 'Underline', cfg: { head: 'under', marks: 'plain', post: DEVOPS },
+    note: 'Three traces leave the chip, turn under the date (on the index, under the heading), and run east across the column. They stop at staggered lengths, so they divide the head from the text without reading as a rule. The text starts 4 to 5 rows lower to leave them room.',
+    phone: 'They run west out of the chip, down the left margin, and turn east under the date. On the article, the one nearest the text is the orange net and turns in to the title, so two run under the date.',
+    recipe: [['circuit', 'chip + traces under the head'], ['ends', 'staggered stops, under']] },
+];
+
+const main = document.getElementById('specimens');
+function specHTML(id, head, phone) {
+  return `<section class="spec" id="${id}">${head}
+    <p class="sub">Index</p><section class="board idx wide"></section>
+    <p class="sub">Article</p><div class="crop wide"><section class="board art wide"></section></div>
+    <p class="sub">390 px</p>
+    <div class="phone-row">
+      <div class="phone"><section class="board idx n"></section></div>
+      <div class="phone"><div class="crop n"><section class="board art n"></section></div></div>
+      <div class="phone-note">${phone}</div>
+    </div></section>`;
+}
+function drawSpec(spec, cfg, crop) {
+  const post = POSTS[cfg.post];
+  spec.querySelectorAll('.idx').forEach(b => { if (!b.children.length) b.innerHTML = indexHTML(); });
+  spec.querySelectorAll('.art').forEach(b => { if (b.dataset.post !== String(cfg.post)) { b.innerHTML = articleHTML(post); b.dataset.post = cfg.post; } });
+  drawBoard(spec.querySelector('.idx.wide'), indexWide(cfg));
+  drawBoard(spec.querySelector('.idx.n'), indexNarrow(cfg));
+  [['wide', articleWide], ['n', articleNarrow]].forEach(([k, layout]) => {
+    const l = layout(cfg), { c } = drawBoard(spec.querySelector(`.art.${k}`), l), box = spec.querySelector(`.crop.${k}`);
+    box.style.aspectRatio = crop && c.crop ? `${l.cols} / ${c.crop}` : '';
+    box.style.webkitMaskImage = box.style.maskImage = crop && c.crop ? '' : 'none';
+  });
+}
+OPTIONS.forEach((o, i) => {
+  const id = 'abc'[i];
+  main.insertAdjacentHTML('beforeend', specHTML(`opt-${id}`,
+    `<div class="cap"><div class="num">Option ${id.toUpperCase()}</div><h2>${o.name}</h2><p>${o.note}</p>
+      <ul class="recipe">${o.recipe.map(([k, v]) => `<li>${k} <b>${v}</b></li>`).join('')}</ul></div>`, `<p>${o.phone}</p>`));
+});
+
+/* ---- mix your own ---- */
+const SWITCHES = {
+  head: [['stop', 'Stops short'], ['mast', 'Masthead'], ['under', 'Underline']],
+  marks: [['plain', 'Plain'], ['blue', 'A blue via before each'], ['orange', 'An orange via before each']],
+  post: POSTS.map((p, i) => [String(i), p.title.length > 48 ? p.title.slice(0, 46) + '…' : p.title]),
+};
+const LABELS = { head: 'Head', marks: 'Headings in the text', post: 'Post' };
+const mix = { ...OPTIONS[0].cfg, marks: 'blue' };
+main.insertAdjacentHTML('beforeend', `<section class="mix" id="mix"><div class="cap"><div class="num">Mix your own</div><h2>Any head, any post, in full</h2>
+  <p>This starts as option A, with one thing the options leave out: a via before each post's title and each section's heading, with no trace to it. It's the only circuit that goes below the head, and it marks the headings the rail used to tap. Set it to plain to see the text with nothing in it. The article is drawn whole; the comments and the footer would follow it.</p></div>
+  <div class="switches">${Object.entries(SWITCHES).map(([k, opts]) => `<label>${LABELS[k]}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></label>`).join('')}</div>
+  <div id="mix-out">${specHTML('mix-spec', '', '<p>The article in full.</p>')}</div></section>`);
+document.getElementById('mix-spec').style.paddingTop = '0';
+document.querySelectorAll('#mix select').forEach(s => {
+  s.value = String(mix[s.dataset.k]);
+  s.addEventListener('change', () => { mix[s.dataset.k] = s.dataset.k === 'post' ? +s.value : s.value; drawSpec(document.getElementById('mix-spec'), mix, false); });
+});
+
+function drawAll() {
+  OPTIONS.forEach((o, i) => drawSpec(document.getElementById(`opt-${'abc'[i]}`), o.cfg, true));
+  drawSpec(document.getElementById('mix-spec'), mix, false);
+}
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', 'italic 400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
