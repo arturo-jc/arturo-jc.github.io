@@ -1,5 +1,5 @@
 // About, which opens the page: the name, as the page's heading, two paragraphs, and a link to the blog.
-import { P, FLAG, bundle, tail, wire, past, rail, lamps } from '../kit.js';
+import { FLAG, bundle, tail, wire, past, rail, lamps } from '../kit.js';
 
 // Wide: the name upper left and the copy lower right. U1 sits level with the name's first line, so the
 // accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
@@ -25,14 +25,14 @@ const wide = {
     wires.push(...rail('J1', bundle([[74, a + 1], [93, a + 1], [93, 4.5]], 5), { after: 'load' }));
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
-    const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
+    const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 5;
     const rows = Math.max(m.copy.bot + 5, m.blog.bot + 4);
     // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
     // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
     wires.push(...rail('U3', bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3)));
     // the diagonal, then west under the name → U2: a branch drawn out of U1 on load
-    wires.push(...rail('U2', bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3), { after: 'load' }));
+    wires.push(...rail('U2', bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: Yd - yc - shoulder }).slice(3), { after: 'load' }));
     // U2 → three lamps → common return → down and east, along the middle of the word's capitals, into the flag,
     // whose point stops just short of the word: a branch drawn out of U2 once the diagonal reaches it
     const lit = [a + 17, a + 20, a + 23];
@@ -69,7 +69,7 @@ const narrow = {
     // the accent net: down out of U1 and in along the name's first line, ending just past it. It is much shorter
     // than the way round through J1, so it starts a moment after the bus and finishes with the rail's sweep, at 1.15s.
     const ay = m.name.cap, vx = past(m.name);
-    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1', code: 'A0130', wait: 0.15, dur: 1 }));
+    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 1, 0], end: 'via', net: 'U1', code: 'A0130', wait: 0.15, dur: 1 }));
     // J1 → down the left of the name and the copy → under the copy → down. The two outer traces carry on down off
     // the board's foot, and Projects picks them up at its top edge in the same columns and takes them into U3's two
     // top left-hand pads. The one nearest the copy turns down with them, then east again `step` rows lower, along the
@@ -80,7 +80,7 @@ const narrow = {
     const rows = Math.max(under + 4, m.blog.bot + 2);
     const tip = m.blog.l - 0.8;
     const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
-    tail(toFlag, [[15, by], [tip - FLAG, by]], [step * P - toFlag.legs[2]]);
+    tail(toFlag, [[15, by], [tip - FLAG, by]], [step - toFlag.legs[2]]);
     wires.push(...rail('U3', [toFlag, ...down], { from: 'J1' }));
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133', rail: 'U3' });
     const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U3' }];

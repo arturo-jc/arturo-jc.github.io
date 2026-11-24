@@ -1,5 +1,5 @@
 // Projects: the heading and two projects, each a name that links to its repo, a stack and a paragraph.
-import { P, bundle, stagger, wire, past, rail } from '../kit.js';
+import { bundle, stagger, wire, past, rail } from '../kit.js';
 
 // Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
 // accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
@@ -22,13 +22,13 @@ const wide = {
     wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3', code: 'B0221' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4', code: 'C0411' }));
     // U3 → down → the long diagonal between the rows → west into U4
     const drop = 5;                             // rows the bus runs straight down before the diagonal starts
-    wires.push(...rail('U4', bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P })));
+    wires.push(...rail('U4', bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: a2 - a1 - 11 - drop })));
     // About's rail, picked up at the top edge in the same columns, into U3's top right pads
     wires.push(...rail('U3', bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3)));
     // U3's five lowest right-hand pads → east → down under About's rail, its outer trace in line with the rail's →
     // back west on one diagonal → down into a pin header over the second project
     const ym = (a1 + a2) / 2, J = a2 - 5;
-    wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), { after: 'U3' }));
+    wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5, 3: 6.5 }), { after: 'U3' }));
     chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
     labels.push({ k: 'net', x: 83.2, y: J - 3, t: 'B0231 – B0235', rail: 'J2' });
     // U4 → west → down the left margin; each stops at a different height
@@ -62,7 +62,7 @@ const narrow = {
     ];
     const wires = [], labels = [];
     // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
-    wires.push(wire([[28, 10], [28, a2], [v2, a2]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U3', code: 'C0411' }),
+    wires.push(wire([[28, 10], [28, a2], [v2, a2]], { o: true, legs: [0, 1, 0], end: 'via', net: 'U3', code: 'C0411' }),
                wire([[28, a1], [v1, a1]], { o: true, end: 'via', net: 'U3', code: 'B0221' }));
     // U3 → down the right of both projects → U4
     wires.push(...rail('U4', [wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]])]));

@@ -69,10 +69,10 @@ const narrow = {
     wires.push(...rail('U5', bundle([[26, 0], [26, 5], [18, 5]], 3)));
     // U5 → west → down the left of the papers. The rail's nearest trace, at column 3, is the accent net.
     const [acc, inner, outer] = bundle([[9, 7], [2, 7], [2, a4]], 3);
-    wires.push(wire(tail(acc, [[3, a4], [4.5, a4]], [6]), { o: true, end: 'via', net: 'U5' }));
+    wires.push(wire(tail(acc, [[3, a4], [4.5, a4]], [0.5]), { o: true, end: 'via', net: 'U5' }));
     [a1, a2, a3].forEach(a => wires.push(wire([[3, a], [4.5, a]], { o: true, end: 'via', net: 'U5' })));
     // the other two turn under the last paper, each into a resistor and a lamp, with a common return
-    wires.push(wire(tail(inner, [[2, L], [20, L], [20, L + 6]], [8, 8]), { end: 'via' }), tail(outer, [[1, L + 3], [20, L + 3]], [8]));
+    wires.push(wire(tail(inner, [[2, L], [20, L], [20, L + 6]], [0.75, 0.75]), { end: 'via' }), tail(outer, [[1, L + 3], [20, L + 3]], [0.75]));
     parts.push(...lamps([L, L + 3], 8, 14, { r: 8, d: 4 }), { kind: 'R', x: 3, y: m.r2.top + 0.5 * m.r2.h, dir: 'v', ref: 'R7', net: 'U5' }, { kind: 'C', x: 1, y: m.r3.top + 0.5 * m.r3.h, dir: 'v' });
     return { rows: L + 9, chips, wires, parts };
   },

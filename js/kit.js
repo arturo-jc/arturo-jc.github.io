@@ -16,12 +16,12 @@ const attrs = o => Object.entries(o).map(([k, v]) => v == null || v === false ? 
 const marks = x => attrs({ 'data-net': x.net, 'data-rail-end': x.rail });
 
 // n parallel traces round an orthogonal centreline, nested at every corner.
-// `legs` is each corner's 45° cut, sized so the diagonals of neighbours stay one pitch apart.
-// `big` = { cornerIndex: units } sets the size of that corner's cut, which makes a long 45° run. Two corners
+// `legs` is each corner's 45° cut, in cells, sized so the diagonals of neighbours stay one pitch apart.
+// `big` = { cornerIndex: cells } sets the size of that corner's cut, which makes a long 45° run. Two corners
 // whose cuts add up to the length of the segment between them make one straight diagonal with no step in it.
 export function bundle(center, n, big = {}) {
   const maxd = (n - 1) / 2;
-  const std = 6 + 0.586 * maxd * P;
+  const std = 0.5 + 0.586 * maxd;
   const out = [];
   for (let k = 0; k < n; k++) {
     const d = maxd - k;                                     // k = 0 is leftmost of travel
@@ -33,7 +33,7 @@ export function bundle(center, n, big = {}) {
       if (din && dout) {
         pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
         const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
-        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d);
       } else {
         const nn = nin || nout;
         pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
@@ -81,7 +81,7 @@ export const lamps = (rows, xr, xl, { r, d, ...marks }) => rows.flatMap((y, i) =
 function tracePath(w) {
   const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
   const n = pts.length;
-  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 2 / 3) * P : 0);
   for (let i = 0; i < n - 1; i++) {
     const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
     if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
