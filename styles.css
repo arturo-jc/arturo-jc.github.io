@@ -18,6 +18,9 @@
   src: url(fonts/plex-mono-500-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap;
   src: url(fonts/plex-mono-500-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+/* The palette, and the boards' grid: 107 cells of 12 units on a wide screen, 32 below the breakpoint. --w is the
+   grid's width in units, which --u divides the window's share by; js/board.js also sets it on each board, from its
+   layout's columns. */
 :root {
   --bg: #0b3048;
   --trace: #3f9fd8;
@@ -31,16 +34,18 @@
   --foot: #061b2a;
   --sans: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --w: 1284;
 }
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 /* main fills the window's height when the page is shorter than it, as the 404 page is, so the footer sits at the foot */
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100dvh; display: flex; flex-direction: column; }
-main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
+main, .foot-in { max-width: 1500px; margin: 0 auto; }
+main { flex: 1 0 auto; width: 100%; padding: 48px 32px 0; }
 
 /* A board is one section: a drawing, and the type sitting in the space the drawing leaves. Each block of
-   type that a layout seats has a data-seat: the name and the copy in About, the heading and each project in
-   Projects, the heading and each paper in Research. Without the script there is no drawing and the blocks are an ordinary column. */
+   type that a layout seats has a data-seat. Without the script there is no drawing and the blocks are an
+   ordinary column. */
 .board { position: relative; container-type: inline-size; }
 .board [data-seat] { max-width: 432px; margin: 0 auto; }
 .board .name { margin-bottom: 28px; }
@@ -51,58 +56,113 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
    _includes/scripts.html. So is the blog's text under its head's board, which would otherwise show under the
    hidden heading and jump down when the drawing arrives. */
 .js .board:not(.drawn) [data-seat], .js .board:not(.drawn) ~ .flow { visibility: hidden; }
-/* --u is one drawing unit, so the drawing and the type scale together */
-.board.drawn [data-seat] { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
-/* Below this width a section draws its narrow layout: see NARROW in js/board.js, which must match.
-   The narrow drawing grows with the screen up to 448px and is centred beyond that. */
-@media (max-width: 1099px) {
-  main { padding: 20px 0 0; }
-  .board { max-width: 448px; margin: 0 auto; }
-  .board:not(.drawn) [data-seat] { padding: 0 24px; }
-  .name span { display: block; }
-}
-
-/* The name is the page's heading. A layout sets its size in --fs. It is on two lines on a wide screen,
-   Arturo / Javier-Castellanos, and on three on a narrow one, where each span is a line. */
+/* --u is one drawing unit, so the drawing and the type scale together: on a board, from its drawing's width, and
+   in the blog's text and the footer, which are on the grid without being on a board, from the grid's. */
 [data-seat] { --u: 1px; }
+.board.drawn [data-seat] { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
+.flow .col, .foot-body { --u: calc(100cqw / var(--w)); }
 /* --t is the type's unit: the drawing unit, but never below 1px, the size the type was designed at. On a wide screen
    the type scales with the drawing, as one picture; in a window under about 1350px, or on a phone under about 380px,
    it stops shrinking with it, wraps into more lines, and the layouts, built round it as measured, grow to fit. It
    also lets zoom enlarge the copy, which it would not do while the type shrank with the window. Every piece of type
-   is set in it but the headings a layout places the drawing against by their size, the name and the blog's and the
-   404 page's big headings and a post's title, which stay on --u. */
+   is set in it but the big type below. */
 [data-seat], .flow .col, .foot-body { --t: max(1px, var(--u)); }
-.name { font: 600 calc(var(--fs, 48) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
+
+/* The big type, which a layout places the drawing against by its size, so it stays on --u, and sizes in --fs: the
+   name, which is the page's heading, on two lines on a wide screen, Arturo / Javier-Castellanos, and on three on a
+   narrow one, where each span is a line; the blog's and the 404 page's headings; and a post's title. */
+.name, .big { font: 600 calc(var(--fs) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
+.name { --fs: 48; }
 .name span:first-child { display: block; }
+.big { --fs: 60; margin: 0; }
+.title { --fs: 34; font: 600 calc(var(--fs) * var(--u))/1.18 var(--sans); letter-spacing: -.015em; text-wrap: balance; margin: 0; }
 /* A section's heading is seated on its own, apart from what it heads. */
 .board h2 { font: 600 calc(30 * var(--t))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
-.copy p { font: 400 calc(16.5 * var(--t))/1.64 var(--sans); margin: 0 0 calc(16 * var(--t)); }
+/* A subhead: a link at the end of a net that leaves the board through an off-page flag (About's link to the blog, a
+   post's way back, the 404 page's way home), the title of an entry on the blog's index, and a heading in a post. */
+.exit, .entry h2, .flow .copy h2 { font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; }
+.exit { display: block; white-space: nowrap; }
+.entry h2, .flow .copy h2 { line-height: 1.25; text-wrap: balance; }
+/* A project's name, on one line, and a paper's title, which wraps, balanced so the lines are about even: set like
+   a post's h3, a little tighter. */
+.project h3, .paper h3 { font: 600 calc(18 * var(--t))/1.3 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(10 * var(--t)); }
+.project h3 { white-space: nowrap; }
+.paper h3 { text-wrap: balance; }
+/* a line of mono under a name or a title: a project's stack, a paper's journal, a date */
+.project .stack, .paper .journal, .date { font: 400 calc(11.5 * var(--t))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); }
+.project .stack, .paper .journal { margin: 0 0 calc(14 * var(--t)); }
+.date { margin: 0; }
+/* running text */
+.copy p, .flow .copy li, .entry .ex { font: 400 calc(16.5 * var(--t))/1.64 var(--sans); }
+.copy p { margin: 0 0 calc(16 * var(--t)); }
 .copy p:last-child { margin-bottom: 0; }
 .copy strong { font-weight: 600; }
 .copy .nb { white-space: nowrap; }
-.copy a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
-          text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(3 * var(--t)); }
-.copy a:hover { color: var(--accent); }
-.copy a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* The link to the blog, in About: one word, set like a project's name, at the end of a net that leaves the
-   board through an off-page flag. Hovering it warms the flag. */
-.blog { display: block; color: inherit; font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
-        text-decoration: underline; text-decoration-color: var(--accent);
-        text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(4 * var(--t)); }
-.blog:hover { color: var(--accent); }
-.blog:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.board:has(a[data-seat]:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
-/* A project is its name, which links to its repo, its stack, and a paragraph. */
-.project h3 { font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--t)); white-space: nowrap; }
-.project h3 a { text-underline-offset: calc(4 * var(--t)); }
-.project .stack { font: 400 calc(11.5 * var(--t))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--t)); }
-/* A paper is its title, which links to the draft's PDF, its journal, which links to the published article, and a summary. The titles are long,
-   so unlike a project's name they wrap, balanced so the lines are about even. */
-.paper h3 { font: 600 calc(22 * var(--t))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--t)); text-wrap: balance; }
-.paper h3 a { text-underline-offset: calc(4 * var(--t)); }
-.paper .journal { font: 400 calc(11.5 * var(--t))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--t)); }
+/* A link in the type: underlined in the accent, and the accent on hover. A subhead's sits a little lower. */
+.copy a, .entry h2 a, .exit { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+  text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(3 * var(--t)); }
+.copy :is(h2, h3) a, .entry h2 a, .exit { text-underline-offset: calc(4 * var(--t)); }
+.copy a:hover, .entry h2 a:hover, .exit:hover { color: var(--accent); }
+.copy a:focus-visible, .entry h2 a:focus-visible, .exit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.exit:focus-visible { outline-offset: 3px; }
 /* The journal links to the published article without an underline: it shows only as the accent on hover. */
 .paper .journal a { text-decoration: none; }
+
+/* The blog. Its index and each post have one board, for the head: the index's heading, and a post's way back, title
+   and date. Everything under the head is outside the board, in .flow: a column on the boards' grid, cells 30 to 84
+   of 107, or 6 to 30 of 32 below the breakpoint, whose type scales with the drawing above it. The widths here must
+   match the head layouts in js/sections/blog.js and post.js. */
+.flow { container-type: inline-size; }
+.flow .col { margin-left: calc(30 / 107 * 100%); width: calc(54 / 107 * 100%); }
+.flow .col:last-child { padding-bottom: calc(72 * var(--u)); }
+/* an entry on the index: the title, which links to the post, the date and the excerpt */
+.entry + .entry { margin-top: calc(60 * var(--t)); }
+.entry h2 { margin: 0 0 calc(6 * var(--t)); }
+.entry .date { margin: 0 0 calc(12 * var(--t)); }
+.entry .ex { margin: 0; }
+/* a post's body: what kramdown writes from the post's Markdown. Only in .flow: a project and a paper are .copy too,
+   and their names are h3s. */
+.flow .copy > :first-child { margin-top: 0; }
+.flow .copy ul, .flow .copy ol { margin: 0 0 calc(16 * var(--t)); padding-left: 1.3em; }
+.flow .copy h2 { margin: calc(44 * var(--t)) 0 calc(12 * var(--t)); }
+.flow .copy h3 { font: 600 calc(18 * var(--t))/1.3 var(--sans); margin: calc(32 * var(--t)) 0 calc(10 * var(--t)); }
+.flow .copy code { font: 400 .88em/1 var(--mono); color: var(--pad); overflow-wrap: anywhere; }
+.flow .copy pre { font: 400 calc(12.5 * var(--t))/1.6 var(--mono); color: var(--silk); background: var(--chip); border-radius: calc(3 * var(--t));
+            padding: calc(12 * var(--t)) calc(14 * var(--t)); margin: 0 0 calc(16 * var(--t)); overflow-x: auto;
+            scrollbar-width: thin; scrollbar-color: var(--trace-dim) transparent; }
+.flow .copy pre code { font: inherit; color: inherit; overflow-wrap: normal; }
+.flow .copy .highlight { margin: 0; }
+/* Rouge's tokens, in the board's palette: keywords in trace blue, names in pad blue, strings and numbers in the
+   accent, comments and punctuation muted, everything else the code's silk. No italic: Plex Mono's is not loaded. */
+.highlight :is(.k, .kd, .kn, .kr, .kt, .kc, .kp, .ow, .si) { color: var(--trace); }
+.highlight :is(.na, .nt, .nc, .nf, .fm, .nb, .bp, .nd, .ne) { color: var(--pad); }
+.highlight :is(.s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .sx, .sr, .ss, .dl, .m, .mi, .mf, .mh, .mo, .mb, .il) { color: var(--accent); }
+.highlight :is(.c, .c1, .cm, .cs, .cd, .cp, .cpf, .ch, .p, .o) { color: var(--muted); }
+.flow .copy blockquote { margin: 0 0 calc(16 * var(--t)); padding-left: 1.2em; color: var(--muted); font-style: italic; }
+.flow .copy img { max-width: 100%; height: auto; }
+/* Disqus draws the comments in its own frame, in its own styles */
+.comments { margin-top: calc(64 * var(--t)); }
+
+/* The footer: a band of its own colour under the last board, edge to edge, with no drawing in it. Inside, the
+   icons and the copyright are centred on the boards' grid, which they share and scale with: centred on Research's
+   two columns (cells 6 to 98) rather than the window. */
+.foot { background: var(--foot); }
+.foot-in { padding: 0 32px; }
+.foot-grid { container-type: inline-size; }
+.foot-body { --c: calc(12 * var(--u)); text-align: center;
+             padding: calc(6 * var(--c)) calc(9 * var(--c)) calc(4 * var(--c)) calc(6 * var(--c)); }
+.foot .contacts { display: flex; justify-content: center; align-items: center; gap: calc(8 * var(--c)); }
+.foot .contacts a { display: block; }
+.foot .contacts svg { display: block; width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: var(--pad); transition: fill .15s; }
+.foot .contacts .mail { width: calc(33 * var(--u)); height: calc(21 * var(--u)); }
+.foot .contacts .in { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+.foot .contacts a:hover svg { fill: var(--accent); }
+.foot .contacts a:focus-visible { outline: 2px solid var(--accent); outline-offset: calc(5 * var(--u)); border-radius: 2px; }
+.foot .cr { font: 400 calc(11 * var(--t))/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); margin: calc(4 * var(--c)) 0 0; white-space: nowrap; }
+/* on every page but the home page, the name links to the home page, quietly */
+.foot .home { color: inherit; text-decoration: none; transition: color .15s; }
+.foot .home:hover { color: var(--accent); }
+.foot .home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 
 /* the drawing */
 .t { fill: none; stroke: var(--trace); }
@@ -121,96 +181,32 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
 /* an accent net is blue until the rail into its chip arrives: see js/rails.js */
 .t.o, .f.o, .lb.o { transition: stroke .6s, fill .6s; }
 .t.o.off { stroke: var(--trace); } .off .f.o { fill: var(--trace); } .lb.o.off { fill: var(--pad); }
+/* an off-page flag; the one in front of a link warms while the link is hovered */
 .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
-/* The blog. Its index and each post have one board, for the head: the index's heading, set like the name, and a
-   post's way back, title and date. Everything under the head is outside the board, in .flow: a column on the
-   boards' grid, cells 30 to 84 of 107, or 6 to 30 of 32 below the breakpoint, whose type scales with the drawing
-   above it. The widths here must match the head layouts in js/sections/blog.js and post.js. */
-.big { font: 600 calc(var(--fs, 60) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; margin: 0; }
-.title { font: 600 calc(var(--fs, 34) * var(--u))/1.18 var(--sans); letter-spacing: -.015em; text-wrap: balance; margin: 0; }
-.date { font: 400 calc(11.5 * var(--t))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0; }
-/* a post's way back, set like a project's name; hovering it warms its flag */
-.back { color: inherit; font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
-        text-decoration: underline; text-decoration-color: var(--accent);
-        text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(4 * var(--t)); }
-.back:hover { color: var(--accent); }
-.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.flow { container-type: inline-size; }
-.flow .col { --u: calc(100cqw / 1284); margin-left: calc(30 / 107 * 100%); width: calc(54 / 107 * 100%); }
-.flow .col:last-child { padding-bottom: calc(72 * var(--u)); }
-@media (max-width: 1099px) {
-  .flow { max-width: 448px; margin: 0 auto; }
-  .flow .col { --u: calc(100cqw / 384); margin-left: calc(6 / 32 * 100%); width: calc(24 / 32 * 100%); }
-}
-/* an entry on the index: the title, which links to the post, the date and the excerpt */
-.entry + .entry { margin-top: calc(60 * var(--t)); }
-.entry h2 { font: 600 calc(22 * var(--t))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--t)); text-wrap: balance; }
-.entry h2 a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
-              text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(4 * var(--t)); }
-.entry h2 a:hover { color: var(--accent); }
-.entry h2 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.entry .date { margin: 0 0 calc(12 * var(--t)); }
-.entry .ex { font: 400 calc(16.5 * var(--t))/1.64 var(--sans); margin: 0; }
-/* a post's body: what kramdown writes from the post's Markdown */
-.copy li { font: 400 calc(16.5 * var(--t))/1.64 var(--sans); }
-.copy ul, .copy ol { margin: 0 0 calc(16 * var(--t)); padding-left: 1.3em; }
-.copy h2 { font: 600 calc(22 * var(--t))/1.25 var(--sans); letter-spacing: -.005em; margin: calc(44 * var(--t)) 0 calc(12 * var(--t)); text-wrap: balance; }
-.copy h3 { font: 600 calc(18 * var(--t))/1.3 var(--sans); margin: calc(32 * var(--t)) 0 calc(10 * var(--t)); }
-.copy > :first-child { margin-top: 0; }
-.copy code { font: 400 .88em/1 var(--mono); color: var(--pad); overflow-wrap: anywhere; }
-.copy pre { font: 400 calc(12.5 * var(--t))/1.6 var(--mono); color: var(--silk); background: var(--chip); border-radius: calc(3 * var(--t));
-            padding: calc(12 * var(--t)) calc(14 * var(--t)); margin: 0 0 calc(16 * var(--t)); overflow-x: auto;
-            scrollbar-width: thin; scrollbar-color: var(--trace-dim) transparent; }
-.copy pre code { font: inherit; color: inherit; overflow-wrap: normal; }
-.copy .highlight { margin: 0; }
-/* Rouge's tokens, in the board's palette: keywords in trace blue, names in pad blue, strings and numbers in the
-   accent, comments and punctuation muted, everything else the code's silk. No italic: Plex Mono's is not loaded. */
-.highlight :is(.k, .kd, .kn, .kr, .kt, .kc, .kp, .ow, .si) { color: var(--trace); }
-.highlight :is(.na, .nt, .nc, .nf, .fm, .nb, .bp, .nd, .ne) { color: var(--pad); }
-.highlight :is(.s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .sx, .sr, .ss, .dl, .m, .mi, .mf, .mh, .mo, .mb, .il) { color: var(--accent); }
-.highlight :is(.c, .c1, .cm, .cs, .cd, .cp, .cpf, .ch, .p, .o) { color: var(--muted); }
-.copy blockquote { margin: 0 0 calc(16 * var(--t)); padding-left: 1.2em; color: var(--muted); font-style: italic; }
-.copy img { max-width: 100%; height: auto; }
-/* Disqus draws the comments in its own frame, in its own styles */
-.comments { margin-top: calc(64 * var(--t)); }
-/* on the blog's pages, the name in the footer links to the home page, quietly */
-.foot .home { color: inherit; text-decoration: none; transition: color .15s; }
-.foot .home:hover { color: var(--accent); }
-.foot .home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.board:has(a[data-seat]:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
 
-/* The footer: a band of its own colour under the last board, edge to edge, with no drawing in it. Inside, the
-   icons and the copyright are centred on the boards' grid, which they share and scale with: 107 cells wide,
-   centred on Research's two columns (cells 6 to 98) rather than the window; below the breakpoint, 32 cells. */
-.foot { background: var(--foot); }
-.foot-in { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
-.foot-grid { container-type: inline-size; }
-.foot-body { --u: calc(100cqw / 1284); --c: calc(12 * var(--u)); text-align: center;
-             padding: calc(6 * var(--c)) calc(9 * var(--c)) calc(4 * var(--c)) calc(6 * var(--c)); }
-.foot .contacts { display: flex; justify-content: center; align-items: center; gap: calc(8 * var(--c)); }
-.foot .contacts a { display: block; }
-.foot .contacts svg { display: block; width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: var(--pad); transition: fill .15s; }
-.foot .contacts .mail { width: calc(33 * var(--u)); height: calc(21 * var(--u)); }
-.foot .contacts .in { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
-.foot .contacts a:hover svg { fill: var(--accent); }
-.foot .contacts a:focus-visible { outline: 2px solid var(--accent); outline-offset: calc(5 * var(--u)); border-radius: 2px; }
-.foot .cr { font: 400 calc(11 * var(--t))/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); margin: calc(4 * var(--c)) 0 0; white-space: nowrap; }
+/* Below this width a section draws its narrow layout: see NARROW in js/board.js, which must match. The narrow
+   drawing grows with the screen up to 448px and is centred beyond that, and so do the blog's text and the footer. */
 @media (max-width: 1099px) {
-  .foot-in { max-width: 448px; padding: 0; }
-  .foot-body { --u: calc(100cqw / 384); padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
+  :root { --w: 384; }
+  main { padding: 20px 0 0; }
+  .board, .flow, .foot-in { max-width: 448px; margin: 0 auto; }
+  .board:not(.drawn) [data-seat] { padding: 0 24px; }
+  .name span { display: block; }
+  .flow .col { margin-left: calc(6 / 32 * 100%); width: calc(24 / 32 * 100%); }
+  .foot-in { padding: 0; }
+  .foot-body { padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
   .foot .contacts { gap: calc(4 * var(--c)); }
 }
 
+/* Motion. The lamps pulse. The type fades in: see js/fades.js. About's copy and link on load, the link a little
+   after the copy, as its net reaches the flag; every other block as it comes up the window. Opacity only: a
+   transform would move the boxes that js/board.js measures. */
 @media (prefers-reduced-motion: no-preference) {
   .pulse { animation: pulse 3.6s ease-in-out infinite; }
   @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
-}
-
-/* The type fades in: see js/fades.js. About's copy and link on load, the link a little after the copy, as its
-   net reaches the flag; every other block as it comes up the window. Opacity only: a transform would move the
-   boxes that js/board.js measures. */
-@media (prefers-reduced-motion: no-preference) {
   .fades [data-fade] { opacity: 0; transition: opacity .9s ease-out; }
   .fades [data-fade].in { opacity: 1; }
   .fades [data-fade="load"] { transition-delay: .15s; }
-  .fades .blog[data-fade="load"] { transition-delay: .5s; }
+  .fades .exit[data-fade="load"] { transition-delay: .5s; }
 }

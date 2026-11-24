@@ -10,7 +10,7 @@ boards: post
   in its notifications do: it is the heaviest thing on the page, and most readers never reach it.
 {%- endcomment -%}
 <section class="board" id="post">
-  <a class="back" data-seat="back" href="{{ '/blog' | relative_url }}">Blog</a>
+  <a class="exit" data-seat="back" href="{{ '/blog' | relative_url }}">Blog</a>
   <h1 class="title" data-seat="title">{{ page.title }}</h1>
   <p class="date" data-seat="date"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%b %d, %Y" }}</time></p>
 </section>
