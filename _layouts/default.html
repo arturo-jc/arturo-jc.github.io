@@ -1,9 +1,13 @@
+{%- comment -%}
+  Every page's frame: the head, main and the footer. The home page's title is the site's; every other page's is its
+  own, then the site's.
+{%- endcomment -%}
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ page.title }} · {{ site.title }}</title>
+<title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
 {% seo title=false %}
 <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" sizes="32x32">
 <link rel="icon" href="{{ '/favicon.svg' | relative_url }}" type="image/svg+xml">
@@ -12,13 +16,12 @@
 <link rel="preload" href="{{ '/fonts/plex-mono-400-latin.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}">
 {% feed_meta %}
-{% assign boards = page.boards | default: layout.boards %}
-{% include scripts.html boards=boards %}
+{% include scripts.html %}
 </head>
 <body>
 <main>
 {{ content }}
 </main>
-{% include footer.html blog=true %}
+{% include footer.html %}
 </body>
 </html>

@@ -21,24 +21,23 @@ boards: post
   <div class="col comments">
     <div id="disqus_thread"></div>
     <script>
-      var disqus_config = function () {
+      // Disqus reads its settings from a global, as a function it calls with its own `this`
+      window.disqus_config = function () {
         this.page.url = "{{ site.url }}{{ page.url }}";
         this.page.identifier = "{{ page.id }}";
       };
-      (function () {
-        var d = document, thread = d.getElementById('disqus_thread'), seen;
-        function load() {
-          if (seen) seen.disconnect();
-          var s = d.createElement('script');
+      (() => {
+        let seen;
+        const load = () => {
+          seen?.disconnect();
+          const s = document.createElement('script');
           s.src = 'https://arturojc.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', +new Date());
-          (d.head || d.body).appendChild(s);
-        }
+          s.dataset.timestamp = Date.now();
+          document.head.appendChild(s);
+        };
         if (/^#(comment-|disqus_thread)/.test(location.hash)) return load();
-        seen = new IntersectionObserver(function (es) {
-          if (es.some(function (e) { return e.isIntersecting; })) load();
-        }, { rootMargin: '0px 0px 1200px 0px' });
-        seen.observe(thread);
+        seen = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) load(); }, { rootMargin: '0px 0px 1200px 0px' });
+        seen.observe(document.getElementById('disqus_thread'));
       })();
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>

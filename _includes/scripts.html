@@ -1,5 +1,5 @@
 {%- comment -%}
-  The scripts, in every page's head. Include with fades=true on the home page, where the type fades in.
+  The scripts, in every page's head. A page whose type fades in, the home page, sets `fades: true` in its front matter.
 
   The inline script runs before the first paint. Its class `js` hides each board's type until the board is drawn
   (styles.css), because until then the type sits in the plain column a page without the scripts shows, and would
@@ -8,15 +8,15 @@
 
   Every module the page runs is preloaded, so that the browser fetches them all at once instead of finding each
   through the one that imports it: the shared ones in js/, which Jekyll lists, so a new one is preloaded without
-  being added here, and the sections the page has boards for. Include with boards= the ids of those boards, which
-  are also the sections' file names; each page sets them as `boards` in its front matter, a post in its layout's.
+  being added here, and the sections the page has boards for: `boards` in the page's front matter, or in its
+  layout's for a post, lists the ids of those boards, which are also the sections' file names.
   main.js imports only the sections whose boards are on the page.
 {%- endcomment -%}
 <script>
-  document.documentElement.classList.add('js'{% if include.fades %}, 'fades'{% endif %});
+  document.documentElement.classList.add('js'{% if page.fades %}, 'fades'{% endif %});
   window.showAnyway = setTimeout(() => document.documentElement.classList.remove('js', 'fades'), 3000);
 </script>
-{%- assign boards = include.boards | split: ' ' %}
+{%- assign boards = page.boards | default: layout.boards | split: ' ' %}
 {%- for file in site.static_files %}{% if file.extname == '.js' and file.path contains '/js/' %}
 {%- if file.path contains '/js/sections/' %}{% unless boards contains file.basename %}{% continue %}{% endunless %}{% endif %}
 <link rel="modulepreload" href="{{ file.path | relative_url }}">
