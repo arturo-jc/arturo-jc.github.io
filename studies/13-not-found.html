@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 13 · The 404 page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --foot: #061b2a;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 72px 0 0; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .sub { font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 14px; }
+  .screen { outline: 1px solid var(--rule); }
+  .phone-row { display: flex; gap: 40px; align-items: flex-start; margin-top: 8px; flex-wrap: wrap; }
+  .phone { width: 390px; flex: none; outline: 1px solid var(--rule); padding-top: 20px; }
+  .phone-note { max-width: 420px; font: 400 14px/1.5 var(--sans); color: #c5d9e6; }
+  .phone-note p { margin: 0 0 10px; }
+  .mix { padding: 72px 0 96px; }
+  .switches { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 0 0 8px; }
+  .switches label { display: grid; gap: 6px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .switches select { font: 400 14px/1.2 var(--sans); color: var(--text); background: var(--chip); border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; }
+
+  /* ---- the designs: the same rules as styles.css ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .board [data-b] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .wide .board { padding-top: 48px; }
+  .wide .board svg, .phone .board svg { position: relative; }
+  /* the heading, set like the blog index's "Blog" */
+  .big { font: 600 calc(var(--fs, 60) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
+  .copy p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0 0 calc(16 * var(--u)); }
+  .copy p:last-child { margin-bottom: 0; }
+  .copy strong { font-weight: 600; }
+  /* the way home, set like a post's way back to the blog; hovering it warms its flag */
+  .back { color: inherit; font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
+          text-decoration: underline; text-decoration-color: var(--accent);
+          text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+  .back:hover { color: var(--accent); }
+  .board:has(.back:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
+
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .silk.dash { stroke-dasharray: 5 3.5; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  /* a lamp that is out: its lens unlit, and now and then a flicker */
+  .lens { fill: color-mix(in srgb, var(--accent) 32%, var(--chip)); }
+  /* a seven-segment display: the segments that are off are faintly there */
+  .seg { fill: color-mix(in srgb, var(--trace-dim) 30%, var(--chip)); }
+  .seg.on { fill: var(--accent); }
+  .seg-halo { fill: var(--accent); filter: blur(4px); opacity: .55; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.dnp { fill: var(--silk); font-size: 10px; letter-spacing: .16em; }
+  .lb.o { fill: var(--accent); }
+  .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+    .flicker { animation: flicker 7.3s linear infinite; }
+    @keyframes flicker { 0%, 58%, 60.5%, 62%, 63.2%, 100% { opacity: 0; } 59%, 59.8% { opacity: .9; } 62.4%, 62.9% { opacity: .5; } }
+  }
+  .flicker { opacity: 0; }
+
+  /* the footer, as in styles.css */
+  .foot { background: var(--foot); }
+  .foot-grid { container-type: inline-size; }
+  .foot-body { --u: calc(100cqw / 1284); --c: calc(12 * var(--u)); text-align: center;
+               padding: calc(6 * var(--c)) calc(9 * var(--c)) calc(4 * var(--c)) calc(6 * var(--c)); }
+  .phone .foot-body { --u: calc(100cqw / 384); padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
+  .foot .contacts { display: flex; justify-content: center; align-items: center; gap: calc(8 * var(--c)); }
+  .phone .foot .contacts { gap: calc(4 * var(--c)); }
+  .foot .contacts svg { display: block; width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: var(--pad); }
+  .foot .contacts .mail { width: calc(33 * var(--u)); height: calc(21 * var(--u)); }
+  .foot .contacts .in { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+  .foot .cr { font: 400 calc(11 * var(--u))/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); margin: calc(4 * var(--c)) 0 0; white-space: nowrap; }
+  .foot .home { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 13</div>
+    <h1>The 404 page: what has gone wrong on the board?</h1>
+    <p>The old site's 404 is a big "404", "Page not found" and "The requested page could not be found." Every option here keeps that copy and adds a <b>way home</b>, set like a post's way back to the blog and behind an orange off-page flag, the net that leaves this page. The page is one board, like a blog page's head, then the footer.</p>
+    <p>What changes is the joke the board tells, one per option: <b>a trace cut in two</b>, <b>a chip that was never fitted</b>, <b>a lamp that has gone out</b>, and <b>a display that reads 404</b>, which moves the number out of the type and into the drawing.</p>
+    <p>Each option is shown wide, then at 390px beside a note. At the bottom, a panel mixes any drawing with either heading and either wording.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+/* A chip, from js/kit.js, with two new kinds beside it:
+   dnp      an unfitted footprint: its pads and a dashed silkscreen outline, with DNP (do not populate) in it
+   display  a seven-segment display: a dark body showing `text` in lit segments, pads on any side */
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1), pins = c.pins || {};
+  (c.allPads ? rows : pins.l || []).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : pins.r || []).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : pins.t || []).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : pins.b || []).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  if (c.dnp) {
+    s.push(`<rect class="silk dash" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+           `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.2" fill="var(--silk)"/>`,
+           `<text class="lb dnp" x="${f(x0 + w / 2 + 1)}" y="${f(y0 + h / 2 + 3.5)}" text-anchor="middle">DNP</text>`);
+    return s.join('');
+  }
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`);
+  if (c.display) { s.push(digits(c.text, x0 + w / 2, y0 + h / 2)); return s.join(''); }
+  s.push(`<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+// Seven-segment digits centred on (cx, cy), in units: each 40 wide and 64 tall, 12 apart, leaning 8°.
+const SEGS = { '0': 'abcdef', '4': 'bcfg', '1': 'bc', 'E': 'adefg', 'r': 'eg' };
+function digits(text, cx, cy) {
+  const W = 40, H = 64, T = 7, G = 12, gap = 1.6;
+  const x0 = cx - (text.length * W + (text.length - 1) * G) / 2, y0 = cy - H / 2;
+  const hz = (x, y) => { const a = x + T / 2 + gap, b = x + W - T / 2 - gap;
+    return `${f(a - T / 2)},${f(y)} ${f(a)},${f(y - T / 2)} ${f(b)},${f(y - T / 2)} ${f(b + T / 2)},${f(y)} ${f(b)},${f(y + T / 2)} ${f(a)},${f(y + T / 2)}`; };
+  const vt = (x, y, l) => { const a = y + T / 2 + gap, b = y + l - T / 2 - gap;
+    return `${f(x)},${f(a - T / 2)} ${f(x + T / 2)},${f(a)} ${f(x + T / 2)},${f(b)} ${f(x)},${f(b + T / 2)} ${f(x - T / 2)},${f(b)} ${f(x - T / 2)},${f(a)}`; };
+  const out = [], halo = [];
+  [...text].forEach((ch, i) => {
+    const x = x0 + i * (W + G) + T / 2, w = W - T, h = H / 2;
+    const at = { a: hz(x - T / 2, y0), g: hz(x - T / 2, y0 + h), d: hz(x - T / 2, y0 + H),
+                 f: vt(x, y0, h), b: vt(x + w, y0, h), e: vt(x, y0 + h, h), c: vt(x + w, y0 + h, h) };
+    for (const [k, p] of Object.entries(at)) {
+      const on = (SEGS[ch] || '').includes(k);
+      out.push(`<polygon class="seg${on ? ' on' : ''}" points="${p}"/>`);
+      if (on) halo.push(`<polygon class="seg-halo" points="${p}"/>`);
+    }
+  });
+  return `<g transform="translate(${f(cx)} ${f(cy)}) skewX(-8) translate(${f(-cx)} ${f(-cy)})"><g class="pulse">${halo.join('')}</g>${out.join('')}</g>`;
+}
+
+// Two-pad parts, from js/kit.js. A lamp with `dead` is out: its lens is unlit, and its light only flickers now and then.
+function part(p) {
+  const lamp = `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`;
+  const g = p.kind === 'LED'
+    ? lamp + (p.dead
+      ? `<rect class="lens" x="-5" y="-4.5" width="10" height="9" rx="1"/><g class="flicker"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+      : `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`)
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+const FLAG = 4;
+function flag({ tip, y, code, dir = 1, go }) {
+  const X = c => f((tip - dir * c) * P), Y = r => f(y * P + r), h = 6.6;
+  return `<path class="flag${go ? ' go' : ''}" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text>`;
+}
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags || []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+/* ===========================================================================
+   The layouts. Every option seats the same three blocks: the heading, the copy under it and the way home under
+   that. Wide, they are a column 36 cells wide at cell 36 of 107; narrow, 24 of 32, at cell 2 when the rail is on
+   the right and 6 when it is on the left. The page's designators are numbered apart, as the blog's are: U301,
+   J301, J302, R301, D301 to D303, DS301, and U404, the part that is missing.
+   =========================================================================== */
+const ref = (x, y, t, a) => ({ k: 'ref', x, y, t, ...(a ? { a } : {}) });
+const net = (x, y, t, a, o) => ({ k: 'net', x, y, t, ...(a ? { a } : {}), ...(o ? { o } : {}) });
+const viaAt = (x, y, o) => wire([[x, y], [x, y]], { o, end: 'via' });
+const drop = (x, y0, y1, o) => wire([[x, y0], [x, y1]], { o, end: 'via' });
+const home = (tip, y, dir) => ({ tip, y, code: 'A0001', dir, go: true });
+
+const WIDE = {
+  // A trace cut in two. U301 at the right, fed by J301's bus across the top, sends the accent net west along the
+  // heading's row; it is orange as far as the cut, and blue past it, because nothing reaches the heading.
+  open(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8);
+    const y0 = f(a - 3), y1 = f(a + 8);
+    const chips = [
+      { conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
+      { x0: 80, y0, x1: 89, y1, code: 'E0404', pins: { l: [a], t: [83, 84, 85, 86], b: [86, 87, 88] } },
+    ];
+    const end = f(m.head.hx + 1.5);
+    const wires = [
+      ...bundle([[26.5, 1.5], [26.5, 5.5], [84.5, 5.5], [84.5, y0]], 4),
+      drop(21, 1.5, f(hc + 2)), drop(22, 1.5, hc), drop(23, 1.5, f(hc - 2)),
+      wire([[80, a], [70, a]], { o: true, end: 'via' }),
+      viaAt(66, a), wire([[66, a], [end, a]], { end: 'via' }),
+      wire([[86, y1], [86, hc], [f(tip + FLAG), hc]]),
+      drop(87, y1, f(hc + 2)), drop(88, y1, f(hc + 4)),
+    ];
+    const r = f((86 + tip + FLAG) / 2);
+    const labels = [
+      ref(29.4, 1.25, 'J301'), ref(80, f(y0 - 1.1), 'U301'), net(87.6, 10, 'D0 – D3'),
+      net(75, f(a - 0.75), 'A0404', 'middle', true), net(f((66 + end) / 2), f(a - 0.75), 'A0404', 'middle'),
+      net(20.2, f(hc + 2.3), 'H0601 – H0603', 'end'), net(88.9, f(hc + 4.3), 'H0611'),
+      ref(r, f(hc - 0.95), 'R301', 'middle'),
+    ];
+    return { rows: f(Math.max(m.home.bot + 6, hc + 6)), chips, wires, parts: [{ kind: 'R', x: r, y: hc }], labels, flags: [home(tip, hc, -1)] };
+  },
+  // A chip that was never fitted. U404's footprint, in the left margin level with the heading, is all pads and a
+  // dashed outline, and its net into the heading is blue. The way home leaves U301, a real chip, at the right.
+  footprint(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8);
+    const fy0 = f(a - 4), fy1 = f(a + 4), y0 = f(hc - 3), y1 = f(hc + 4);
+    const chips = [
+      { conn: true, x0: 21.2, y0: 0, x1: 28.8, y1: 1.5, pins: { b: [22, 23, 24, 25, 26, 27, 28] } },
+      { dnp: true, x0: 20, y0: fy0, x1: 30, y1: fy1, allPads: true },
+      { conn: true, x0: 82.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [83, 84, 85, 86, 87, 88] } },
+      { x0: 80, y0, x1: 90, y1, code: 'E0404', pins: { l: [hc], t: [84, 85, 86, 87], b: [84, 86] } },
+    ];
+    const r = f((80 + tip + FLAG) / 2);
+    const wires = [
+      ...bundle([[25, 1.5], [25, fy0]], 7),
+      wire([[30, a], [34.5, a]], { end: 'via' }),
+      ...bundle([[85.5, 1.5], [85.5, y0]], 4),
+      wire([[80, hc], [f(tip + FLAG), hc]]),
+      drop(84, y1, f(y1 + 3)), drop(86, y1, f(y1 + 1.5)),
+    ];
+    const labels = [
+      ref(29.4, 1.25, 'J301'), ref(18.8, f(fy0 + 0.2), 'U404', 'end'), net(20.6, 7, 'D0 – D6', 'end'),
+      net(32.6, f(a + 1.45), 'A0404', 'middle'),
+      ref(81.6, 1.25, 'J302', 'end'), ref(80, f(y0 - 1.1), 'U301'), net(88.2, 9, 'D0 – D3'),
+      ref(r, f(hc - 0.95), 'R301', 'middle'), net(84.9, f(y1 + 3.3), 'H0611'),
+    ];
+    return { rows: f(Math.max(m.home.bot + 6, y1 + 6)), chips, wires, parts: [{ kind: 'R', x: r, y: hc }], labels, flags: [home(tip, hc, -1)] };
+  },
+  // A lamp that has gone out. U301 in the left margin, fed by J301's bus across the top from the right, lights
+  // three lamps on stubs to its left, and the middle one is out. Three more traces drop down the right and stop.
+  lamp(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.l - 0.8);
+    const y0 = f(a - 3), y1 = f(a + 8.5), rows = [f(a + 1), f(a + 4), f(a + 7)], ends = [12, 9, 6];
+    const chips = [
+      { conn: true, x0: 78.2, y0: 0, x1: 86.8, y1: 1.5, pins: { b: [79, 80, 81, 82, 84, 85, 86] } },
+      { x0: 18, y0, x1: 27, y1, code: 'E0404', pins: { l: rows, r: [a], t: [21, 22, 23, 24], b: [25] } },
+    ];
+    const wires = [
+      ...bundle([[80.5, 1.5], [80.5, 5.5], [22.5, 5.5], [22.5, y0]], 4),
+      drop(84, 1.5, f(hc - 3)), drop(85, 1.5, f(hc - 1)), drop(86, 1.5, f(hc + 1)),
+      wire([[27, a], [34.5, a]], { o: true, end: 'via' }),
+      ...rows.map((r, i) => wire([[18, r], [ends[i], r]], { end: 'via' })),
+      wire([[25, y1], [25, hc], [f(tip - FLAG), hc]]),
+    ];
+    const parts = rows.map((r, i) => ({ kind: 'LED', x: ends[i] + 2.5, y: r, delay: i * 1.1, dead: i === 1 }));
+    const labels = [
+      ref(77.6, 1.25, 'J301', 'end'), ref(17.4, f(y0 + 0.6), 'U301', 'end'), net(19.8, 9.5, 'D0 – D3', 'end'),
+      net(30.75, f(a - 0.75), 'A0404', 'middle', true),
+      ...rows.map((r, i) => ref(ends[i] + 2.5, f(r - 0.85), `D30${i + 1}`, 'middle')),
+      net(86.9, f(hc + 1.3), 'H0601 – H0603'),
+    ];
+    return { rows: f(Math.max(m.home.bot + 6, y1 + 4)), chips, wires, parts, labels, flags: [home(tip, hc, 1)] };
+  },
+  // A display that reads 404. U301 in the left margin drives DS301 at the right through a seven-wide bus, one trace
+  // a segment, across the top. The display's three commons drop down the right and stop.
+  display(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.l - 0.8);
+    const y0 = f(a - 3), y1 = f(a + 8), dy0 = f(a - 4), dy1 = f(a + 4);
+    const chips = [
+      { x0: 20, y0, x1: 29, y1, code: 'E0404', pins: { r: [a], t: [21, 22, 23, 24, 25, 26, 27], b: [25] } },
+      { display: true, text: '404', x0: 81, y0: dy0, x1: 95, y1: dy1, pins: { t: [85, 86, 87, 88, 89, 90, 91], b: [85, 86, 87] } },
+    ];
+    const wires = [
+      ...bundle([[24, y0], [24, 4.5], [88, 4.5], [88, dy0]], 7),
+      wire([[29, a], [34.5, a]], { o: true, end: 'via' }),
+      wire([[25, y1], [25, hc], [f(tip - FLAG), hc]]),
+      drop(85, dy1, f(dy1 + 8)), drop(86, dy1, f(dy1 + 6)), drop(87, dy1, f(dy1 + 4)),
+    ];
+    const labels = [
+      ref(19.4, f(y0 + 0.6), 'U301', 'end'), ref(81, f(dy0 - 1.1), 'DS301'), net(92.6, 8.6, 'SEG A – G'),
+      net(31.75, f(a - 0.75), 'A0404', 'middle', true), net(87.9, f(dy1 + 4.3), 'DIG1 – DIG3'),
+    ];
+    return { rows: f(Math.max(m.home.bot + 6, dy1 + 12)), chips, wires, parts: [], labels, flags: [home(tip, hc, 1)] };
+  },
+};
+
+const NARROW = {
+  // The rail on the right. J301 top left feeds U301 top right; the accent net comes down out of U301 and west
+  // along the heading's row, cut in two. Three traces drop down the right of the copy: the nearest turns under it
+  // into the flag beside the way home, the other two stop past it.
+  open(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
+    const chips = [
+      { conn: true, x0: 1.2, y0: 0, x1: 7.8, y1: 1.5, pins: { b: [2, 3, 4, 5, 6, 7] } },
+      { x0: 22, y0: 2, x1: 31, y1: 9.5, code: 'E0404', pins: { l: [4, 5, 6, 7], b: [25, 28, 29, 30] } },
+    ];
+    const cut = f(Math.max(end + 3.5, 18.5));
+    const wires = [
+      ...bundle([[4.5, 1.5], [4.5, 5.5], [22, 5.5]], 4),
+      wire([[25, 9.5], [25, a], [f(cut + 3.5), a]], { o: true, legs: [0, 8, 0], end: 'via' }),
+      viaAt(cut, a), wire([[cut, a], [end, a]], { end: 'via' }),
+      wire([[28, 9.5], [28, hc], [f(tip + FLAG), hc]], { legs: [0, 8, 0] }),
+      drop(29, 9.5, f(hc + 1.5)), drop(30, 9.5, f(hc + 3)),
+    ];
+    const labels = [
+      ref(8.4, 1.1, 'J301'), ref(21.4, 2.2, 'U301', 'end'), net(9.5, 8.75, 'D0 – D3'),
+      net(f(cut + 1.75), f(a - 0.75), 'A0404', 'middle', true),
+    ];
+    return { rows: f(hc + 5.5), chips, wires, parts: [], labels, flags: [home(tip, hc, -1)] };
+  },
+  // The rail on the left. J301 top left feeds the footprint at the top right, whose blue net comes down and west
+  // to the heading. J301's other three pins drop down the left of the copy; the nearest turns under it into the
+  // flag before the way home, which sits at the right, as About's link to the blog does.
+  footprint(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.l - 0.8), end = f(m.head.hx + 1.5);
+    const chips = [
+      { conn: true, x0: 1, y0: 0, x1: 9.8, y1: 1.5, pins: { b: [2, 3, 4, 6, 7, 8, 9] } },
+      { dnp: true, x0: 20, y0: 2, x1: 29, y1: 9, allPads: true },
+    ];
+    const wires = [
+      ...bundle([[7.5, 1.5], [7.5, 5.5], [20, 5.5]], 4),
+      wire([[25, 9], [25, a], [end, a]], { legs: [0, 8, 0], end: 'via' }),
+      wire([[4, 1.5], [4, hc], [f(tip - FLAG), hc]], { legs: [0, 8, 0] }),
+      drop(3, 1.5, f(hc + 1.5)), drop(2, 1.5, f(hc + 3)),
+    ];
+    const labels = [
+      ref(10.4, 1.1, 'J301'), ref(26, 11.2, 'U404'), net(10.5, 8.75, 'D0 – D3'),
+      net(f((25 + end) / 2), f(a - 0.75), 'A0404', 'middle'),
+    ];
+    return { rows: f(hc + 5.5), chips, wires, parts: [], labels, flags: [home(tip, hc, 1)] };
+  },
+  // The rail on the left, out of U301 at the top left, which lights two lamps on stubs to its right, one of them
+  // out. Its accent net runs east under them, down the right and in along the heading's row.
+  lamp(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.l - 0.8), end = f(m.head.hx + 1.5);
+    const chips = [{ x0: 1, y0: 2, x1: 10, y1: 9.5, code: 'E0404', pins: { r: [3.5, 5.5, 7.5], b: [2, 3, 4] } }];
+    const wires = [
+      wire([[10, 3.5], [24, 3.5]], { end: 'via' }), wire([[10, 5.5], [19, 5.5]], { end: 'via' }),
+      wire([[10, 7.5], [28, 7.5], [28, a], [end, a]], { o: true, legs: [0, 8, 8, 0], end: 'via' }),
+      wire([[4, 9.5], [4, hc], [f(tip - FLAG), hc]], { legs: [0, 8, 0] }),
+      drop(3, 9.5, f(hc + 1.5)), drop(2, 9.5, f(hc + 3)),
+    ];
+    const parts = [{ kind: 'LED', x: 21, y: 3.5 }, { kind: 'LED', x: 16, y: 5.5, dead: true }];
+    const labels = [
+      ref(10.6, 1.9, 'U301'), ref(21, 2.65, 'D301', 'middle'), ref(16, 4.65, 'D302', 'middle'),
+      net(f((28 + end) / 2), f(a - 0.75), 'A0404', 'middle', true),
+    ];
+    return { rows: f(hc + 5.5), chips, wires, parts, labels, flags: [home(tip, hc, 1)] };
+  },
+  // The rail on the right. DS301 top left, fed by U301 top right through four traces; U301's accent net comes down
+  // and west along the heading's row, and the rail is open's.
+  display(m) {
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
+    const chips = [
+      { display: true, text: '404', x0: 2, y0: 2, x1: 16, y1: 10, pins: { r: [4, 5, 6, 7] } },
+      { x0: 22, y0: 2, x1: 31, y1: 9.5, code: 'E0404', pins: { l: [4, 5, 6, 7], b: [27, 28, 29, 30] } },
+    ];
+    const ax = f(Math.max(27, end + 3));
+    const wires = [
+      ...bundle([[22, 5.5], [16, 5.5]], 4),
+      wire([[ax, 9.5], [ax, a], [end, a]], { o: true, legs: [0, 8, 0], end: 'via' }),
+      wire([[28, 9.5], [28, hc], [f(tip + FLAG), hc]], { legs: [0, 8, 0] }),
+      drop(29, 9.5, f(hc + 1.5)), drop(30, 9.5, f(hc + 3)),
+    ];
+    const labels = [ref(2, 1.1, 'DS301'), ref(31, 1.1, 'U301', 'end'), net(19, 8.75, 'SEG', 'middle')];
+    return { rows: f(hc + 5.5), chips, wires, parts: [], labels, flags: [home(tip, hc, -1)] };
+  },
+};
+
+const RIGHT_RAIL = { open: true, display: true };
+function wideLayout(cfg) {
+  const big = cfg.heading === '404';
+  return {
+    cols: 107,
+    seats: {
+      head: { x: 36, y: 11, size: big ? 96 : 48 },
+      copy: m => ({ x: 36, y: f(m.head.bot + (big ? 2 : 2.5)), w: 36 }),
+      home: m => ({ x: 36, y: f(m.copy.bot + 3) }),
+    },
+    build: m => WIDE[cfg.idea](m),
+  };
+}
+function narrowLayout(cfg) {
+  const big = cfg.heading === '404', right = RIGHT_RAIL[cfg.idea], cx = right ? 2 : 6;
+  return {
+    cols: 32,
+    seats: {
+      head: { x: cx, y: 13, size: big ? 72 : 32 },
+      copy: m => ({ x: cx, y: f(m.head.bot + 2), w: 24 }),
+      // with the rail on the left, the way home sits at the right under the copy, as About's link to the blog does
+      home: m => right ? { x: cx, y: f(m.copy.bot + 3) } : { x: 24, y: f(m.copy.bot + 3.5) },
+    },
+    build: m => NARROW[cfg.idea](m),
+  };
+}
+
+/* ===========================================================================
+   Seating and measuring, as in js/board.js
+   =========================================================================== */
+function baselineOf(el) {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+function capHeight(el) {
+  const cs = getComputedStyle(el), cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${cs.fontWeight} 1000px ${cs.fontFamily}`;
+  return cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+}
+function measure(el, board, u) {
+  const box = board.getBoundingClientRect(), pad = parseFloat(getComputedStyle(board).paddingTop);
+  const cell = px => f(px / u / P), r = el.getBoundingClientRect(), top = box.top + pad;
+  const m = { top: cell(r.top - top), bot: cell(r.bottom - top), h: cell(r.height), l: cell(r.left - box.left) };
+  const heading = el.matches('h1, h2, a') ? el : el.querySelector('h3');
+  if (!heading) return m;
+  m.cap = cell(baselineOf(heading) - capHeight(heading) / 2 - top);
+  const word = document.createRange();
+  word.selectNodeContents(heading);
+  const rects = [...word.getClientRects()].filter(r => r.width > 0);
+  m.hx = cell(Math.max(...rects.filter(r => Math.abs(r.top - rects[0].top) < 2).map(r => r.right)) - box.left);
+  return m;
+}
+function drawBoard(board, l) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const u = board.getBoundingClientRect().width / W, pad = parseFloat(getComputedStyle(board).paddingTop);
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-b="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    if (s.size) el.style.setProperty('--fs', s.size);
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : 'auto';
+    el.style.top = `calc(${pad}px + ${s.y * P} * var(--u))`;
+    m[key] = measure(el, board, u);
+  }
+  board.insertAdjacentHTML('beforeend', svgOf(l.cols, l.build(m)));
+}
+
+/* ===========================================================================
+   The page's markup, as Jekyll would write it, and the footer
+   =========================================================================== */
+const WORDS = {
+  old: ['Page not found.', 'The requested page could not be found.'],
+  theme: ['Page not found.', 'Nothing is connected at this address. The page may have moved, or the link that brought you here may be wrong.'],
+};
+function pageHTML(cfg) {
+  const [lead, rest] = WORDS[cfg.words], big = cfg.heading === '404';
+  return `<h1 class="big" data-b="head">${big ? '404' : 'Page not found'}</h1>`
+       + `<div class="copy" data-b="copy">${big ? `<p><strong>${lead}</strong></p>` : ''}<p>${rest}</p></div>`
+       + `<a class="back" data-b="home" href="#">Home</a>`;
+}
+const FOOT = `<footer class="foot"><div class="foot-grid"><div class="foot-body">
+  <nav class="contacts" aria-label="Contact">
+    <a aria-label="Email"><svg class="mail" viewBox="4 8 25 16"><path d="M5.315 9.274l7.735 6.726-7.737 6.728c-0.194-0.184-0.313-0.445-0.313-0.735v-11.986c0-0.289 0.121-0.549 0.315-0.733zM27.687 9.272c0.194 0.184 0.313 0.445 0.313 0.735v11.986c0 0.289-0.121 0.549-0.315 0.733l-7.735-6.726 7.737-6.728zM19.202 16.651l7.298 6.349h-20l7.298-6.349 2.702 2.349 2.702-2.349zM6.004 8c-1.107 0-2.004 0.895-2.004 1.994v12.012c0 1.101 0.89 1.994 2.004 1.994h20.993c1.107 0 2.004-0.895 2.004-1.994v-12.012c0-1.101-0.89-1.994-2.004-1.994h-20.993zM16.5 17.7l-10-8.7h20l-10 8.7z"/></svg></a>
+    <a aria-label="GitHub"><svg viewBox="0 0.395 32 31.6"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.290-1.777-7.290-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"/></svg></a>
+    <a aria-label="LinkedIn"><svg class="in" viewBox="0 0 32 32"><path d="M29 0h-26c-1.65 0-3 1.35-3 3v26c0 1.65 1.35 3 3 3h26c1.65 0 3-1.35 3-3v-26c0-1.65-1.35-3-3-3zM12 26h-4v-14h4v14zM10 10c-1.106 0-2-0.894-2-2s0.894-2 2-2c1.106 0 2 0.894 2 2s-0.894 2-2 2zM26 26h-4v-8c0-1.106-0.894-2-2-2s-2 0.894-2 2v8h-4v-14h4v2.481c0.825-1.131 2.087-2.481 3.5-2.481 2.488 0 4.5 2.238 4.5 5v9z"/></svg></a>
+  </nav>
+  <p class="cr">© 2026 <a class="home">Arturo Javier-Castellanos</a></p></div></div></footer>`;
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const OPTIONS = [
+  { name: 'Open trace', cfg: { idea: 'open', heading: '404', words: 'old' },
+    note: 'The accent net is cut. It leaves U301 orange and stops on a via short of the heading; past a gap of four cells it picks up again on another via and runs on to the "404", blue, because nothing reaches it. The rest of the board works: J301\'s bus across the top into U301, and the way home, through R301 to its flag.',
+    phone: 'J301 top left feeds U301 top right, as on the blog\'s index. The accent net comes down out of U301 and west along the heading\'s row, and the cut is on that run. Three traces drop down the right of the copy; the nearest turns under it into the flag beside "Home".',
+    recipe: [['the fault', 'a cut in the accent net'], ['past the cut', 'blue'], ['rail', 'right, on a phone']] },
+  { name: 'Unfitted chip', cfg: { idea: 'footprint', heading: '404', words: 'old' },
+    note: 'The chip that should drive the heading was never fitted. Where it belongs, level with the "404", there is only its footprint: every pad, a dashed silkscreen outline, a pin-one dot, and DNP, "do not populate", inside. It is U404. Its bus comes in from J301 and its net goes out to the heading, both blue, so the only orange on the page is the flag home, fed by U301 at the right.',
+    phone: 'J301 top left feeds the empty footprint at the top right, and its blue net comes down and in along the heading\'s row. J301\'s other three pins drop down the left; the nearest turns under the copy into a flag before "Home", which sits at the right, as About\'s link to the blog does.',
+    recipe: [['the fault', 'an empty footprint, U404'], ['accent net', 'blue: nothing drives it'], ['rail', 'left, on a phone']] },
+  { name: 'Lamp out', cfg: { idea: 'lamp', heading: '404', words: 'old' },
+    note: 'U301 sits in the left margin and lights three lamps on stubs out of its left side. The middle one, D302, is out: its lens is a dull amber, and every seven seconds or so it flickers, twice, and goes dark again. Everything else works, including the orange accent net into the heading. The quietest of the four, and the only one that moves.',
+    phone: 'U301 at the top left lights two lamps to its right, and the second is out. Its accent net runs east under them, down the right and in along the heading\'s row. The rail is out of U301\'s foot, down the left, into the flag before "Home".',
+    recipe: [['the fault', 'one lamp out, flickering'], ['accent net', 'orange'], ['rail', 'left, on a phone']] },
+  { name: 'Display', cfg: { idea: 'display', heading: 'text', words: 'old' },
+    note: 'The number moves out of the type and onto the board: DS301, a three-digit seven-segment display, reads 404 in lit segments, with the unlit ones faintly there. U301 drives it through a seven-wide bus across the top, a trace per segment. The heading is then the words, "Page not found", set smaller, and the copy is the one sentence under it. The panel can put the "404" back in the heading, if you want both.',
+    phone: 'The display sits at the top left, fed from U301 at the top right through four traces, and the accent net comes down out of U301 into the heading. The rail is the same as Open trace\'s.',
+    recipe: [['the fault', 'none: the board reports it'], ['heading', '"Page not found"'], ['rail', 'right, on a phone']] },
+];
+
+const main = document.getElementById('specimens');
+function specHTML(id, head, phone) {
+  return `<section class="spec" id="${id}">${head}
+    <div class="screen wide"><section class="board"></section>${FOOT}</div>
+    <p class="sub">390 px</p>
+    <div class="phone-row">
+      <div class="phone"><section class="board"></section>${FOOT}</div>
+      <div class="phone-note">${phone}</div>
+    </div></section>`;
+}
+function drawSpec(spec, cfg) {
+  const [wide, narrow] = spec.querySelectorAll('.board');
+  const key = `${cfg.heading}|${cfg.words}`;
+  [wide, narrow].forEach(b => { if (b.dataset.key !== key) { b.innerHTML = pageHTML(cfg); b.dataset.key = key; } });
+  drawBoard(wide, wideLayout(cfg));
+  drawBoard(narrow, narrowLayout(cfg));
+}
+OPTIONS.forEach((o, i) => {
+  const id = 'abcd'[i];
+  main.insertAdjacentHTML('beforeend', specHTML(`opt-${id}`,
+    `<div class="cap"><div class="num">Option ${id.toUpperCase()}</div><h2>${o.name}</h2><p>${o.note}</p>
+      <ul class="recipe">${o.recipe.map(([k, v]) => `<li>${k} <b>${v}</b></li>`).join('')}</ul></div>`, `<p>${o.phone}</p>`));
+});
+
+/* ---- mix your own ---- */
+const SWITCHES = {
+  idea: [['open', 'Open trace'], ['footprint', 'Unfitted chip'], ['lamp', 'Lamp out'], ['display', 'Display']],
+  heading: [['404', '"404"'], ['text', '"Page not found"']],
+  words: [['old', 'The old site\'s'], ['theme', 'On theme, longer']],
+};
+const LABELS = { idea: 'Drawing', heading: 'Heading', words: 'Wording' };
+const mix = { idea: 'lamp', heading: '404', words: 'theme' };
+main.insertAdjacentHTML('beforeend', `<section class="mix" id="mix"><div class="cap"><div class="num">Mix your own</div><h2>Any drawing, either heading, either wording</h2>
+  <p>This starts as option C with the longer wording: "Nothing is connected at this address. The page may have moved, or the link that brought you here may be wrong." With the words as the heading, the copy drops its first line, which would repeat them.</p></div>
+  <div class="switches">${Object.entries(SWITCHES).map(([k, opts]) => `<label>${LABELS[k]}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></label>`).join('')}</div>
+  ${specHTML('mix-spec', '', '<p>The mix at 390px.</p>')}</section>`);
+document.getElementById('mix-spec').style.paddingTop = '24px';
+document.querySelectorAll('#mix select').forEach(s => {
+  s.value = mix[s.dataset.k];
+  s.addEventListener('change', () => { mix[s.dataset.k] = s.value; drawSpec(document.getElementById('mix-spec'), mix); });
+});
+
+function drawAll() {
+  OPTIONS.forEach((o, i) => drawSpec(document.getElementById(`opt-${'abcd'[i]}`), o.cfg));
+  drawSpec(document.getElementById('mix-spec'), mix);
+}
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
