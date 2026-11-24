@@ -71,6 +71,7 @@ Studies double as a parts bin of working code:
 - `studies/10-blog-head.html` holds the two other blog heads the site does not use: three traces dropping beside the head and stopping short, and three turning under it as a divider. Its panel also puts a lone via before each heading in the text.
 - `studies/11-empty-corners.html` holds the fillers for the empty corners under U3 and U5 in the wide layouts that the site does not use: a second chip with two capacitors and a staggered tail, a crystal with its two load capacitors (a part `js/kit.js` does not have), a serpentine down U3's corner, and a six-pin header under U5.
 - `studies/12-favicon.html` holds the favicons the site does not use: a lit lamp on a trace and an orange trace turning 45° into a via, each on the board's ground, with a panel that also draws a resistor or a capacitor, other grounds, and traces that end on vias.
+- `studies/13-not-found.html` holds the 404 pages the site does not use, each a different fault on the board: an unfitted footprint (pads, a dashed outline and DNP, with its net into the heading blue), a lamp that is out and flickers now and then, and a seven-segment display reading 404 with the words as the heading. The footprint, the dead lamp and the display are parts `js/kit.js` does not have.
 
 ## The code
 
@@ -80,6 +81,8 @@ The home page has three sections and a footer. About opens the page: the name, w
 
 The blog is two kinds of page, each with one board, and the board holds only the page's head. The index, at `/blog/`, has the heading "Blog", which the off-page flag `A0140` arrives at, the same net that leaves About beside its link. A post has its way back to the index, a link behind a flag pointing at it in the top left, its title and its date. Both heads are a masthead: a connector on the top edge and a bus across the top into the chip. Everything under the head (the posts with their dates and excerpts, or a post's body and its Disqus comments) is plain text in a column on the boards' grid, outside the board, with no drawing beside it. On every page but the home page, the name in the footer links home.
 
+The 404 page, which GitHub Pages serves for any address it has no page for, is one board: a big "404", the old site's two lines, and a link home behind an off-page flag. Its drawing is a cut trace: the accent net leaves U301 orange, stops on a via short of the heading, and picks up past a gap in blue, because nothing reaches the heading. It is short, so `main` grows to fill the window and the footer sits at its foot.
+
 | File | What is in it |
 |---|---|
 | `index.html` | The home page's markup: each section's `.board` and the blocks of type in it, in page order, then the footer. Each block a layout seats has a `data-seat`. Its empty front matter makes Jekyll process it, for the footer's include. |
@@ -87,6 +90,7 @@ The blog is two kinds of page, each with one board, and the board holds only the
 | `_layouts/default.html` | The blog pages' frame: the head, `main`, and the footer with `blog=true`. |
 | `blog/index.html` | The blog's index: its head's board, then every post, newest first, in `.flow`. |
 | `_layouts/post.html` | A post: its head's board, then the post and its Disqus thread in `.flow`. |
+| `404.html` | The 404 page: its board, `notfound`. |
 | `_posts/` | The posts, in Markdown. The `excerpt` in a post's front matter is what the index shows. |
 | `_config.yml` | Jekyll's settings. Permalinks are the default, `/:categories/:year/:month/:day/:title.html`, as on the old site: changing them breaks every post's links and its Disqus thread. |
 | `styles.css` | All the styles: the tokens, the page frame, the type of the name, a heading, the copy, a project and a paper, the footer, the drawing's classes. |
@@ -94,7 +98,7 @@ The blog is two kinds of page, each with one board, and the board holds only the
 | `js/board.js` | `mountBoard()`: seats and measures the type, draws the layout, and redraws when the width changes. |
 | `js/rails.js` | The animation: draws the main rail as the page scrolls, and grows the branches and accent nets once their chip connects. |
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
-| `js/main.js` | The list of boards, on every page. It mounts each one whose `.board` is on the page, by id, and fills in the footer's year. `blog` is the index's head and `post` a post's. |
+| `js/main.js` | The list of boards, on every page. It mounts each one whose `.board` is on the page, by id, and fills in the footer's year. `blog` is the index's head, `post` a post's and `notfound` the 404 page's. |
 | `favicon.svg`, `favicon.ico`, `apple-touch-icon.png` | The icon: a chip with two pads a side, its pin-one mark lit orange, and a trace off each side pad. The SVG is the source; the other two are rendered from it, the `.ico` at 16, 32 and 48 (`rsvg-convert -w N -h N`, then `magick` the three PNGs into one), the touch icon at 180 with the square's `rx` removed, because phones round its corners themselves. Linked from `index.html` and `_layouts/default.html`. |
 
 ### Adding a section
@@ -169,13 +173,13 @@ Render the page and look at it; a description of the code is not evidence. The u
   `python3 -c "import http.server as h; H = h.SimpleHTTPRequestHandler; e = H.end_headers; H.end_headers = lambda s: (s.send_header('Cache-Control', 'no-store'), e(s))[1]; h.ThreadingHTTPServer(('127.0.0.1', 8741), H).serve_forever()"` and `fuser -k 8741/tcp`. Stop it by port, not with `pkill -f` and a pattern, which also matches the shell running it when the pattern appears anywhere in that shell's command. Plain `python3 -m http.server` sends no cache headers, and Chrome then loads the page with some modules new and some stale, which shows up as a section with no drawing.
 - **A section is taller than the screenshot.** Set `document.body.style.zoom` to fit it for an overview, then use the zoom action on bridges, labels and trace ends, where the problems are. Take measurements at zoom 1.
 - **Look at the narrow layout in iframes,** several widths side by side. On the served page, hide `main` and inject same-origin iframes of the page at 320, 390, 430 and 768px wide; media queries inside an iframe follow the iframe's width, and its `contentDocument` can be measured from outside. Give each iframe `box-sizing: content-box` and more height than the page, or its border and a scrollbar come out of the width. Check at each width that there is no horizontal scroll, that the accent via is level with the heading's cap middle, and that the gap under the copy's last line is the same. Then change one iframe's width across 1100px in both directions and check the drawing swaps.
-- **The pages are served by Jekyll,** with the system Ruby. The gems are in `vendor/bundle`, set by the ignored `.bundle/config`; in a fresh clone, run `bundle config set --local path vendor/bundle` and `bundle install` first. Serve at http://127.0.0.1:4000 with `bundle exec jekyll serve`, which sends no-cache headers and rebuilds when a file changes, and stop it with `fuser -k 4000/tcp`. Jekyll does not reload `_config.yml` while serving: restart it after changing that.
+- **The pages are served by Jekyll,** with the system Ruby. The gems are in `vendor/bundle`, set by the ignored `.bundle/config`; in a fresh clone, run `bundle config set --local path vendor/bundle` and `bundle install` first. Serve at http://127.0.0.1:4000 with `bundle exec jekyll serve`, which sends no-cache headers and rebuilds when a file changes, and stop it with `fuser -k 4000/tcp`. Jekyll does not reload `_config.yml` while serving: restart it after changing that. It also serves `404.html` for a missing address only if the file existed when it started; otherwise open `/404.html` directly.
   Opened without Jekyll, `index.html` shows its front matter and the footer's include as text. The studies are not part of the site (`_config.yml` excludes them) and still open from the plain server above, or straight from disk.
 - **Mood board images:** navigating a tab straight to an `i.pinimg.com` image hangs the screenshot tool, and `/originals/` URLs fail. Stay on the board page, read the pin image URLs from the DOM, swap `/236x/` for `/736x/`, and show the image in an element injected into that page.
 
 ## Facts and decoration
 
-Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, J2, R5 and R6; Research has U5 to U8, R7 to R9, D4 and D5. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. Names, places, jobs, dates, projects and links must come from `~/Code/personal-website` or from the user. The surname is hyphenated: Javier-Castellanos.
+Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, J2, R5 and R6; Research has U5 to U8, R7 to R9, D4 and D5. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. So is the 404 page: U301, J301 and R301. Names, places, jobs, dates, projects and links must come from `~/Code/personal-website` or from the user. The surname is hyphenated: Javier-Castellanos.
 
 ## Committing
 

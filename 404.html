@@ -1,0 +1,18 @@
+---
+layout: default
+title: Page not found
+permalink: /404.html
+---
+{%- comment -%}
+  The 404 page, which GitHub Pages serves for any address it has no page for. One board: the heading, the copy and
+  the way home, the end of a net that leaves the board through an off-page flag. The drawing is a cut trace: see
+  js/sections/notfound.js.
+{%- endcomment -%}
+<section class="board" id="notfound">
+  <h1 class="big" data-seat="head">404</h1>
+  <div class="copy" data-seat="copy">
+    <p><strong>Page not found.</strong></p>
+    <p>The requested page could not be found.</p>
+  </div>
+  <a class="back" data-seat="home" href="{{ '/' | relative_url }}">Home</a>
+</section>
