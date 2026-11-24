@@ -21,7 +21,7 @@ const LOAD = 0.8;                       // the seconds the runs drawn on load ta
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
-let runs = [], queued = 0, ticking = 0, then = 0, born = null, reached = new Set();
+let runs = [], queued = 0, ticking = 0, then = 0, born = null, swept0 = null, reached = new Set(), live = new Set();
 
 // A path's points every few units, in page coordinates, with how far along it each is.
 function samples(p, len) {
@@ -79,7 +79,7 @@ function collect() {
     // flag, is shown when the nearest trace end is reached, and a part sitting on one, with its designator, when the
     // tip reaches the part.
     ...group('rail').map(([to, paths]) => {
-      const r = run(to, paths, { after: paths[0].dataset.after });
+      const r = run(to, paths, { after: paths[0].dataset.after, dur: +paths[0].dataset.dur || null, from: paths[0].dataset.from });
       const ps = r.legs.flatMap(l => l.ps);
       r.reveal = [...document.querySelectorAll(`[data-rail-end="${to}"]`)].map(el => ({ ...nearest(ps, centre(el), !el.matches('[transform], .ref')), el }));
       return r;
@@ -103,7 +103,7 @@ function collect() {
 function chains() {
   const keyed = new Map(runs.map(r => [r.key, r]));
   for (const r of runs)
-    if (r.after === 'load' || (r.net && !keyed.has(r.after))) Object.assign(r, { load: true, lead: 0, head: r, chain: 0 });
+    if (r.after === 'load' || (r.net && !keyed.has(r.after))) Object.assign(r, { load: true, lead: 0, head: r, chain: 0, dur: r.dur ?? LOAD });
   for (let more = true; more;) {
     more = false;
     for (const r of runs) {
@@ -146,8 +146,12 @@ function update() {
   // On load the reading line sweeps down from the top of the page to its place, easing out, so that the main rail
   // grows to where the scroll puts it instead of starting half drawn. It sweeps a fraction of the way there, so it
   // takes the same time however far down the page opens, and a scroll during it moves where it is heading.
-  born ??= performance.now();
-  const swept = still.matches ? 1 : clamp((performance.now() - born) / 1000 / SWEEP);
+  // A main rail marked `from` a chip that is drawn to on load, as J1 is in About's narrow layout, holds the sweep back
+  // until that chip connects.
+  const now = performance.now();
+  born ??= now;
+  if (swept0 === null && runs.every(r => r.after || !r.from || live.has(r.from))) swept0 = now;
+  const swept = still.matches ? 1 : swept0 === null ? 0 : clamp((now - swept0) / 1000 / SWEEP);
   const line = (1 - (1 - swept) ** 3) * (scrollY + READ * innerHeight);
   if (swept < 1) later();
   // a rail that ends too low for the reading line to reach at the foot of the page finishes at the foot
@@ -174,7 +178,7 @@ function update() {
 // connected when the main rail or a branch has reached it, and from the start when no run leads into it, as U1 has
 // none; the page counts as `load`.
 function aim() {
-  const on = new Set(['load', ...reached]);
+  const on = live = new Set(['load', ...reached]);
   for (const r of runs) if (r.net && !runs.some(q => q.key === r.after)) on.add(r.after);
   for (const r of runs) if (r.after && !r.net && (grown.get(r.key) ?? 0) >= 1) on.add(r.key);
   for (const r of runs) if (r.after) r.goal = r.load || on.has(r.after) ? 1 : 0;
@@ -191,8 +195,9 @@ function grow() {
     if (!r.after) continue;
     let g = grown.get(r.key) ?? 0;
     if (r.load) {
-      // a run drawn on load: its share of its chain, on the chain's clock
-      const s = still.matches ? 1 : clamp((now - born) / 1000 / LOAD);
+      // a run drawn on load: its share of its chain, on the chain's clock. A chain that takes less than LOAD starts late,
+      // so that it still finishes with the others.
+      const dur = r.head.dur, s = still.matches ? 1 : clamp((now - born) / 1000 / dur - (LOAD - dur) / dur);
       g = clamp(((1 - (1 - s) ** 3) * r.head.chain - r.lead) / r.len);
     } else {
       // a branch grows at a steady speed, and a net in a steady time, retracting as much faster as a branch does

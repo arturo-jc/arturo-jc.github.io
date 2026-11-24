@@ -73,8 +73,9 @@ const narrow = {
       { id: 'U1', x0: 18, y0: 3, x1: 27, y1: 10, code: 'A0131', allPads: true },
     ];
     const wires = [], labels = [];
-    // J1 → U1, four wide
-    wires.push(...bundle([[7.5, 2.5], [7.5, 6.5], [18, 6.5]], 4));
+    // U1 → J1, four wide: a branch drawn out of U1 on load. It is short, so it starts late and takes `dur` seconds,
+    // reaching J1 as the accent net finishes, and the rail out of J1 waits for it.
+    wires.push(...rail('J1', bundle([[18, 6.5], [7.5, 6.5], [7.5, 2.5]], 4), 'load').map(w => Object.assign(w, { dur: 0.35 })));
     // the accent net: down out of U1 and in along the name's first line, ending just past it
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
     wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1' }));
@@ -89,7 +90,7 @@ const narrow = {
     const tip = f(m.blog.l - 0.8);
     const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
     toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
-    wires.push(...rail('U3', [toFlag, ...down]));
+    wires.push(...rail('U3', [toFlag, ...down]).map(w => Object.assign(w, { from: 'J1' })));
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
     const flags = [{ tip, y: by, code: 'A0140', go: true }];
     const parts = [
@@ -99,7 +100,7 @@ const narrow = {
     labels.push(
       { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },
       { k: 'ref', x: 26.1, y: 13.45, t: 'R4', net: 'U1' },
-      { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3' },
+      { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3', rail: 'J1' },
       { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true, net: 'U1' },
     );
     return { rows, chips, wires, parts, labels, flags };
