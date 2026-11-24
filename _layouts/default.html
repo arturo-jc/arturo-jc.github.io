@@ -12,7 +12,8 @@
 <link rel="preload" href="{{ '/fonts/plex-mono-400-latin.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}">
 {% feed_meta %}
-{% include scripts.html %}
+{% assign boards = page.boards | default: layout.boards %}
+{% include scripts.html boards=boards %}
 </head>
 <body>
 <main>

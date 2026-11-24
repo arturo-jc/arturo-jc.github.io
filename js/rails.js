@@ -23,22 +23,50 @@ const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
 let runs = [], queued = 0, ticking = 0, then = 0, born = null, swept0 = null, reached = new Set(), live = new Set();
 
-// A path's points every few units, in page coordinates, with how far along it each is.
-function samples(p, len) {
-  const m = p.getScreenCTM(), out = [];
-  for (let at = 0; ; at = Math.min(len, at + 3)) {
-    const pt = p.getPointAtLength(at);
-    out.push({ at, x: m.a * pt.x + m.c * pt.y + m.e, y: m.b * pt.x + m.d * pt.y + m.f + scrollY });
-    if (at === len) return out;
+// A trace's point `at` units along it, in page coordinates. `x` is a trace as legsOf() keeps it, with its path `p`,
+// the path's screen matrix `m`, and `k`, page px to a unit.
+function point(x, at) {
+  const { m } = x, pt = x.p.getPointAtLength(at);
+  return { at, x: m.a * pt.x + m.c * pt.y + m.e, y: m.b * pt.x + m.d * pt.y + m.f + scrollY };
+}
+// A trace's points every STEP units, and its end. getPointAtLength() is slow, and a redraw samples every animated
+// trace on the page, so the samples are coarse, and nearest() looks closer only where it needs to.
+const STEP = 24;
+function samples(x) {
+  const out = [];
+  for (let at = 0; ; at = Math.min(x.len, at + STEP)) {
+    out.push(point(x, at));
+    if (at === x.len) return out;
   }
 }
 const centre = el => { const b = el.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 + scrollY }; };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-// the trace, and the point on it, nearest to `c`; with `tips`, only the traces' ends are considered
+// The point on trace `x` nearest to `c` between `lo` and `hi` units along it, to within a unit, by golden-section
+// search: the span is two samples' worth, short enough that the distance falls to one low point and rises again.
+const GOLD = (Math.sqrt(5) - 1) / 2;
+function closest(x, c, lo, hi) {
+  const at = t => ({ at: t, d: dist(point(x, t), c) });
+  let p = at(hi - GOLD * (hi - lo)), q = at(lo + GOLD * (hi - lo));
+  while (hi - lo > 1)
+    if (p.d < q.d) { hi = q.at; q = p; p = at(hi - GOLD * (hi - lo)); }
+    else { lo = p.at; p = q; q = at(lo + GOLD * (hi - lo)); }
+  return p.d < q.d ? p : q;
+}
+// The trace, and the point on it to about a unit, nearest to `c`; with `tips`, only the traces' ends are considered.
+// The point nearest `c` is within STEP / 2 units of a sample, so that sample is within STEP / 2 units, in page px,
+// of the nearest sample of all. Every sample that close which is nearer than the samples either side of it is
+// looked at again, between those two.
 function nearest(ps, c, tips) {
+  if (tips) return ps.map(x => { const s = x.pts.at(-1); return { x, at: s.at, d: dist(s, c) }; }).reduce((a, b) => b.d < a.d ? b : a);
+  const ds = ps.map(x => x.pts.map(s => dist(s, c)));
+  const near = Math.min(...ds.flat());
   let best = null;
-  for (const x of ps) for (const s of tips ? [x.pts.at(-1)] : x.pts)
-    if (!best || dist(s, c) < best.d) best = { x, at: s.at, d: dist(s, c) };
+  ps.forEach((x, j) => ds[j].forEach((d, i) => {
+    if (d > near + STEP / 2 * x.k || d > (ds[j][i - 1] ?? Infinity) || d > (ds[j][i + 1] ?? Infinity)) return;
+    const s = closest(x, c, x.pts[Math.max(0, i - 1)].at, x.pts[Math.min(x.pts.length - 1, i + 1)].at);
+    if (d < s.d) Object.assign(s, { at: x.pts[i].at, d });
+    if (!best || s.d < best.d) best = { x, ...s };
+  }));
   return best;
 }
 
@@ -46,7 +74,10 @@ function nearest(ps, c, tips) {
 // branch does on its trunk, waits for the trunk's tip to reach it: `off` is how far along the trunk that is.
 function legsOf(paths) {
   return [...new Set(paths.map(p => p.ownerSVGElement))].map(svg => {
-    const ps = paths.filter(p => p.ownerSVGElement === svg).map(p => { const len = p.getTotalLength(); return { p, len, off: 0, pts: samples(p, len) }; });
+    const ps = paths.filter(p => p.ownerSVGElement === svg).map(p => {
+      const m = p.getScreenCTM(), x = { p, m, k: Math.hypot(m.a, m.b), len: p.getTotalLength(), off: 0 };
+      return Object.assign(x, { pts: samples(x) });
+    });
     const trunk = ps.reduce((a, b) => b.len > a.len ? b : a);
     for (const x of ps) {
       if (x === trunk) continue;
