@@ -132,6 +132,12 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
             scrollbar-width: thin; scrollbar-color: var(--trace-dim) transparent; }
 .copy pre code { font: inherit; color: inherit; overflow-wrap: normal; }
 .copy .highlight { margin: 0; }
+/* Rouge's tokens, in the board's palette: keywords in trace blue, names in pad blue, strings and numbers in the
+   accent, comments and punctuation muted, everything else the code's silk. No italic: Plex Mono's is not loaded. */
+.highlight :is(.k, .kd, .kn, .kr, .kt, .kc, .kp, .ow, .si) { color: var(--trace); }
+.highlight :is(.na, .nt, .nc, .nf, .fm, .nb, .bp, .nd, .ne) { color: var(--pad); }
+.highlight :is(.s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .sx, .sr, .ss, .dl, .m, .mi, .mf, .mh, .mo, .mb, .il) { color: var(--accent); }
+.highlight :is(.c, .c1, .cm, .cs, .cd, .cp, .cpf, .ch, .p, .o) { color: var(--muted); }
 .copy blockquote { margin: 0 0 calc(16 * var(--u)); padding-left: 1.2em; color: var(--muted); font-style: italic; }
 .copy img { max-width: 100%; height: auto; }
 /* Disqus draws the comments in its own frame, in its own styles */
