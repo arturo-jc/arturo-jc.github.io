@@ -72,6 +72,7 @@ Studies double as a parts bin of working code:
 - `studies/11-empty-corners.html` holds the fillers for the empty corners under U3 and U5 in the wide layouts that the site does not use: a second chip with two capacitors and a staggered tail, a crystal with its two load capacitors (a part `js/kit.js` does not have), a serpentine down U3's corner, and a six-pin header under U5.
 - `studies/12-favicon.html` holds the favicons the site does not use: a lit lamp on a trace and an orange trace turning 45° into a via, each on the board's ground, with a panel that also draws a resistor or a capacitor, other grounds, and traces that end on vias.
 - `studies/13-not-found.html` holds the 404 pages the site does not use, each a different fault on the board: an unfitted footprint (pads, a dashed outline and DNP, with its net into the heading blue), a lamp that is out and flickers now and then, and a seven-segment display reading 404 with the words as the heading. The footprint, the dead lamp and the display are parts `js/kit.js` does not have.
+- `studies/14-share-card.html` holds the link-preview images the site does not use, each a 1200 × 630 crop of the home page embedded in the file: the name and the circuit closer in with the copy hidden, and the circuit around U3 with no type at all. It also mocks a LinkedIn post and a Discord embed.
 
 ## The code
 
@@ -101,6 +102,7 @@ The 404 page, which GitHub Pages serves for any address it has no page for, is o
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
 | `js/main.js` | The list of boards, on every page. It mounts each one whose `.board` is on the page, by id, and fills in the footer's year. `blog` is the index's head, `post` a post's and `notfound` the 404 page's. |
 | `favicon.svg`, `favicon.ico`, `apple-touch-icon.png` | The icon: a chip with two pads a side, its pin-one mark lit orange, and a trace off each side pad. The SVG is the source; the other two are rendered from it, the `.ico` at 16, 32 and 48 (`rsvg-convert -w N -h N`, then `magick` the three PNGs into one), the touch icon at 180 with the square's `rx` removed, because phones round its corners themselves. Linked from `index.html` and `_layouts/default.html`. |
+| `assets/share-card.png` | The image every page's link preview shows, set under `defaults` in `_config.yml`: a screenshot of About as it is on a wide screen, so it goes stale when About changes. To remake it, serve a built copy of the site with `<style>#projects h2{visibility:hidden}</style>` added to its `index.html`, screenshot it with `google-chrome-stable --headless=new --force-prefers-reduced-motion --hide-scrollbars --force-device-scale-factor=2 --window-size=1284,1400 --virtual-time-budget=8000 --screenshot`, and `magick` it with `-crop 2266x1190+132+0 +repage -filter Lanczos -resize 1200x630!`. Reduced motion draws everything at once. LinkedIn keeps a preview for about a week; its Post Inspector fetches the page again. |
 
 ### Adding a section
 

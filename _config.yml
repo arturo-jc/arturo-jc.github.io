@@ -21,6 +21,17 @@ social:
     - https://github.com/arturo-jc
     - https://www.linkedin.com/in/arturo-javier-castellanos-551006197/
 
+# The image every page's link preview shows: About as it is on a wide screen, study 14's option A.
+defaults:
+  - scope:
+      path: ""
+    values:
+      image:
+        path: /assets/share-card.png
+        width: 1200
+        height: 630
+        alt: The top of the site, Arturo Javier-Castellanos's name beside a drawing of a circuit board
+
 exclude:
   - CLAUDE.md
   - studies/
