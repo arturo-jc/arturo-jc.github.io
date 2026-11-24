@@ -42,7 +42,7 @@ const wide = {
     lamps(78, [a1 + 1, a1 + 4], 8, 4, wires, parts, labels);
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
     const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
-    bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3).forEach((w, k) => {
+    rail('U5 serpentine', bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3), 'U5').forEach((w, k) => {
       cut(w, 7, [78, 80, 82][k]).end = 'via';
       wires.push(w);
     });
@@ -51,11 +51,11 @@ const wide = {
                ...rail('U8', bundle([[51, a3 + 5], [51, a4 - 3]], 3)));
     // U8 → down the gap → west under the third paper, stopping short
     const L = f(m.r3.bot + 4);
-    bundle([[50, a4 + 5], [50, L], [6, L]], 3).forEach((w, k) => {
+    rail('U8 west', bundle([[50, a4 + 5], [50, L], [6, L]], 3)).forEach((w, k) => {
       const stop = [34, 26, 18][k];
       cut(w, 1, stop).end = 'via';
       wires.push(w);
-      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end' });
+      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end', rail: 'U8 west' });
     });
     // ref = silkscreen designators · net = wire codes
     labels.push(

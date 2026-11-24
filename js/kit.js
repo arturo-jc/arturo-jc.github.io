@@ -49,9 +49,12 @@ export function cut(w, seg, at) {
 }
 export const wire = (pts, extra = {}) => ({ pts, ...extra });
 // Mark traces as a rail into chip `to`: js/rails.js draws them out of their source as the page scrolls. A rail
-// that crosses into the next board is marked with the same `to` in both. An accent net, its via and its code marked
-// `net: 'U3'` are blue until the rail into U3 arrives, and then turn orange.
-export const rail = (to, ws) => ws.map(w => Object.assign(w, { rail: to }));
+// that crosses into the next board is marked with the same `to` in both. A branch, which leaves a chip on the main
+// rail and ends short of any other, is named for where it goes (`'U4 west'`) and given `after`, the chip it leaves: it
+// grows by itself once the rail into that chip arrives, instead of with the scroll. Its vias, and labels marked `rail`
+// with its name, appear as it reaches them. An accent net, its via and its code marked `net: 'U3'` are blue until the
+// rail into U3 arrives, and then turn orange.
+export const rail = (to, ws, after) => ws.map(w => Object.assign(w, { rail: to, after }));
 
 // a trace as a path: 45° corners, and a semicircular bridge at every hop
 export function tracePath(w) {

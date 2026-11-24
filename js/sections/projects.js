@@ -28,15 +28,15 @@ const wide = {
     // U3's five lowest right-hand pads → east → down under About's rail, its outer trace in line with the rail's →
     // back west on one diagonal → down into a pin header over the second project
     const ym = f((a1 + a2) / 2), J = f(a2 - 5);
-    wires.push(...bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }));
+    wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), 'U3'));
     chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
     labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235' });
     // U4 → west → down the left margin; each stops at a different height
-    bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3).forEach((w, k) => {
+    rail('U4 west', bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3), 'U4').forEach((w, k) => {
       const stop = a2 + [10, 15, 20][k];
       cut(w, 1, stop).end = 'via';
       wires.push(w);
-      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
+      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}`, rail: 'U4 west' });
     });
     // U4 → east → down off the board's foot. Research picks the three up at its top edge in the same columns.
     const bus = 49;
