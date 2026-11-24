@@ -17,7 +17,7 @@ const wide = {
     ];
     const wires = [
       wire([[21, a], [f(tip - FLAG), a]], { net: 'U101' }),
-      ...rail('J101', bundle([[16.5, f(a - 3)], [16.5, 5.5], [86.5, 5.5], [86.5, 1.5]], 4), 'load'),
+      ...rail('J101', bundle([[16.5, f(a - 3)], [16.5, 5.5], [86.5, 5.5], [86.5, 1.5]], 4), { after: 'load' }),
     ];
     const labels = [
       { k: 'net', x: 90, y: 5.75, t: 'D0 – D3', rail: 'J101' },
@@ -40,7 +40,7 @@ const narrow = {
     ];
     const wires = [
       wire([[25, 9], [25, a], [f(tip + FLAG), a]], { legs: [0, 8, 0], net: 'U101' }),
-      ...rail('J101', bundle([[21, 5.5], [5.5, 5.5], [5.5, 1.5]], 4), 'load'),
+      ...rail('J101', bundle([[21, 5.5], [5.5, 5.5], [5.5, 1.5]], 4), { after: 'load' }),
     ];
     const labels = [
       { k: 'net', x: 9.5, y: 8.75, t: 'D0 – D3', rail: 'J101' },

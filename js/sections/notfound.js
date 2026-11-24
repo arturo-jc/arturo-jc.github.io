@@ -2,9 +2,8 @@
 // net leaves its chip orange and stops on a via short of the heading, and past a gap it picks up again on another
 // via and runs on to the heading in blue, because nothing reaches it. The rest of the board works, and the way home
 // is the end of a net that leaves the board through an off-page flag.
-import { FLAG, bundle, wire, f } from '../kit.js';
+import { FLAG, bundle, wire, past, f } from '../kit.js';
 
-const viaAt = (x, y) => wire([[x, y], [x, y]], { end: 'via' });
 const drop = (x, y0, y1) => wire([[x, y0], [x, y1]], { end: 'via' });
 
 // Wide: the column at cells 36 to 72. U301 sits at the right, level with the heading, fed by J301's bus across the
@@ -19,7 +18,7 @@ const wide = {
     home: m => ({ x: 36, y: f(m.copy.bot + 3) }),
   },
   build(m) {
-    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = past(m.head);
     const y0 = f(a - 3), y1 = f(a + 8);
     const chips = [
       { id: 'J301', conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, nudge: [0, 0.15], pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
@@ -30,7 +29,7 @@ const wide = {
       drop(21, 1.5, f(hc + 2)), drop(22, 1.5, hc), drop(23, 1.5, f(hc - 2)),
       // the cut: orange as far as it, blue past it
       wire([[80, a], [70, a]], { o: true, end: 'via' }),
-      viaAt(66, a), wire([[66, a], [end, a]], { end: 'via' }),
+      wire([[66, a], [end, a]], { start: 'via', end: 'via' }),
       wire([[86, y1], [86, hc], [f(tip + FLAG), hc]]),
       drop(87, y1, f(hc + 2)), drop(88, y1, f(hc + 4)),
     ];
@@ -57,7 +56,7 @@ const narrow = {
     home: m => ({ x: 2, y: f(m.copy.bot + 3) }),
   },
   build(m) {
-    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
+    const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = past(m.head);
     const chips = [
       { id: 'J301', conn: true, x0: 1.2, y0: 0, x1: 7.8, y1: 1.5, pins: { b: [2, 3, 4, 5, 6, 7] } },
       { id: 'U301', ref: 'left', x0: 22, y0: 2, x1: 31, y1: 9.5, code: 'E0404', pins: { l: [4, 5, 6, 7], r: [], t: [], b: [25, 28, 29, 30] } },
@@ -67,7 +66,7 @@ const narrow = {
     const wires = [
       ...bundle([[4.5, 1.5], [4.5, 5.5], [22, 5.5]], 4),
       wire([[25, 9.5], [25, a], [f(cut + 3.5), a]], { o: true, legs: [0, 8, 0], end: 'via' }),
-      viaAt(cut, a), wire([[cut, a], [end, a]], { end: 'via' }),
+      wire([[cut, a], [end, a]], { start: 'via', end: 'via' }),
       wire([[28, 9.5], [28, hc], [f(tip + FLAG), hc]], { legs: [0, 8, 0] }),
       drop(29, 9.5, f(hc + 1.5)), drop(30, 9.5, f(hc + 3)),
     ];

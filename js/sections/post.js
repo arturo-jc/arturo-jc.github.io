@@ -21,9 +21,9 @@ const wide = {
       { id: 'J201', conn: true, ref: 'pins-left', x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } },
     ];
     const wires = [
-      ...rail('U201 back', [wire([[17.5, bc], [f(tip + FLAG), bc]])], 'load'),
+      ...rail('U201 back', [wire([[17.5, bc], [f(tip + FLAG), bc]])], { after: 'load' }),
       wire([[23, a], [28.5, a]], { o: true, end: 'via', net: 'U201' }),
-      ...rail('J201', bundle([[23, 6.5], [86.5, 6.5], [86.5, 1.5]], 4), 'load'),
+      ...rail('J201', bundle([[23, 6.5], [86.5, 6.5], [86.5, 1.5]], 4), { after: 'load' }),
     ];
     const labels = [
       { k: 'net', x: 90, y: 6.75, t: 'D0 – D3', rail: 'J201' },
@@ -50,9 +50,9 @@ const narrow = {
       { id: 'U201', ref: 'top-end', nudge: [0.2, 0.6], x0: 20, y0: 4, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } },
     ];
     const wires = [
-      ...rail('J201', bundle([[24.5, 4], [24.5, 1.5]], 4), 'load'),
+      ...rail('J201', bundle([[24.5, 4], [24.5, 1.5]], 4), { after: 'load' }),
       // the step's two ends are as far apart across as down, so it is a 45° run
-      ...rail('U201 back', [wire([[20, 5.5], [17.5, 5.5], [f(17.5 - (5.5 - bc)), bc], [f(tip + FLAG), bc]], { legs: [0, 0, 0, 0] })], 'load'),
+      ...rail('U201 back', [wire([[20, 5.5], [17.5, 5.5], [f(17.5 - (5.5 - bc)), bc], [f(tip + FLAG), bc]], { legs: [0, 0, 0, 0] })], { after: 'load' }),
       wire([[20, 8.5], [3, 8.5], [3, f(a - 1.5)], [4.5, a]], { o: true, legs: [0, 8, 0, 0], end: 'via', net: 'U201' }),
     ];
     const labels = [

@@ -51,14 +51,30 @@ export function cut(w, seg, at) {
   w.legs = [...w.legs.slice(0, seg + 1), 0];
   return w;
 }
+// end each of traces `ws` early on a via, part-way along segment `seg`, at staggered stops
+export const stagger = (ws, seg, stops) => ws.map((w, k) => Object.assign(cut(w, seg, stops[k]), { end: 'via' }));
+// Take a trace on from where it ends another way: its last point is replaced by `pts`, and `legs` are the cuts at
+// each of them but the last, as `bundle` takes them. For one trace of a bundle that leaves the others.
+export function tail(w, pts, legs = []) {
+  w.pts = [...w.pts.slice(0, -1), ...pts];
+  w.legs = [...w.legs.slice(0, -1), ...legs, 0];
+  return w;
+}
+// A single trace. `end: 'via'` ends it on a via, and `start: 'via'` starts it on one; `code` writes its wire code
+// over it, just behind the via it ends on, as an accent net's is.
 export const wire = (pts, extra = {}) => ({ pts, ...extra });
-// Mark traces as a rail into chip `to`: js/rails.js draws them out of their source as the page scrolls. A rail
-// that crosses into the next board is marked with the same `to` in both. A branch, which leaves a chip on the main
-// rail and ends short of any other, is named for where it goes (`'U4 west'`) and given `after`, the chip it leaves: it
-// grows by itself once the rail into that chip arrives, instead of with the scroll. Its vias, and labels marked `rail`
-// with its name, appear as it reaches them. An accent net, its via and its code marked `net: 'U3'` are blue until the
-// rail into U3 arrives, and then turn orange.
-export const rail = (to, ws, after) => ws.map(w => Object.assign(w, { rail: to, after }));
+// Where an accent net's via goes: just past the end of a block's heading's first line.
+export const past = b => f(b.hx + 1.5);
+// Mark traces `ws` as a run that js/rails.js animates, `to` being the chip it runs into, or a branch's name. With
+// `after`, the chip it leaves or 'load', it is a branch, which grows by itself; without, it follows the scroll.
+// `from`, `dur` and `wait` time it further: see js/rails.js.
+export const rail = (to, ws, timing = {}) => ws.map(w => Object.assign(w, { rail: to }, timing));
+// A lamp on each of `rows`: a resistor at column `xr` and a lit LED at `xl`, numbered on from R`r` and D`d`, each
+// blinking out of step with the one above. `marks` ties them to a run, as `{ rail: 'U5 lamps' }`.
+export const lamps = (rows, xr, xl, { r, d, ...marks }) => rows.flatMap((y, i) => [
+  { kind: 'R', x: xr, y, ref: `R${r + i}`, ...marks },
+  { kind: 'LED', x: xl, y, ref: `D${d + i}`, delay: [0, 1.3, 2.5][i], ...marks },
+]);
 
 // a trace as a path: 45° corners, and a semicircular bridge at every hop
 function tracePath(w) {
@@ -142,6 +158,9 @@ function part(p) {
   return `<g${marks(p)} transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
 }
 
+// an accent net's wire code, over its last run just behind the via it ends on
+const codeOf = w => { const [x, y] = w.pts.at(-1), s = Math.sign(w.pts.at(-2)[0] - x); return { k: 'net', t: w.code, o: w.o, net: w.net, rail: w.rail, x: f(x + s * 0.9), y: f(y - 0.75), a: s < 0 ? 'end' : undefined }; };
+
 // Designators. A chip's is its `id`, placed beside its box by `ref`, one of the places below: `top` by default, or
 // `right` for a connector. A part's is its `ref`, over it when it lies across and beside it when it stands
 // (`dir: 'v'`), and it carries the part's marks, so it appears with the part. Either can be moved by `nudge`, [dx, dy].
@@ -164,8 +183,9 @@ const partRef = p => ({
 // A circuit, as build() returns it, drawn on a grid `cols` cells wide. Only `rows` and `wires` are required.
 export function drawing(c, cols) {
   const { wires, chips = [], parts = [], flags = [] } = c;
-  const labels = [...chips.map(chipRef), ...parts.filter(p => p.ref).map(partRef), ...(c.labels ?? [])];
+  const labels = [...chips.map(chipRef), ...parts.filter(p => p.ref).map(partRef), ...wires.filter(w => w.code).map(codeOf), ...(c.labels ?? [])];
+  const vias = [...wires.filter(w => w.start === 'via').map(w => end({ ...w, pts: [w.pts[0]] })), ...wires.filter(w => w.end === 'via').map(end)];
   return `<svg viewBox="0 0 ${cols * P} ${f(c.rows * P)}" aria-hidden="true">
     <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${wires.map(trace).join('')}</g>
-    <g>${chips.map(chip).join('')}${parts.map(part).join('')}${flags.map(flag).join('')}</g><g>${wires.filter(w => w.end === 'via').map(end).join('')}</g><g>${labels.map(label).join('')}</g></svg>`;
+    <g>${chips.map(chip).join('')}${parts.map(part).join('')}${flags.map(flag).join('')}</g><g>${vias.join('')}</g><g>${labels.map(label).join('')}</g></svg>`;
 }

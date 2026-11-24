@@ -6,8 +6,8 @@
 //   scroll, but grows by itself once the main rail reaches its chip, and draws back in, faster, if the reader scrolls
 //   back above it.
 // - A chip's accent net: everything marked `net: to`. It grows out of `to` like a branch, in blue, but in the same
-//   time whatever its length, and turns orange once it reaches the content; it turns blue again and draws back in when `to` disconnects. Its parts, via and code
-//   appear as the tip reaches them.
+//   time whatever its length, and turns orange once it reaches the content; it turns blue again and draws back in
+//   when `to` disconnects. Its parts, via and code appear as the tip reaches them.
 // A branch with `after: 'load'` grows as soon as the page loads, and one that reaches a chip connects it as the main
 // rail does, so that a branch can grow out of the end of another. A branch's and a net's drawn length is kept by name,
 // so a redraw never puts any of them out of step. On load the reading line sweeps down to its place, and everything
@@ -21,6 +21,7 @@ const LOAD = 0.8;                       // the seconds the runs drawn on load ta
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
+const growth = r => grown.get(r.key) ?? 0;
 let runs = [], queued = 0, ticking = 0, then = 0, born = null, swept0 = null, reached = new Set(), live = new Set();
 
 // A trace's point `at` units along it, in page coordinates. `x` is a trace as legsOf() keeps it, with its path `p`,
@@ -128,6 +129,9 @@ function collect() {
       return r;
     }),
   ];
+  // the net of a chip no run leads into, as none leads into U1, which counts as connected from the start
+  const keys = new Set(runs.map(r => r.key));
+  for (const r of runs) r.root = r.net && !keys.has(r.after);
   chains();
 }
 
@@ -139,7 +143,7 @@ function collect() {
 function chains() {
   const keyed = new Map(runs.map(r => [r.key, r]));
   for (const r of runs)
-    if (r.after === 'load' || (r.net && !keyed.has(r.after))) {
+    if (r.after === 'load' || r.root) {
       const dur = r.dur ?? LOAD;
       Object.assign(r, { load: true, lead: 0, head: r, chain: 0, dur, wait: r.wait ?? LOAD - dur });
     }
@@ -206,7 +210,7 @@ function update() {
   aim();
   for (const r of runs) {
     if (!r.after) continue;
-    const g = grown.get(r.key) ?? 0;
+    const g = growth(r);
     paint(r, g);
     light(r, g);
   }
@@ -218,8 +222,8 @@ function update() {
 // none; the page counts as `load`.
 function aim() {
   const on = live = new Set(['load', ...reached]);
-  for (const r of runs) if (r.net && !runs.some(q => q.key === r.after)) on.add(r.after);
-  for (const r of runs) if (r.after && !r.net && (grown.get(r.key) ?? 0) >= 1) on.add(r.key);
+  for (const r of runs) if (r.root) on.add(r.after);
+  for (const r of runs) if (r.after && !r.net && growth(r) >= 1) on.add(r.key);
   for (const r of runs) if (r.after) r.goal = r.load || on.has(r.after) ? 1 : 0;
 }
 
@@ -232,7 +236,7 @@ function grow() {
   let moving = false;
   for (const r of runs) {
     if (!r.after) continue;
-    let g = grown.get(r.key) ?? 0;
+    let g = growth(r);
     if (r.load) {
       // a run drawn on load: its share of its chain, on the chain's clock, which starts `wait` seconds after load
       const { dur, wait } = r.head, s = still.matches ? 1 : clamp(((now - born) / 1000 - wait) / dur);
@@ -249,7 +253,7 @@ function grow() {
   }
   // a branch that has just arrived can set another off
   aim();
-  if (runs.some(r => r.after && (grown.get(r.key) ?? 0) !== r.goal)) moving = true;
+  if (runs.some(r => r.after && growth(r) !== r.goal)) moving = true;
   if (moving) ticking = requestAnimationFrame(grow);
 }
 

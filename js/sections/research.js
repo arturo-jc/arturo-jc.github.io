@@ -1,20 +1,12 @@
 // Research: the heading and four papers, newest first, each a title that links to the published article, the
 // journal and a summary. The titles are long and wrap; `cap` and `hx` are their first line's.
-import { bundle, cut, wire, rail, f } from '../kit.js';
-
-// two lamps out of a chip's side, each a resistor and a lamp, with a common return: a branch named `run`, which
-// grows out of the chip `after` once the main rail reaches it, its parts and designators appearing as it passes
-function lamps(x, rows, n0, d0, run, after, wires, parts) {
-  wires.push(...rail(run, [wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]])], after));
-  rows.forEach((r, i) => {
-    parts.push({ kind: 'R', x: x + 5, y: r, ref: `R${n0 + i}`, rail: run }, { kind: 'LED', x: x + 11, y: r, ref: `D${d0 + i}`, delay: [0, 1.3][i], rail: run });
-  });
-}
+import { bundle, stagger, tail, wire, past, rail, lamps, f } from '../kit.js';
 
 // Wide: two columns, the right one dropped by about half a paper, so the papers read in a zigzag and leave a corner
 // empty at each end. Projects' bus crosses the top into U5 in the top right-hand corner, which reaches the first
-// paper across the gap, lights two lamps and sends a serpentine across the corner over the second paper. A chain of chips runs down the gap, one level with each title after it,
-// and the last sends three traces under the bottom left-hand paper, stopping short.
+// paper across the gap, lights two lamps and sends a serpentine across the corner over the second paper. A chain of
+// chips runs down the gap, one level with each title after it, and the last sends three traces under the bottom
+// left-hand paper, stopping short.
 const wide = {
   cols: 107,
   seats: {
@@ -24,7 +16,7 @@ const wide = {
   },
   build(m) {
     const [a1, a2, a3, a4] = ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
-    const v1 = f(m.r1.hx + 1.5), v3 = f(m.r3.hx + 1.5);   // just past the left-hand titles' first lines
+    const v1 = past(m.r1), v3 = past(m.r3);   // just past the left-hand titles' first lines
     const wires = [], labels = [], parts = [];
     const chips = [
       { id: 'U5', x0: 66, y0: a1 - 3, x1: 78, y1: a1 + 6, code: 'E0510', allPads: true },
@@ -36,30 +28,25 @@ const wide = {
     wires.push(...rail('U5', bundle([[49, 0], [49, 5.5], [72, 5.5], [72, a1 - 3]], 3)));
     // the accent net: U5 across the gap to the first paper; each chip in the gap to the paper level with it, ending
     // just past the title on the left and just before it on the right
-    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
-               wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
+    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5', code: 'E0511' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
+               wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7', code: 'E0531' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
     parts.push({ kind: 'R', x: 56, y: a1, ref: 'R7', net: 'U5' });
-    lamps(78, [a1 + 1, a1 + 4], 8, 4, 'U5 lamps', 'U5', wires, parts);
+    // U5's right side → two lamps → a common return, stopping short: a branch, which grows once the main rail reaches U5
+    const lit = [a1 + 1, a1 + 4];
+    wires.push(...rail('U5 lamps', [wire([[78, lit[0]], [94, lit[0]], [94, lit[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[78, lit[1]], [94, lit[1]]])], { after: 'U5' }));
+    parts.push(...lamps(lit, 83, 89, { r: 8, d: 4, rail: 'U5 lamps' }));
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
     const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
-    rail('U5 serpentine', bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3), 'U5').forEach((w, k) => {
-      cut(w, 7, [78, 80, 82][k]).end = 'via';
-      wires.push(w);
-    });
+    wires.push(...stagger(rail('U5 serpentine', bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3), { after: 'U5' }), 7, [78, 80, 82]));
     // U5 → west → down the gap → U6 → U7 → U8
     wires.push(...rail('U6', bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3)), ...rail('U7', bundle([[50, a2 + 5], [50, a3 - 3]], 3)),
                ...rail('U8', bundle([[51, a3 + 5], [51, a4 - 3]], 3)));
     // U8 → down the gap → west under the third paper, stopping short
     const L = f(m.r3.bot + 4);
-    rail('U8 west', bundle([[50, a4 + 5], [50, L], [6, L]], 3)).forEach((w, k) => {
-      const stop = [34, 26, 18][k];
-      cut(w, 1, stop).end = 'via';
-      wires.push(w);
-      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end', rail: 'U8 west' });
-    });
-    labels.push(
-      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true, net: 'U5' }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true, net: 'U7' },
-    );
+    const stops = [34, 26, 18];
+    const west = stagger(rail('U8 west', bundle([[50, a4 + 5], [50, L], [6, L]], 3)), 1, stops);
+    wires.push(...west);
+    west.forEach((w, k) => labels.push({ k: 'net', x: stops[k] - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end', rail: 'U8 west' }));
     return { rows: f(Math.max(m.r4.bot, L + 1) + 5), chips, wires, parts, labels };
   },
 };
@@ -82,17 +69,11 @@ const narrow = {
     wires.push(...rail('U5', bundle([[26, 0], [26, 5], [18, 5]], 3)));
     // U5 → west → down the left of the papers. The rail's nearest trace, at column 3, is the accent net.
     const [acc, inner, outer] = bundle([[9, 7], [2, 7], [2, a4]], 3);
-    acc.pts.push([4.5, a4]); acc.legs.splice(-1, 1, 6, 0);
-    wires.push({ ...acc, o: true, end: 'via', net: 'U5' });
+    wires.push(Object.assign(tail(acc, [[3, a4], [4.5, a4]], [6]), { o: true, end: 'via', net: 'U5' }));
     [a1, a2, a3].forEach(a => wires.push(wire([[3, a], [4.5, a]], { o: true, end: 'via', net: 'U5' })));
     // the other two turn under the last paper, each into a resistor and a lamp, with a common return
-    inner.pts.splice(-1, 1, [2, L], [20, L], [20, L + 6]); inner.legs.splice(-1, 1, 8, 8, 0);
-    outer.pts.splice(-1, 1, [1, L + 3], [20, L + 3]); outer.legs.splice(-1, 1, 8, 0);
-    wires.push({ ...inner, end: 'via' }, outer);
-    [L, L + 3].forEach((r, i) => {
-      parts.push({ kind: 'R', x: 8, y: r, ref: `R${8 + i}` }, { kind: 'LED', x: 14, y: r, ref: `D${4 + i}`, delay: [0, 1.3][i] });
-    });
-    parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v', ref: 'R7', nudge: [-0.2, 0], net: 'U5' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
+    wires.push(Object.assign(tail(inner, [[2, L], [20, L], [20, L + 6]], [8, 8]), { end: 'via' }), tail(outer, [[1, L + 3], [20, L + 3]], [8]));
+    parts.push(...lamps([L, L + 3], 8, 14, { r: 8, d: 4 }), { kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v', ref: 'R7', nudge: [-0.2, 0], net: 'U5' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
     return { rows: f(L + 9), chips, wires, parts };
   },
 };
