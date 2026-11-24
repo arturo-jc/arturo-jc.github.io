@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 15 · Type size</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --foot: #061b2a;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: #08263a; }
+  body { margin: 0; background: #08263a; color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 72px 0 0; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .recipe { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+  .recipe li { font: 400 11.5px/1 var(--mono); color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 7px; white-space: nowrap; }
+  .recipe li b { font-weight: 500; color: var(--pad); }
+  .sub { font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 14px; }
+  .sub span { text-transform: none; letter-spacing: .04em; color: #6f97b1; }
+  .row { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .crops { display: flex; gap: 16px; flex-wrap: wrap; }
+  .crop { width: 330px; height: 196px; overflow: hidden; position: relative; outline: 1px solid var(--rule); background: var(--bg); }
+  .crop .win { position: absolute; left: 0; top: 0; transform-origin: 0 0; outline: none; overflow: visible; }
+  .crop-cap { font: 400 11.5px/1.5 var(--mono); color: var(--muted); margin: 8px 0 0; }
+  .crop-cap b { font-weight: 500; color: var(--pad); }
+  .mix { padding: 72px 0 96px; }
+  .switches { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 0 0 8px; }
+  .switches label { display: grid; gap: 6px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .switches select { font: 400 14px/1.2 var(--sans); color: var(--text); background: var(--chip); border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; }
+
+  /* ---- a window: the page frame of styles.css, at a set width. It scrolls inside. ---- */
+  .win { flex: none; background: var(--bg); overflow-y: auto; scrollbar-width: none; outline: 1px solid var(--rule); }
+  .win .main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
+  .win.n .main { padding: 20px 0 0; }
+  .win.n .board { max-width: 448px; margin: 0 auto; }
+  .win.n .name span { display: block; }
+
+  /* ---- the designs: the rules of styles.css, with one change. Each block's type unit, --t, is set apart from its
+     drawing unit, --u, by the option's rule (.r-…) on the window. The drawing, each block's seat and the name use
+     --u, as now; every other piece of type uses --t. ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .board [data-seat] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .r-lock :is([data-seat], .foot-body) { --t: var(--u); }
+  .r-floor :is([data-seat], .foot-body) { --t: max(1px, var(--u)); }
+  .r-slow :is([data-seat], .foot-body) { --t: max(var(--u), calc(1px + (var(--u) - 1px) / 2)); }
+  .r-fixed :is([data-seat], .foot-body) { --t: calc(var(--k) * 1rem / 16); }
+
+  .name { font: 600 calc(var(--fs, 48) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; }
+  .name span:first-child { display: block; }
+  .board h2 { font: 600 calc(30 * var(--t))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
+  .copy p { font: 400 calc(16.5 * var(--t))/1.64 var(--sans); margin: 0 0 calc(16 * var(--t)); }
+  .copy p:last-child { margin-bottom: 0; }
+  .copy .nb { white-space: nowrap; }
+  .copy a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+            text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(3 * var(--t)); }
+  .copy a:hover { color: var(--accent); }
+  .blog { display: block; color: inherit; font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
+          text-decoration: underline; text-decoration-color: var(--accent);
+          text-decoration-thickness: max(1px, calc(1.5 * var(--t))); text-underline-offset: calc(4 * var(--t)); }
+  .blog:hover { color: var(--accent); }
+  .board:has(a[data-seat]:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
+  .project h3 { font: 600 calc(22 * var(--t))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--t)); white-space: nowrap; }
+  .project h3 a { text-underline-offset: calc(4 * var(--t)); }
+  .project .stack { font: 400 calc(11.5 * var(--t))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--t)); }
+
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+
+  /* the footer, as in styles.css, its copyright on --t */
+  .foot { background: var(--foot); }
+  .foot-in { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .win.n .foot-in { max-width: 448px; padding: 0; }
+  .foot-grid { container-type: inline-size; }
+  .foot-body { --u: calc(100cqw / 1284); --c: calc(12 * var(--u)); text-align: center;
+               padding: calc(6 * var(--c)) calc(9 * var(--c)) calc(4 * var(--c)) calc(6 * var(--c)); }
+  .win.n .foot-body { --u: calc(100cqw / 384); padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
+  .foot .contacts { display: flex; justify-content: center; align-items: center; gap: calc(8 * var(--c)); }
+  .win.n .foot .contacts { gap: calc(4 * var(--c)); }
+  .foot .contacts a { display: block; }
+  .foot .contacts svg { display: block; width: calc(26 * var(--u)); height: calc(26 * var(--u)); fill: var(--pad); }
+  .foot .contacts .mail { width: calc(33 * var(--u)); height: calc(21 * var(--u)); }
+  .foot .contacts .in { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+  .foot .cr { font: 400 calc(11 * var(--t))/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); margin: calc(4 * var(--c)) 0 0; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 15</div>
+    <h1>Type size: how should the type follow the window?</h1>
+    <p>Every piece of type is sized in drawing units, so it scales with the window as the drawing does. Two things follow. <b>Near the bottom of each layout's range the type is small:</b> in an 1100px window the copy is 13.3px and the stack lines and the copyright about 9px, a little less again with a scrollbar beside them, and on a 320px phone the copy is 13.8px. <b>Zooming in does nothing between about 1100 and 1500px:</b> zoom narrows the window in CSS pixels by the factor it enlarges them, so the copy stays the same size on screen until the page crosses into the narrow layout.</p>
+    <p>In every option the drawing and the name scale with the window, as now, and so do the seats: where each block sits and how wide its column is. What changes is how <b>every other piece of type</b> (the headings, the projects' names, the copy, the stack lines, the link to the blog and the copyright) relates to them; D changes the breakpoint instead. Type larger than the drawing expects wraps into more lines, and the circuit grows round it, because the layouts are built from the type as measured.</p>
+    <p>Each option is shown in an <b>1100px window</b>, the narrowest that gets the wide layout, on <b>320 and 390px phones</b>, and <b>zoomed to 100, 110, 125 and 150% on a 1366px laptop</b>, cropped to the copy at the size it would be on that screen. The windows and phones scroll inside. At the bottom, a panel mixes the rules, the sizes and the breakpoint, at other window widths and on other laptops.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js.
+   =========================================================================== */
+// The drawing kit: what a layout is written with (bundle, cut, wire) and how each piece of a
+// circuit becomes SVG (tracePath, via, chip, part). Nothing here touches the page.
+// Geometry is in grid cells: 1 cell = P units = one trace pitch.
+const P = 12;
+const WEIGHT = 4;    // trace width, in units
+const HOP = 7;              // bridge radius, in units
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+// n parallel traces round an orthogonal centreline, nested at every corner.
+// `legs` is each corner's 45° cut, sized so the diagonals of neighbours stay one pitch apart.
+// `big` = { cornerIndex: units } sets the size of that corner's cut, which makes a long 45° run. Two corners
+// whose cuts add up to the length of the segment between them make one straight diagonal with no step in it.
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+// end a trace early, part-way along segment `seg`
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+// Mark traces as a rail into chip `to`: js/rails.js draws them out of their source as the page scrolls. A rail
+// that crosses into the next board is marked with the same `to` in both. A branch, which leaves a chip on the main
+// rail and ends short of any other, is named for where it goes (`'U4 west'`) and given `after`, the chip it leaves: it
+// grows by itself once the rail into that chip arrives, instead of with the scroll. Its vias, and labels marked `rail`
+// with its name, appear as it reaches them. An accent net, its via and its code marked `net: 'U3'` are blue until the
+// rail into U3 arrives, and then turn orange.
+const rail = (to, ws, after) => ws.map(w => Object.assign(w, { rail: to, after }));
+
+// a trace as a path: 45° corners, and a semicircular bridge at every hop
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      // bridges rise north over a horizontal run and east over a vertical one
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+// A chip may sit on fractional cells, so that one of its pads lands on a measured row.
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {             // a pin header: through-hole pads in a silkscreen outline
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+// An off-page connector: the flag a schematic draws where a net leaves the sheet and carries on elsewhere. It
+// points east, or west when `dir` is -1, its point at column `tip` and its tail FLAG cells back, where the trace
+// that feeds it ends. The net's code is written inside it. `go` marks the flag in front of a link, which warms
+// when the link is hovered. Marked `rail` or `net` with a run's name, it appears as that run reaches it.
+const FLAG = 4;
+function flag({ tip, y, code, dir = 1, go, rail, net }) {
+  const X = c => f((tip - dir * c) * P), Y = r => f(y * P + r), h = 6.6;
+  return `<g${rail ? ` data-rail-end="${rail}"` : ''}${net ? ` data-net="${net}"` : ''}><path class="flag${go ? ' go' : ''}" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text></g>`;
+}
+
+// two-pad parts sitting on a trace; each knocks out the stretch of trace under it
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g${p.net ? ` data-net="${p.net}"` : ''}${p.rail ? ` data-rail-end="${p.rail}"` : ''} transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+/* ===========================================================================
+   Measuring a seated block, copied from js/board.js.
+   =========================================================================== */
+// The baseline of the line that `el` starts, in px.
+function baselineOf(el) {
+  const probe = document.createElement('span');          // zero-size, so its bottom is the baseline
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+
+// What a layout cannot know in advance about a seated block, in cells from the board's top left: `top`, `bot`
+// and `h` are its box, and `l` its left edge. A block with a heading also has `cap`, the row of the middle of the
+// capitals of the heading's first line, and `hx`, the column where that line's last letter ends, which for a
+// heading that wraps, as Research's titles do, is not the right of its box. The heading is the block
+// itself when it is an h1, an h2 or a link, and otherwise its h3; its first line is its first span when it is set
+// on several lines, each in a span.
+// The board's box is read here, beside the block's, rather than once before seating: seating changes the page's
+// height, and when the page is scrolled to its foot the browser then pulls the scroll back, which moves every
+// box on screen. A board's box read before that, against a block's read after it, puts the block rows off.
+function measure(el, board, u) {
+  const box = board.getBoundingClientRect(), cell = px => px / u / P, r = el.getBoundingClientRect();
+  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height), l: cell(r.left - box.left) };
+  const heading = el.matches('h1, h2, a') ? el : el.querySelector('h3');
+  if (!heading) return m;
+  const line = heading.querySelector('span') ?? heading;
+  const word = document.createRange();
+  word.selectNodeContents(line);
+  const cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${getComputedStyle(heading).fontWeight} 1000px ${getComputedStyle(heading).fontFamily}`;
+  const capHeight = cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(getComputedStyle(heading).fontSize);
+  m.cap = cell(baselineOf(line) - capHeight / 2 - box.top);
+  const rects = [...word.getClientRects()].filter(r => r.width > 0);
+  m.hx = cell(Math.max(...rects.filter(r => Math.abs(r.top - rects[0].top) < 2).map(r => r.right)) - box.left);
+  return m;
+}
+
+/* ===========================================================================
+   The layouts, copied from js/sections/about.js and projects.js.
+   =========================================================================== */
+const ABOUT = (() => {
+// About, which opens the page: the name, as the page's heading, two paragraphs, and a link to the blog.
+
+// Wide: the name upper left and the copy lower right. U1 sits level with the name's first line, so the
+// accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
+// west under the name to U2; three leave its right side, below J1's bus, and go down the copy's right and under it.
+// U2 lights three lamps, and their common return carries on down and east into an off-page flag before the link
+// to the blog, which sits in the pocket under the lamps, left of the copy.
+const wide = {
+  cols: 107,
+  seats: { name: { x: 6, y: 6, size: 60 }, copy: { x: 54, y: 21, w: 36 }, blog: m => ({ x: 40, y: f(m.copy.bot + 0.4) }) },
+  build(m) {
+    const a = f(m.name.cap);                    // the accent's row; U1 and what hangs off it are placed from it
+    const vx = f(m.name.hx + 1.5);                 // the accent's via, just past the first line
+    const wires = [], labels = [], parts = [];
+    const u2 = { x0: 5.75, y0: a + 10, x1: 13.75, y1: a + 24 };
+    const chips = [
+      { id: 'U1', x0: 62, y0: a - 3, x1: 74, y1: a + 8, code: 'A0131', allPads: true },
+      { id: 'U2', ...u2, code: 'C0412', pins: { l: [], r: [a + 12, a + 13, a + 14, a + 17, a + 20, a + 23], t: [], b: [] } },
+      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, pins: { b: [91, 92, 93, 94, 95] } },
+    ];
+    // the accent net: straight from U1 to the name
+    wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via', net: 'U1' }));
+    // U1 → J1, five wide: a branch drawn out of U1 on load
+    wires.push(...rail('J1', bundle([[74, a + 1], [93, a + 1], [93, 4.5]], 5), 'load'));
+    // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
+    // six-wide bundle, centred on yc, so its traces land on those pads.
+    const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
+    const rows = f(Math.max(m.copy.bot + 5, m.blog.bot + 4));
+    // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
+    // up at its top edge in the same columns and takes it into U3.
+    const Xr = 94;
+    wires.push(...rail('U3', bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3)));
+    // the diagonal, then west under the name → U2: a branch drawn out of U1 on load
+    wires.push(...rail('U2', bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3), 'load'));
+    // U2 → three lamps → common return → down and east, along the middle of the word's capitals, into the flag,
+    // whose point stops just short of the word: a branch drawn out of U2 once the diagonal reaches it
+    const lamps = [a + 17, a + 20, a + 23];
+    const by = f(m.blog.cap), tip = f(m.blog.l - 0.8);
+    wires.push(...rail('U2 lamps', [wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, by], [f(tip - FLAG), by]], { legs: [0, 8, 8, 0] }),
+               wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]])], 'U2'));
+    const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U2 lamps' }];
+    lamps.forEach((r, i) => {
+      parts.push({ kind: 'R', x: 19, y: r, rail: 'U2 lamps' }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i], rail: 'U2 lamps' });
+      labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle', rail: 'U2 lamps' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle', rail: 'U2 lamps' });
+    });
+    parts.push({ kind: 'R', x: 42, y: a, net: 'U1' });
+    // ref = silkscreen designators · net = wire codes
+    labels.push(
+      { k: 'ref', x: 62, y: a - 4.1, t: 'U1' }, { k: 'ref', x: u2.x0, y: u2.y1 + 1.3, t: 'U2' }, { k: 'ref', x: 89.6, y: 4.75, t: 'J1', a: 'end' },
+      { k: 'ref', x: 42, y: a - 0.95, t: 'R4', a: 'middle', net: 'U1' },
+      { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true, net: 'U1' },
+      { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4', rail: 'J1' },
+    );
+    return { rows, chips, wires, parts, labels, flags };
+  },
+};
+
+// Narrow: J1 and U1 above the name, which is on three lines; the accent net comes down out of U1 and in
+// along the name's first line; three traces run down the left of the name and the copy, turn under it and turn
+// down. The one nearest the copy turns east again after a short 45° step, into an off-page flag before the link to
+// the blog; the other two drop into Projects' U3.
+const narrow = {
+  cols: 32,
+  seats: {
+    name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }),
+    // the link 3 rows under the rail's turn, its flag's tail a couple of cells past the end of the step
+    blog: m => ({ x: 23.3, y: f(m.copy.bot + 5.5) }),
+  },
+  build(m) {
+    const chips = [
+      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
+      { id: 'U1', x0: 18, y0: 3, x1: 27, y1: 10, code: 'A0131', allPads: true },
+    ];
+    const wires = [], labels = [];
+    // U1 → J1, four wide: a branch drawn out of U1 on load. It is short, so it starts late and takes `dur` seconds,
+    // reaching J1 as the accent net finishes, and the rail out of J1 waits for it.
+    wires.push(...rail('J1', bundle([[18, 6.5], [7.5, 6.5], [7.5, 2.5]], 4), 'load').map(w => Object.assign(w, { dur: 0.35 })));
+    // the accent net: down out of U1 and in along the name's first line, ending just past it
+    const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
+    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1' }));
+    // J1 → down the left of the name and the copy → under the copy → down. The two outer traces carry on down off
+    // the board's foot, and Projects picks them up at its top edge in the same columns and takes them into U3's two
+    // top left-hand pads. The one nearest the copy turns down with them, then east again `step` rows lower, along the
+    // middle of the link's capitals, into the flag. Its two cuts add up to the step, so the turn is one straight 45°
+    // run, and the first is the bundle's own, so the run stays nested with the other two.
+    const step = 3, by = f(m.blog.cap);
+    const under = f(by - step);                // the row of the trace nearest the copy's last line
+    const rows = f(Math.max(under + 4, m.blog.bot + 2));
+    const tip = f(m.blog.l - 0.8);
+    const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
+    toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
+    wires.push(...rail('U3', [toFlag, ...down]).map(w => Object.assign(w, { from: 'J1' })));
+    labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133', rail: 'U3' });
+    const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U3' }];
+    const parts = [
+      { kind: 'R', x: 25, y: 13.2, dir: 'v', net: 'U1' },
+      { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v', rail: 'U3' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v', rail: 'U3' },
+    ];
+    labels.push(
+      { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },
+      { k: 'ref', x: 26.1, y: 13.45, t: 'R4', net: 'U1' },
+      { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3', rail: 'J1' },
+      { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true, net: 'U1' },
+    );
+    return { rows, chips, wires, parts, labels, flags };
+  },
+};
+
+return { wide, narrow };
+})();
+const PROJECTS = (() => {
+// Projects: the heading and two projects, each a name that links to its repo, a stack and a paragraph.
+
+// Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
+// accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
+// parallel to About's. A bus leaves U3's right side, drops under About's rail, comes back on a diagonal and drops
+// into a pin header over the second project. Three traces leave U4 and stop down the left margin, and three
+// more leave its right side and drop off the board's foot into Research.
+const wide = {
+  cols: 107,
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);   // each accent's row; each chip is placed from its own
+    const vx = f(m.p1.hx + 1.5);                // the first accent's via, just past the name
+    const rows = f(m.p2.bot + 4);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
+    ];
+    // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4' }));
+    // U3 → down → the long diagonal between the rows → west into U4
+    const drop = 5;                             // rows the bus runs straight down before the diagonal starts
+    wires.push(...rail('U4', bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P })));
+    // About's rail, picked up at the top edge in the same columns, into U3's top right pads
+    wires.push(...rail('U3', bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3)));
+    // U3's five lowest right-hand pads → east → down under About's rail, its outer trace in line with the rail's →
+    // back west on one diagonal → down into a pin header over the second project
+    const ym = f((a1 + a2) / 2), J = f(a2 - 5);
+    wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), 'U3'));
+    chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
+    labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235', rail: 'J2' });
+    // U4 → west → down the left margin; each stops at a different height
+    rail('U4 west', bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3), 'U4').forEach((w, k) => {
+      const stop = a2 + [10, 15, 20][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}`, rail: 'U4 west' });
+    });
+    // U4 → east → down off the board's foot. Research picks the three up at its top edge in the same columns.
+    const bus = 49;
+    wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
+    labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end', rail: 'U5' });
+    parts.push({ kind: 'R', x: 46, y: a1, net: 'U3' }, { kind: 'R', x: 42, y: a2, net: 'U4' });
+    // ref = silkscreen designators · net = wire codes
+    labels.push(
+      { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle', net: 'U3' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle', net: 'U4' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end', net: 'U4' },
+    );
+    return { rows, chips, wires, parts, labels };
+  },
+};
+
+// Narrow: U3 above the heading, fed from its left by two traces of About's rail; three traces come down out of U3 on the right of the
+// projects. The nearest is the accent net: it branches in along the first name's row and ends by turning in
+// along the second's. The other two carry on down to U4, under the last project, which closes the section and
+// sends three traces off the board's foot into Research.
+const narrow = {
+  cols: 32,
+  seats: { head: { x: 2, y: 12 }, p1: { x: 2, y: 17.5, w: 24 }, p2: m => ({ x: 2, y: f(m.p1.bot + 4.5), w: 24 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
+    const v1 = f(m.p1.hx + 1.5), v2 = f(m.p2.hx + 1.5);
+    const F = f(m.p2.bot + 2.5);                // U4's top
+    const chips = [
+      { id: 'U3', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
+    ];
+    const wires = [], labels = [];
+    // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
+    wires.push(wire([[28, 10], [28, a2], [v2, a2]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U3' }),
+               wire([[28, a1], [v1, a1]], { o: true, end: 'via', net: 'U3' }));
+    // U3 → down the right of both projects → U4
+    wires.push(...rail('U4', [wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]])]));
+    // About's rail, its two outer traces picked up at the top edge in the same columns, east into U3's two top
+    // left-hand pads
+    wires.push(...rail('U3', bundle([[13.5, 0], [13.5, 4.5], [22, 4.5]], 2)));
+    // U4 → down off the board's foot. Research picks the three up at its top edge in the same columns.
+    wires.push(...rail('U5', bundle([[26, F + 6], [26, F + 9]], 3)));
+    // U4 → two traces west, stopping short on vias: a branch, which grows once Projects' rail reaches U4
+    [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
+      wires.push(...rail('U4 west', [wire([[22, r], [stop, r]], { end: 'via' })], 'U4'));
+      labels.push({ k: 'net', x: stop - 0.9, y: r + 0.25, t: `C041${i + 3}`, a: 'end', rail: 'U4 west' });
+    });
+    const parts = [
+      { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v', rail: 'U4' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v', rail: 'U4' },
+    ];
+    labels.push(
+      { k: 'ref', x: 31, y: 1.9, t: 'U3', a: 'end' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },
+      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: v2 + 0.9, y: a2 - 0.75, t: 'C0411', o: true, net: 'U3' },
+    );
+    return { rows: F + 9, chips, wires, parts, labels };
+  },
+};
+
+return { wide, narrow };
+})();
+/* ===========================================================================
+   Seating and drawing a board, from js/board.js, without the animation: everything is drawn at once.
+   =========================================================================== */
+function drawBoard(board, l) {
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const u = board.getBoundingClientRect().width / W;
+  if (!u) return;
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-seat="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    if (s.size) el.style.setProperty('--fs', s.size);
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    m[key] = measure(el, board, u);
+  }
+  const c = l.build(m);
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  board.querySelector('svg')?.remove();
+  board.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags ?? []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
+}
+
+/* ===========================================================================
+   The home page's first two sections and the footer, as in index.html and _includes/footer.html
+   =========================================================================== */
+const SECTIONS = {
+  about: `<h1 class="name" data-seat="name"><span>Arturo</span> <span>Javier-</span><span>Castellanos</span></h1>
+    <div class="copy" data-seat="copy">
+      <p>I'm a full-stack TypeScript developer. I'm currently lead developer at a B2B SaaS company, where I own <span class="nb">business-critical</span> systems such as financial reporting and <span class="nb">e-signature</span>.</p>
+      <p>Previously, I worked in academic philosophy, where I specialized in the metaphysics of material objects.</p>
+    </div>
+    <a class="blog" data-seat="blog" href="#">Blog</a>`,
+  projects: `<h2 data-seat="head">Projects</h2>
+    <article class="copy project" data-seat="p1">
+      <h3><a href="#">Hardly Working</a></h3>
+      <p class="stack">Electron&nbsp;· Angular&nbsp;· NgRx&nbsp;· SQLite&nbsp;· Drizzle</p>
+      <p>Alongside my <span class="nb">full-time</span> job I work as a contractor, which means billing my hours. Most trackers either make you start and stop a timer, which is easy to forget when you juggle several projects, or watch which windows are active, which is invasive and says little when most of your work happens inside a terminal and a browser. Hardly Working does neither. You link a project to a repo and a few URLs, and it records your edits and commits, reads your visits from the browser's own history (no extension needed), and reconstructs your hours from them. Nothing ever leaves your machine.</p>
+    </article>
+    <article class="copy project" data-seat="p2">
+      <h3><a href="#">Step by Step Strength</a></h3>
+      <p class="stack">Angular&nbsp;· Node.js&nbsp;· GraphQL&nbsp;· PostgreSQL&nbsp;· TypeORM</p>
+      <p>Step by Step Strength is a workout tracker for programs like Starting Strength, which alternate two workouts, A and B, three days a week. When I ran the program myself, the trackers I tried only supported weekly schedules, so a <span class="nb">Monday-Wednesday-Friday</span> plan repeated a workout across each weekend instead of alternating. SBSS supports schedules that span several weeks, so an <span class="nb">A-B-A,</span> <span class="nb">B-A-B</span> rotation is just a <span class="nb">two-week</span> schedule.</p>
+    </article>`,
+};
+const LAYOUTS = { about: ABOUT, projects: PROJECTS };
+const FOOT = `<footer class="foot"><div class="foot-in"><div class="foot-grid"><div class="foot-body">
+  <nav class="contacts" aria-label="Contact">
+    <a aria-label="Email"><svg class="mail" viewBox="4 8 25 16" aria-hidden="true"><path d="M5.315 9.274l7.735 6.726-7.737 6.728c-0.194-0.184-0.313-0.445-0.313-0.735v-11.986c0-0.289 0.121-0.549 0.315-0.733zM27.687 9.272c0.194 0.184 0.313 0.445 0.313 0.735v11.986c0 0.289-0.121 0.549-0.315 0.733l-7.735-6.726 7.737-6.728zM19.202 16.651l7.298 6.349h-20l7.298-6.349 2.702 2.349 2.702-2.349zM6.004 8c-1.107 0-2.004 0.895-2.004 1.994v12.012c0 1.101 0.89 1.994 2.004 1.994h20.993c1.107 0 2.004-0.895 2.004-1.994v-12.012c0-1.101-0.89-1.994-2.004-1.994h-20.993zM16.5 17.7l-10-8.7h20l-10 8.7z"/></svg></a>
+    <a aria-label="GitHub"><svg viewBox="0 0.395 32 31.6" aria-hidden="true"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.29-1.777-7.29-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"/></svg></a>
+    <a aria-label="LinkedIn"><svg class="in" viewBox="0 0 32 32" aria-hidden="true"><path d="M29 0h-26c-1.65 0-3 1.35-3 3v26c0 1.65 1.35 3 3 3h26c1.65 0 3-1.35 3-3v-26c0-1.65-1.35-3-3-3zM12 26h-4v-14h4v14zM10 10c-1.106 0-2-0.894-2-2s0.894-2 2-2c1.106 0 2 0.894 2 2s-0.894 2-2 2zM26 26h-4v-8c0-1.106-0.894-2-2-2s-2 0.894-2 2v8h-4v-14h4v2.481c0.825-1.131 2.087-2.481 3.5-2.481 2.488 0 4.5 2.238 4.5 5v9z"/></svg></a>
+  </nav>
+  <p class="cr">© 2026 Arturo Javier-Castellanos</p></div></div></div></footer>`;
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+// An option: `rule` for the type unit (lock, floor, slow or fixed), `k` the fixed rule's size, as a multiple of the
+// design size (17px copy is 17 / 16.5), and `bp`, the narrowest window that gets the wide layout.
+const RULES = { lock: 'Locked to the drawing', floor: 'A floor at the design size', slow: 'Half as fast below the design size', fixed: 'A fixed size, in rem' };
+const unitOf = (o, u) => ({ lock: u, floor: Math.max(1, u), slow: Math.max(u, 1 + (u - 1) / 2), fixed: o.k })[o.rule];
+// the drawing unit in a window `w` px wide, as styles.css makes it: a board 64px narrower than the window up to
+// 1500, or up to 448 wide in the narrow layout
+const drawingUnit = (o, w) => w < o.bp ? Math.min(w, 448) / 384 : (Math.min(w, 1500) - 64) / 1284;
+const px = n => `${n.toFixed(1)}px`;
+function sizes(o, w) {
+  const t = unitOf(o, drawingUnit(o, w));
+  return `<b>${px(16.5 * t)}</b> copy, <b>${px(11 * t)}</b> smallest`;
+}
+
+const OPTIONS = [
+  { name: 'Locked to the drawing (as now)', o: { rule: 'lock', k: 1, bp: 1100 },
+    note: 'Every piece of type is in drawing units: the page is one picture that scales as a whole. Between its two breakpoints it never reflows, and the copy is always the same share of the column. In an 1100px window the copy is 13.3px and the copyright 8.9px; on a 1366px laptop, zooming to 110% leaves the copy the same size on screen, and 125% is the first step that changes anything, by crossing into the narrow layout.' },
+  { name: 'A floor at the design size', o: { rule: 'floor', k: 1, bp: 1100 },
+    note: 'The type follows the drawing down to the size it was designed at, where one drawing unit is one pixel (16.5px copy, 11px copyright), and no further. Above that it scales as now, so a big screen looks as it does today. Below it, the copy is larger than its column expects and wraps into more lines, and the circuit beside it grows to fit. Zoom enlarges the copy wherever the floor holds, which is any window under about 1350px.' },
+  { name: 'A fixed size, in rem', o: { rule: 'fixed', k: 17 / 16.5, bp: 1100 },
+    note: 'The type is set as an ordinary page sets it: 17px copy at every width, in rem, so it follows the browser\'s own font-size setting as well as zoom, and every step of Ctrl+ enlarges it. The drawing and the name still scale with the window, so on a big screen the copy is smaller beside them than now (17px against 18.4px in a 1500px window), and on a small one larger.' },
+  { name: 'The wide layout from 1280px', o: { rule: 'lock', k: 1, bp: 1280 },
+    note: 'The type stays locked to the drawing, and the wide layout starts at 1280px instead of 1100, so the smallest it gets is 15.6px copy. Between 1100 and 1279px the page draws the phone layout, centred, as a tablet gets it now, with 19.3px copy. An 1100px window is shown with it. On a 1366px laptop, 110% already crosses into the phone layout; on a 1440 or 1536px one, the first step still does almost nothing.' },
+];
+
+const main = document.getElementById('specimens');
+function winHTML(w, h, secs, foot) {
+  return `<div class="win" data-w="${w}" style="width:${w}px;${h ? `height:${h}px` : ''}"><div class="main">${secs.map(s =>
+    `<section class="board" data-sec="${s}">${SECTIONS[s]}</section>`).join('')}</div>${foot ? FOOT : ''}</div>`;
+}
+function specHTML(id, head, cfg) {
+  return `<section class="spec" id="${id}">${head}
+    <p class="sub">A window <span class="ww">${cfg.win}</span>px wide <span>· scrolls inside</span></p>
+    <div class="row">${winHTML(cfg.win, 720, ['about', 'projects'], true)}</div>
+    <p class="sub">Phones, 320 and 390px <span>· scroll inside</span></p>
+    <div class="row">${winHTML(320, 568, ['about', 'projects'], true)}${winHTML(390, 844, ['about', 'projects'], true)}</div>
+    <p class="sub">Zooming in on a <span class="lw">${cfg.laptop}</span>px laptop <span>· the copy at its size on that screen</span></p>
+    <div class="crops">${[1, 1.1, 1.25, 1.5].map(z => `<div><div class="crop" data-z="${z}">${winHTML(100, 0, ['about'], false)}</div><p class="crop-cap"></p></div>`).join('')}</div>
+  </section>`;
+}
+function recipe(o) {
+  return `<ul class="recipe"><li>type <b>${RULES[o.rule]}${o.rule === 'fixed' ? `, ${px(16.5 * o.k)} copy` : ''}</b></li><li>wide layout from <b>${o.bp}px</b></li>${
+    [320, 390, 1100, 1366, 1500].map(w => `<li>${w}px: ${sizes(o, w)}</li>`).join('')}</ul>`;
+}
+
+// Draw a window: its layout from its width against the option's breakpoint, its type unit from the option's rule.
+function drawWin(win, o, w) {
+  win.style.width = `${w}px`;
+  win.dataset.w = w;
+  win.className = `win r-${o.rule}${w < o.bp ? ' n' : ''}`;
+  win.style.setProperty('--k', o.k);
+  for (const b of win.querySelectorAll('.board')) drawBoard(b, LAYOUTS[b.dataset.sec][w < o.bp ? 'narrow' : 'wide']);
+}
+// A crop: the laptop's window at zoom z is laptop / z CSS px wide, drawn at that width and then scaled by z, so the
+// copy is the size it would be on that screen. The crop starts just above and left of the copy.
+function drawCrop(crop, o, laptop) {
+  const z = +crop.dataset.z, w = Math.round(laptop / z), win = crop.querySelector('.win');
+  win.style.transform = '';
+  drawWin(win, o, w);
+  win.style.transform = `scale(${z})`;
+  const wr = win.getBoundingClientRect(), cr = win.querySelector('[data-seat="copy"]').getBoundingClientRect();
+  win.style.transform = `translate(${-(cr.left - wr.left - 16)}px, ${-(cr.top - wr.top - 14)}px) scale(${z})`;
+  const copy = parseFloat(getComputedStyle(win.querySelector('.copy p')).fontSize) * z;
+  crop.nextElementSibling.innerHTML = `<b>${Math.round(z * 100)}%</b> · a ${w}px window, ${w < o.bp ? 'narrow' : 'wide'}<br>copy <b>${px(copy)}</b> on screen`;
+}
+function drawSpec(spec, o, cfg) {
+  const [big, ...phones] = [...spec.querySelectorAll('.row .win')];
+  drawWin(big, o, cfg.win);
+  spec.querySelector('.ww').textContent = cfg.win;
+  phones.forEach(p => drawWin(p, o, +p.dataset.w));
+  spec.querySelector('.lw').textContent = cfg.laptop;
+  spec.querySelectorAll('.crop').forEach(c => drawCrop(c, o, cfg.laptop));
+}
+
+const FIXED = { win: 1100, laptop: 1366 };
+OPTIONS.forEach((x, i) => {
+  const id = 'abcd'[i];
+  main.insertAdjacentHTML('beforeend', specHTML(`opt-${id}`,
+    `<div class="cap"><div class="num">Option ${id.toUpperCase()}</div><h2>${x.name}</h2><p>${x.note}</p>${recipe(x.o)}</div>`, FIXED));
+});
+
+/* ---- mix your own ---- */
+const SWITCHES = {
+  rule: Object.entries(RULES),
+  k: [[16 / 16.5, '16px'], [17 / 16.5, '17px'], [18 / 16.5, '18px']].map(([v, t]) => [String(v), t]),
+  bp: [['1100', '1100px'], ['1200', '1200px'], ['1280', '1280px'], ['1366', '1366px']],
+  win: [1100, 1180, 1280, 1366, 1440, 1500].map(w => [String(w), `${w}px`]),
+  laptop: [1280, 1366, 1440, 1536, 1920].map(w => [String(w), `${w}px`]),
+};
+const LABELS = { rule: 'Type', k: 'Fixed copy size', bp: 'Wide layout from', win: 'Window', laptop: 'Laptop' };
+const mix = { rule: 'floor', k: String(17 / 16.5), bp: '1100', win: '1180', laptop: '1440' };
+const mixOpt = () => ({ rule: mix.rule, k: +mix.k, bp: +mix.bp });
+main.insertAdjacentHTML('beforeend', `<section class="mix"><div class="cap"><div class="num">Mix your own</div><h2>Any rule, size and breakpoint, in any window</h2>
+  <p>The rules are A's, B's and C's, and one between B and A: below the design size the type shrinks half as fast as the drawing. The fixed size applies only to C's rule. The window sets the width of the first frame, and the laptop the zoom crops; 1536 is a 1920px screen at 125% scaling, as Windows sets many laptops.</p>
+  <div id="mix-recipe"></div></div>
+  <div class="switches">${Object.entries(SWITCHES).map(([k, opts]) => `<label>${LABELS[k]}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></label>`).join('')}</div>
+  ${specHTML('mix-spec', '', { win: +mix.win, laptop: +mix.laptop })}</section>`);
+document.getElementById('mix-spec').style.paddingTop = '24px';
+const drawMix = () => {
+  document.getElementById('mix-recipe').innerHTML = recipe(mixOpt());
+  drawSpec(document.getElementById('mix-spec'), mixOpt(), { win: +mix.win, laptop: +mix.laptop });
+};
+document.querySelectorAll('.mix select').forEach(s => {
+  s.value = mix[s.dataset.k];
+  s.addEventListener('change', () => { mix[s.dataset.k] = s.value; drawMix(); });
+});
+
+function drawAll() {
+  OPTIONS.forEach((x, i) => drawSpec(document.getElementById(`opt-${'abcd'[i]}`), x.o, FIXED));
+  drawMix();
+}
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(drawAll);
+</script>
+</body>
+</html>
