@@ -2,12 +2,13 @@
 // journal and a summary. The titles are long and wrap; `cap` and `hx` are their first line's.
 import { bundle, cut, wire, rail, f } from '../kit.js';
 
-// two lamps out of a chip's side, each a resistor and a lamp, with a common return
-function lamps(x, rows, n0, d0, wires, parts, labels) {
-  wires.push(wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]]));
+// two lamps out of a chip's side, each a resistor and a lamp, with a common return: a branch named `run`, which
+// grows out of the chip `after` once the main rail reaches it, its parts and designators appearing as it passes
+function lamps(x, rows, n0, d0, run, after, wires, parts, labels) {
+  wires.push(...rail(run, [wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]])], after));
   rows.forEach((r, i) => {
-    parts.push({ kind: 'R', x: x + 5, y: r }, { kind: 'LED', x: x + 11, y: r, delay: [0, 1.3][i] });
-    labels.push({ k: 'ref', x: x + 5, y: r - 0.95, t: `R${n0 + i}`, a: 'middle' }, { k: 'ref', x: x + 11, y: r - 1.05, t: `D${d0 + i}`, a: 'middle' });
+    parts.push({ kind: 'R', x: x + 5, y: r, rail: run }, { kind: 'LED', x: x + 11, y: r, delay: [0, 1.3][i], rail: run });
+    labels.push({ k: 'ref', x: x + 5, y: r - 0.95, t: `R${n0 + i}`, a: 'middle', rail: run }, { k: 'ref', x: x + 11, y: r - 1.05, t: `D${d0 + i}`, a: 'middle', rail: run });
   });
 }
 
@@ -39,7 +40,7 @@ const wide = {
     wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
                wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
     parts.push({ kind: 'R', x: 56, y: a1, net: 'U5' });
-    lamps(78, [a1 + 1, a1 + 4], 8, 4, wires, parts, labels);
+    lamps(78, [a1 + 1, a1 + 4], 8, 4, 'U5 lamps', 'U5', wires, parts, labels);
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
     const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
     rail('U5 serpentine', bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3), 'U5').forEach((w, k) => {
