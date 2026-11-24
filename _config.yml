@@ -2,7 +2,7 @@
 # _posts, laid out by _layouts/post.html. Permalinks are Jekyll's default, as on the old site, so every post keeps
 # its URL and its Disqus thread.
 title: Arturo Javier-Castellanos
-description: Personal website of Arturo Javier-Castellanos.
+description: Full-stack TypeScript developer and lead developer at a B2B SaaS company, previously in academic philosophy.
 baseurl: ""
 url: "https://arturojc.dev"
 
@@ -10,6 +10,16 @@ highlighter: rouge
 
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+
+# Read by jekyll-seo-tag, which writes each page's description, canonical URL and link-preview tags: the site's
+# description on the home page and the blog's index, a post's excerpt on a post.
+author: Arturo Javier-Castellanos
+social:
+  name: Arturo Javier-Castellanos
+  links:
+    - https://github.com/arturo-jc
+    - https://www.linkedin.com/in/arturo-javier-castellanos-551006197/
 
 exclude:
   - CLAUDE.md

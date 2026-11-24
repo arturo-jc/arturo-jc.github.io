@@ -92,7 +92,7 @@ The 404 page, which GitHub Pages serves for any address it has no page for, is o
 | `_layouts/post.html` | A post: its head's board, then the post and its Disqus thread in `.flow`. |
 | `404.html` | The 404 page: its board, `notfound`. |
 | `_posts/` | The posts, in Markdown. The `excerpt` in a post's front matter is what the index shows. |
-| `_config.yml` | Jekyll's settings. Permalinks are the default, `/:categories/:year/:month/:day/:title.html`, as on the old site: changing them breaks every post's links and its Disqus thread. |
+| `_config.yml` | Jekyll's settings. Permalinks are the default, `/:categories/:year/:month/:day/:title.html`, as on the old site: changing them breaks every post's links and its Disqus thread. Its `description`, `author` and `social` feed `jekyll-seo-tag`, which each head runs as `{% seo title=false %}` (the heads write their own `<title>`) to write the description, the canonical URL and the link-preview tags; a post's description is its `excerpt`. |
 | `styles.css` | All the styles: the tokens, the page frame, the type of the name, a heading, the copy, a project and a paper, the footer, the drawing's classes. |
 | `js/kit.js` | What a layout is written with (`bundle`, `cut`, `wire`), and how a trace, chip, part or via becomes SVG. It does not touch the page. |
 | `js/board.js` | `mountBoard()`: seats and measures the type, draws the layout, and redraws when the width changes. |
