@@ -70,6 +70,8 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
 .paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
 .paper h3 a { text-underline-offset: calc(4 * var(--u)); }
 .paper .journal { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
+/* The journal links to the published article without an underline: it shows only as the accent on hover. */
+.paper .journal a { text-decoration: none; }
 
 /* the drawing */
 .t { fill: none; stroke: var(--trace); }
