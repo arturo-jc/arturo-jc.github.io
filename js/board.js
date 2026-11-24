@@ -85,21 +85,32 @@ function drawBoard(board, layouts) {
   document.dispatchEvent(new Event('boarddrawn'));
 }
 
-// Draw a section, and again whenever its width changes or the fonts arrive: the type wraps
-// differently at another width or in another face, and the layouts are built round its measurements.
+// Draw a section, and again whenever its width changes, the fonts arrive or a block's height changes: the type
+// wraps differently at another width or in another face, and the layouts are built round its measurements. A
+// block's height also changes on its own, at the same width, when a reader overrides the text's spacing, has the
+// page translated or zooms the text only; without a redraw the blocks would overlap and run off their boards.
 // Every board is redrawn in the same turn, so that js/rails.js puts the animation back on all of them at once,
 // before the next paint.
-const SETTLE = 150;                     // ms the width must be still before the boards are redrawn
+const SETTLE = 150;                     // ms the sizes must be still before the boards are redrawn
 const boards = new Map();               // each board, with what draws it
 let settling = 0;
 const each = fn => { for (const [board, b] of boards) fn(board, b); };
-const draw = (board, b) => { b.at = board.getBoundingClientRect().width; drawBoard(board, b.layouts); };
+const draw = (board, b) => {
+  b.at = board.getBoundingClientRect().width;
+  drawBoard(board, b.layouts);
+  b.hs = b.blocks.map(el => el.getBoundingClientRect().height);
+};
+// A board needs redrawing when its width or a block's height is not what it was drawn at.
+const stale = (board, b) => board.getBoundingClientRect().width !== b.at
+  || b.blocks.some((el, i) => Math.abs(el.getBoundingClientRect().height - b.hs[i]) > 0.5);
 // While a window is dragged wider or narrower, a layout scales as a whole, its drawing by its viewBox and its type
 // by --u, so the boards are left to scale until the width has been still for SETTLE ms, and redrawn once then.
-// Redrawing every frame of the drag costs about 50ms a frame on the wide home page.
+// Redrawing every frame of the drag costs about 50ms a frame on the wide home page. The blocks are watched too, for
+// a height that changes at the same width; a redraw resizes them, but to the heights it then records, so it
+// does not set off another.
 const watch = new ResizeObserver(() => {
   clearTimeout(settling);
-  settling = setTimeout(() => each((board, b) => { if (board.getBoundingClientRect().width !== b.at) draw(board, b); }), SETTLE);
+  settling = setTimeout(() => each((board, b) => { if (stale(board, b)) draw(board, b); }), SETTLE);
 });
 // Across the breakpoint the layout changes, so the boards are redrawn at once, and the other layout's drawing goes
 // first. Left in, it is stretched to the new width for a frame, which can make the page tall enough to gain a
@@ -112,8 +123,9 @@ NARROW.addEventListener('change', () => {
 document.fonts.ready.then(() => each(draw));
 
 export function mountBoard(board, layouts) {
-  const b = { layouts, at: 0 };
+  const b = { layouts, at: 0, blocks: [...board.querySelectorAll('[data-seat]')], hs: [] };
   boards.set(board, b);
   draw(board, b);
   watch.observe(board);
+  for (const el of b.blocks) watch.observe(el);
 }

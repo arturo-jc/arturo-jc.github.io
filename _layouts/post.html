@@ -5,6 +5,8 @@ layout: default
   A post: its head on a board (the way back, the title and the date), then the post and its comments as plain text
   in a column on the board's grid. Links to other sites open in a new tab: kramdown cannot add the target itself,
   and GitHub Pages runs no plugin that does, so the replace below adds it to every link that starts with http.
+  Disqus loads only once its thread is near the window, or at once when the address points into it, as the links
+  in its notifications do: it is the heaviest thing on the page, and most readers never reach it.
 {%- endcomment -%}
 <section class="board" id="post">
   <a class="back" data-seat="back" href="{{ '/blog' | relative_url }}">Blog</a>
@@ -23,10 +25,19 @@ layout: default
         this.page.identifier = "{{ page.id }}";
       };
       (function () {
-        var d = document, s = d.createElement('script');
-        s.src = 'https://arturojc.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
+        var d = document, thread = d.getElementById('disqus_thread'), seen;
+        function load() {
+          if (seen) seen.disconnect();
+          var s = d.createElement('script');
+          s.src = 'https://arturojc.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        }
+        if (/^#(comment-|disqus_thread)/.test(location.hash)) return load();
+        seen = new IntersectionObserver(function (es) {
+          if (es.some(function (e) { return e.isIntersecting; })) load();
+        }, { rootMargin: '0px 0px 1200px 0px' });
+        seen.observe(thread);
       })();
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
