@@ -1,9 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-<!-- The end of the accent net: an orange trace turning 45° into a via, option C of studies/12-favicon.html -->
+<!-- A chip with two pads a side and its pin-one mark lit, option B of studies/12-favicon.html -->
 <defs><clipPath id="c"><rect width="32" height="32" rx="7"/></clipPath></defs>
 <rect width="32" height="32" rx="7" fill="#0b3048"/>
 <g clip-path="url(#c)">
-<path d="M20.5 11.5L11.5 20.5V33" fill="none" stroke="#f7a52b" stroke-width="6" stroke-linejoin="round"/>
-<circle cx="20.5" cy="11.5" r="8.1" fill="#f7a52b"/><circle cx="20.5" cy="11.5" r="3.15" fill="#0b3048"/>
+<path d="M2.7 12.2H-1M2.7 19.8H-1M29.3 12.2H33M29.3 19.8H33" stroke="#3f9fd8" stroke-width="3.8"/>
+<g transform="translate(16 16) scale(.95)" fill="#9bd0ee">
+<rect x="-14" y="-6" width="6" height="4" rx=".6"/><rect x="8" y="-6" width="6" height="4" rx=".6"/><rect x="-6" y="-14" width="4" height="6" rx=".6"/><rect x="-6" y="8" width="4" height="6" rx=".6"/>
+<rect x="-14" y="2" width="6" height="4" rx=".6"/><rect x="8" y="2" width="6" height="4" rx=".6"/><rect x="2" y="-14" width="4" height="6" rx=".6"/><rect x="2" y="8" width="4" height="6" rx=".6"/>
+<rect x="-9.5" y="-9.5" width="19" height="19" rx="1.8" fill="#072235" stroke="#1f6593" stroke-width="1"/>
+<circle cx="-5" cy="-5" r="1.8" fill="#f7a52b"/>
+</g>
 </g>
 </svg>

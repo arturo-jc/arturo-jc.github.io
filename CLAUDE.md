@@ -70,7 +70,7 @@ Studies double as a parts bin of working code:
 - `studies/09-blog.html` holds the blog drawn with a rail of three traces down the posts and down an article, tapping in to each post's title and each section's heading, stepped or with parts between taps. The user turned it down: on a long article the rail distracts from the text. It also holds `marks`, a measurement of every `h2` in a block of running text.
 - `studies/10-blog-head.html` holds the two other blog heads the site does not use: three traces dropping beside the head and stopping short, and three turning under it as a divider. Its panel also puts a lone via before each heading in the text.
 - `studies/11-empty-corners.html` holds the fillers for the empty corners under U3 and U5 in the wide layouts that the site does not use: a second chip with two capacitors and a staggered tail, a crystal with its two load capacitors (a part `js/kit.js` does not have), a serpentine down U3's corner, and a six-pin header under U5.
-- `studies/12-favicon.html` holds the favicons the site does not use: a lit lamp on a trace and a chip with its pin-one mark lit, each on the board's ground, with a panel that also draws a resistor or a capacitor, other grounds, and traces that end on vias.
+- `studies/12-favicon.html` holds the favicons the site does not use: a lit lamp on a trace and an orange trace turning 45° into a via, each on the board's ground, with a panel that also draws a resistor or a capacitor, other grounds, and traces that end on vias.
 
 ## The code
 
@@ -95,7 +95,7 @@ The blog is two kinds of page, each with one board, and the board holds only the
 | `js/rails.js` | The animation: draws the main rail as the page scrolls, and grows the branches and accent nets once their chip connects. |
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
 | `js/main.js` | The list of boards, on every page. It mounts each one whose `.board` is on the page, by id, and fills in the footer's year. `blog` is the index's head and `post` a post's. |
-| `favicon.svg`, `favicon.ico`, `apple-touch-icon.png` | The icon: an orange trace turning 45° into a via. The SVG is the source; the other two are rendered from it, the `.ico` at 16, 32 and 48 (`rsvg-convert -w N -h N`, then `magick` the three PNGs into one), the touch icon at 180 with the square's `rx` removed, because phones round its corners themselves. Linked from `index.html` and `_layouts/default.html`. |
+| `favicon.svg`, `favicon.ico`, `apple-touch-icon.png` | The icon: a chip with two pads a side, its pin-one mark lit orange, and a trace off each side pad. The SVG is the source; the other two are rendered from it, the `.ico` at 16, 32 and 48 (`rsvg-convert -w N -h N`, then `magick` the three PNGs into one), the touch icon at 180 with the square's `rx` removed, because phones round its corners themselves. Linked from `index.html` and `_layouts/default.html`. |
 
 ### Adding a section
 
