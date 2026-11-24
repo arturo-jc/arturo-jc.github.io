@@ -65,7 +65,7 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
 .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
 .project h3 a { text-underline-offset: calc(4 * var(--u)); }
 .project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
-/* A paper is its title, which links to the published article, its journal, and a summary. The titles are long,
+/* A paper is its title, which links to the draft's PDF, its journal, which links to the published article, and a summary. The titles are long,
    so unlike a project's name they wrap, balanced so the lines are about even. */
 .paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
 .paper h3 a { text-underline-offset: calc(4 * var(--u)); }
