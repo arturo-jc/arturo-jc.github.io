@@ -1,5 +1,5 @@
 // Putting a section on the page: seat its type, measure it, draw its circuit, and redraw when either changes.
-import { P, WEIGHT, f, tracePath, via, chip, part } from './kit.js';
+import { P, WEIGHT, f, tracePath, via, chip, part, flag } from './kit.js';
 
 // The baseline of the line that `el` starts, in px.
 function baselineOf(el) {
@@ -12,18 +12,18 @@ function baselineOf(el) {
 }
 
 // What a layout cannot know in advance about a seated block, in cells from the board's top left: `top`, `bot`
-// and `h` are its box. A block with a heading also has `cap`, the row of the middle of the capitals of the
-// heading's first line, and `hx`, the column where that line's last letter ends, which for a heading that wraps,
-// as Research's titles do, is not the right of its box. The heading is the block
-// itself when it is an h1 or h2, and otherwise its h3; its first line is its first span when it is set on
-// several lines, each in a span.
+// and `h` are its box, and `l` its left edge. A block with a heading also has `cap`, the row of the middle of the
+// capitals of the heading's first line, and `hx`, the column where that line's last letter ends, which for a
+// heading that wraps, as Research's titles do, is not the right of its box. The heading is the block
+// itself when it is an h1, an h2 or a link, and otherwise its h3; its first line is its first span when it is set
+// on several lines, each in a span.
 // The board's box is read here, beside the block's, rather than once before seating: seating changes the page's
 // height, and when the page is scrolled to its foot the browser then pulls the scroll back, which moves every
 // box on screen. A board's box read before that, against a block's read after it, puts the block rows off.
 function measure(el, board, u) {
   const box = board.getBoundingClientRect(), cell = px => px / u / P, r = el.getBoundingClientRect();
-  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height) };
-  const heading = el.matches('h1, h2') ? el : el.querySelector('h3');
+  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height), l: cell(r.left - box.left) };
+  const heading = el.matches('h1, h2, a') ? el : el.querySelector('h3');
   if (!heading) return m;
   const line = heading.querySelector('span') ?? heading;
   const word = document.createRange();
@@ -39,7 +39,8 @@ function measure(el, board, u) {
 
 // A section has two layouts, `wide` and `narrow`. Each gives the grid's width in `cols`, a seat for each
 // block of type in `seats`, and `build(m)`, which returns the circuit. A seat is keyed by the block's
-// data-seat and gives the cell where its top left sits, its width `w` when it wraps, and its `size` in units
+// data-seat and gives the cell where its top left sits (or, with `r` in place of `x`, the column its right
+// edge sits on), its width `w` when it wraps, and its `size` in units
 // when the layout sets it, as it does for the name. A seat can be a function of the blocks seated before it,
 // so that one can sit under another. `m` is every block as measured by measure(), under the same keys.
 // The width here must match the media query in styles.css.
@@ -59,7 +60,8 @@ function drawBoard(board, layouts) {
   for (const [key, seat] of Object.entries(l.seats)) {
     const el = board.querySelector(`[data-seat="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
     if (s.size) el.style.setProperty('--fs', s.size);
-    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.left = s.r === undefined ? `${100 * s.x / l.cols}%` : 'auto';
+    el.style.right = s.r === undefined ? '' : `${100 * (l.cols - s.r) / l.cols}%`;
     el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
     el.style.top = `calc(${s.y * P} * var(--u))`;
     m[key] = measure(el, board, u);
@@ -79,7 +81,7 @@ function drawBoard(board, layouts) {
   const old = board.querySelector('svg');
   board.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${f(c.rows * P)}" aria-hidden="true">
     <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
-    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags ?? []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
   old?.remove();
 }
 

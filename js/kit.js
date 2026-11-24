@@ -102,6 +102,16 @@ export function chip(c) {
   return s.join('');
 }
 
+// An off-page connector: the flag a schematic draws where a net leaves the sheet and carries on elsewhere. It
+// points east, its point at column `tip` and its tail FLAG cells back, where the trace that feeds it ends. The
+// net's code is written inside it.
+export const FLAG = 4;
+export function flag({ tip, y, code }) {
+  const X = c => f((tip - c) * P), Y = r => f(y * P + r), h = 6.6;
+  return `<path class="flag" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text>`;
+}
+
 // two-pad parts sitting on a trace; each knocks out the stretch of trace under it
 export function part(p) {
   const g = p.kind === 'LED'

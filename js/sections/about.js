@@ -1,11 +1,14 @@
-// About, which opens the page: the name, as the page's heading, and two paragraphs.
-import { P, bundle, cut, wire, f } from '../kit.js';
+// About, which opens the page: the name, as the page's heading, two paragraphs, and a link to the blog.
+import { P, FLAG, bundle, cut, wire, f } from '../kit.js';
 
 // Wide: the name upper left and the copy lower right. U1 sits level with the name's first line, so the
 // accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
 // west under the name to U2; three leave its right side, below J1's bus, and go down the copy's right and under it.
+// U2 lights three lamps, and their common return carries on down and east into an off-page flag before the link
+// to the blog, which sits in the pocket under the lamps, left of the copy.
 const wide = {
-  cols: 107, seats: { name: { x: 6, y: 6, size: 60 }, copy: { x: 54, y: 21, w: 36 } },
+  cols: 107,
+  seats: { name: { x: 6, y: 6, size: 60 }, copy: { x: 54, y: 21, w: 36 }, blog: m => ({ x: 40, y: f(m.copy.bot + 0.4) }) },
   build(m) {
     const a = f(m.name.cap);                    // the accent's row; U1 and what hangs off it are placed from it
     const vx = f(m.name.hx + 1.5);                 // the accent's via, just past the first line
@@ -23,17 +26,20 @@ const wide = {
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
     const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
-    const rows = f(m.copy.bot + 5);
+    const rows = f(Math.max(m.copy.bot + 5, m.blog.bot + 4));
     // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
     // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
     wires.push(...bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3));
     // the diagonal, then west under the name → U2
     wires.push(...bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3));
-    // U2 → three lamps → common return
+    // U2 → three lamps → common return → down and east, along the middle of the word's capitals, into the flag,
+    // whose point stops just short of the word
     const lamps = [a + 17, a + 20, a + 23];
-    wires.push(wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, a + 25]], { legs: [0, 8, 0], end: 'via' }),
+    const by = f(m.blog.cap), tip = f(m.blog.l - 0.8);
+    wires.push(wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, by], [f(tip - FLAG), by]], { legs: [0, 8, 8, 0] }),
                wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]]));
+    const flags = [{ tip, y: by, code: 'A0140' }];
     lamps.forEach((r, i) => {
       parts.push({ kind: 'R', x: 19, y: r }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i] });
       labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle' });
@@ -46,15 +52,20 @@ const wide = {
       { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true },
       { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4' },
     );
-    return { rows, chips, wires, parts, labels };
+    return { rows, chips, wires, parts, labels, flags };
   },
 };
 
 // Narrow: J1 and U1 above the name, which is on three lines; the accent net comes down out of U1 and in
 // along the name's first line; three traces run down the left of the name and the copy, turn under it and
-// drop into Projects' U3.
+// drop into Projects' U3. Where the outer trace turns down, a branch leaves it a clear cell below the bend and runs
+// east under the copy into an off-page flag before the link to the blog, which ends at the copy's right edge.
 const narrow = {
-  cols: 32, seats: { name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }) },
+  cols: 32,
+  seats: {
+    name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }),
+    blog: m => ({ r: 30, y: f(m.copy.bot + 5.4) }),
+  },
   build(m) {
     const chips = [
       { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
@@ -69,9 +80,13 @@ const narrow = {
     // J1 → down the left of the name and the copy → under the copy → down off the board's foot. Projects picks
     // the three up at its top edge in the same columns and takes them into U3's top left-hand pads.
     const under = f(m.copy.bot + 3.5);         // the row of the trace nearest the copy's last line
-    const rows = under + 4;
+    const rows = f(Math.max(under + 4, m.blog.bot + 2));
     wires.push(...bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3));
-    labels.push({ k: 'net', x: 16, y: under + 3.35, t: 'A0131 – A0133' });
+    labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
+    // the branch: off the rail's outer trace, at column 15, east into the flag
+    const by = f(m.blog.cap), tip = f(m.blog.l - 0.8);
+    wires.push(wire([[15, by], [f(tip - FLAG), by]]));
+    const flags = [{ tip, y: by, code: 'A0140' }];
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },
@@ -82,7 +97,7 @@ const narrow = {
       { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3' },
       { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true },
     );
-    return { rows, chips, wires, parts, labels };
+    return { rows, chips, wires, parts, labels, flags };
   },
 };
 
