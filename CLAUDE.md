@@ -1,6 +1,8 @@
 # Circuitboard portfolio
 
-A redesign of the portfolio at `~/Code/personal-website`, which it will replace. That repo is the source for content: `_includes/`, `_data/projects.yml`, `_data/articles.yml`, `assets/`. The blog's posts have moved here, into `_posts/`; a new post is written here.
+The portfolio at https://arturojc.dev, a circuit-board redesign of the one it replaced. The repo is `arturo-jc/arturo-jc.github.io` on GitHub, and GitHub Pages builds and serves its `master` branch, so **a push to `master` deploys the site.**
+
+The replaced site's code is in this repo's history, the second parent of the merge that brought it in, at commit `dc5cd79`, and is still the source for content not yet carried over: `git show dc5cd79:_data/projects.yml`, and likewise `_includes/`, `_data/articles.yml` and `assets/`. A new post is written here, in `_posts/`.
 
 ## The guiding principle
 
@@ -188,7 +190,7 @@ Render the page and look at it; a description of the code is not evidence. The u
 
 ## Facts and decoration
 
-Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, J2, R5 and R6; Research has U5 to U8, R7 to R9, D4 and D5. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. So is the 404 page: U301, J301 and R301. Names, places, jobs, dates, projects and links must come from `~/Code/personal-website` or from the user. The surname is hyphenated: Javier-Castellanos.
+Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, J2, R5 and R6; Research has U5 to U8, R7 to R9, D4 and D5. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. So is the 404 page: U301, J301 and R301. Names, places, jobs, dates, projects and links must come from the replaced site (commit `dc5cd79`) or from the user. The surname is hyphenated: Javier-Castellanos.
 
 ## Committing
 
@@ -196,4 +198,4 @@ Commit without being asked after a significant batch of work: a section built, a
 
 Do not commit small adjustments made so the user can see how something looks, such as a font size, a colour or a spacing nudge. When the wording is exploratory ("let's try…", "what if…"), or the request is a vague tweak of the kind someone makes before they have made up their mind, leave it uncommitted. It goes into the next significant commit, or gets committed when the user says they are happy with it. When unsure which case applies, leave it uncommitted and say so.
 
-The repo has no remote and no gitleaks hook: do not push, and say the commit was not scanned.
+The repo is public and a push deploys the site: commit, but **push only when the user asks.** Every commit is scanned by gitleaks, from `.githooks/pre-commit`; a fresh clone has to run `git config core.hooksPath .githooks` once to wire it, and without that nothing is scanned.
