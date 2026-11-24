@@ -20,9 +20,9 @@ const wide = {
       { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, pins: { b: [91, 92, 93, 94, 95] } },
     ];
     // the accent net: straight from U1 to the name
-    wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via' }));
-    // J1 → U1, five wide
-    wires.push(...bundle([[93, 4.5], [93, a + 1], [74, a + 1]], 5));
+    wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via', net: 'U1' }));
+    // U1 → J1, five wide: a branch drawn out of U1 on load
+    wires.push(...rail('J1', bundle([[74, a + 1], [93, a + 1], [93, 4.5]], 5), 'load'));
     // The long diagonal leaves U1's three lowest left pads, level with the rail on its right. It is the far half of a
     // six-wide bundle, centred on yc, so its traces land on those pads.
     const X = 49.5, yc = a + 7.5, Yd = a + 14.5, shoulder = 60;
@@ -31,26 +31,26 @@ const wide = {
     // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
     wires.push(...rail('U3', bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3)));
-    // the diagonal, then west under the name → U2
-    wires.push(...bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3));
+    // the diagonal, then west under the name → U2: a branch drawn out of U1 on load
+    wires.push(...rail('U2', bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3), 'load'));
     // U2 → three lamps → common return → down and east, along the middle of the word's capitals, into the flag,
-    // whose point stops just short of the word
+    // whose point stops just short of the word: a branch drawn out of U2 once the diagonal reaches it
     const lamps = [a + 17, a + 20, a + 23];
     const by = f(m.blog.cap), tip = f(m.blog.l - 0.8);
-    wires.push(wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, by], [f(tip - FLAG), by]], { legs: [0, 8, 8, 0] }),
-               wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]]));
-    const flags = [{ tip, y: by, code: 'A0140', go: true }];
+    wires.push(...rail('U2 lamps', [wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, by], [f(tip - FLAG), by]], { legs: [0, 8, 8, 0] }),
+               wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]])], 'U2'));
+    const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U2 lamps' }];
     lamps.forEach((r, i) => {
-      parts.push({ kind: 'R', x: 19, y: r }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i] });
-      labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle' });
+      parts.push({ kind: 'R', x: 19, y: r, rail: 'U2 lamps' }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i], rail: 'U2 lamps' });
+      labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle', rail: 'U2 lamps' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle', rail: 'U2 lamps' });
     });
-    parts.push({ kind: 'R', x: 42, y: a });
+    parts.push({ kind: 'R', x: 42, y: a, net: 'U1' });
     // ref = silkscreen designators · net = wire codes
     labels.push(
       { k: 'ref', x: 62, y: a - 4.1, t: 'U1' }, { k: 'ref', x: u2.x0, y: u2.y1 + 1.3, t: 'U2' }, { k: 'ref', x: 89.6, y: 4.75, t: 'J1', a: 'end' },
-      { k: 'ref', x: 42, y: a - 0.95, t: 'R4', a: 'middle' },
-      { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true },
-      { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4' },
+      { k: 'ref', x: 42, y: a - 0.95, t: 'R4', a: 'middle', net: 'U1' },
+      { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true, net: 'U1' },
+      { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4', rail: 'J1' },
     );
     return { rows, chips, wires, parts, labels, flags };
   },
@@ -77,7 +77,7 @@ const narrow = {
     wires.push(...bundle([[7.5, 2.5], [7.5, 6.5], [18, 6.5]], 4));
     // the accent net: down out of U1 and in along the name's first line, ending just past it
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
-    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
+    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1' }));
     // J1 → down the left of the name and the copy → under the copy → down. The two outer traces carry on down off
     // the board's foot, and Projects picks them up at its top edge in the same columns and takes them into U3's two
     // top left-hand pads. The one nearest the copy turns down with them, then east again `step` rows lower, along the
@@ -93,14 +93,14 @@ const narrow = {
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
     const flags = [{ tip, y: by, code: 'A0140', go: true }];
     const parts = [
-      { kind: 'R', x: 25, y: 13.2, dir: 'v' },
+      { kind: 'R', x: 25, y: 13.2, dir: 'v', net: 'U1' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v', rail: 'U3' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v', rail: 'U3' },
     ];
     labels.push(
       { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },
-      { k: 'ref', x: 26.1, y: 13.45, t: 'R4' },
+      { k: 'ref', x: 26.1, y: 13.45, t: 'R4', net: 'U1' },
       { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3' },
-      { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true },
+      { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true, net: 'U1' },
     );
     return { rows, chips, wires, parts, labels, flags };
   },

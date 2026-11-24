@@ -8,8 +8,10 @@
 // - A chip's accent net: everything marked `net: to`. It grows out of `to` like a branch, in blue, but in the same
 //   time whatever its length, and turns orange once it reaches the content; it turns blue again and draws back in when `to` disconnects. Its parts, via and code
 //   appear as the tip reaches them.
-// A branch's and a net's drawn length is kept by name, so a redraw never puts any of them out of step. On load the
-// reading line sweeps down to its place, and everything follows it.
+// A branch with `after: 'load'` grows as soon as the page loads, and one that reaches a chip connects it as the main
+// rail does, so that a branch can grow out of the end of another. A branch's and a net's drawn length is kept by name,
+// so a redraw never puts any of them out of step. On load the reading line sweeps down to its place, and everything
+// follows it.
 const READ = 0.7;                       // the reading line, as a fraction of the window's height down from its top
 const SWEEP = 0.8;                      // the seconds the reading line takes to sweep down to its place on load
 const GROW = 900;                       // a branch's growth, in drawing units a second
@@ -18,7 +20,7 @@ const NET = 0.5;                        // the seconds a net takes to draw, what
 const still = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = (t, hi = 1) => Math.min(hi, Math.max(0, t));
 const grown = new Map();                // by name: how much of a branch or net is drawn, 0 to 1
-let runs = [], queued = 0, ticking = 0, then = 0, born = null;
+let runs = [], queued = 0, ticking = 0, then = 0, born = null, reached = new Set();
 
 // A path's points every few units, in page coordinates, with how far along it each is.
 function samples(p, len) {
@@ -72,12 +74,13 @@ function collect() {
     return [...by];
   };
   runs = [
-    // The main rail and the branches. What waits at the end of one that stops short, its vias and their codes, is
-    // shown when the nearest trace end is reached, and a part sitting on one when the tip reaches the part.
+    // The main rail and the branches. What waits at the end of one that stops short, its vias, their codes and a
+    // flag, is shown when the nearest trace end is reached, and a part sitting on one, with its designator, when the
+    // tip reaches the part.
     ...group('rail').map(([to, paths]) => {
       const r = run(to, paths, { after: paths[0].dataset.after });
       const ps = r.legs.flatMap(l => l.ps);
-      r.reveal = [...document.querySelectorAll(`[data-rail-end="${to}"]`)].map(el => ({ ...nearest(ps, centre(el), !el.matches('[transform]')), el }));
+      r.reveal = [...document.querySelectorAll(`[data-rail-end="${to}"]`)].map(el => ({ ...nearest(ps, centre(el), !el.matches('[transform], .ref')), el }));
       return r;
     }),
     // the accent nets. Their parts, vias and codes are shown when the tip reaches the point nearest them.
@@ -130,18 +133,17 @@ function update() {
   if (swept < 1) later();
   // a rail that ends too low for the reading line to reach at the foot of the page finishes at the foot
   const lowest = document.documentElement.scrollHeight - (1 - READ) * innerHeight - 1;
-  const arrived = new Set();
+  reached = new Set();
   for (const r of runs) {
     if (r.after) continue;
     const y1 = Math.min(r.y1, lowest), y0 = Math.min(r.y0, y1 - 40);
     const t = still.matches ? 1 : clamp((line - y0) / (y1 - y0));
     paint(r, t);
-    if (t >= 1) arrived.add(r.key);
+    if (t >= 1) reached.add(r.key);
   }
-  // the branches and nets: each heads for drawn while its chip is connected, and for gone while it is not
+  aim();
   for (const r of runs) {
     if (!r.after) continue;
-    r.goal = arrived.has(r.after) ? 1 : 0;
     const g = grown.get(r.key) ?? 0;
     paint(r, g);
     light(r, g);
@@ -149,11 +151,22 @@ function update() {
   if (!ticking) { then = performance.now(); grow(); }
 }
 
+// The branches and nets: each heads for drawn while its chip is connected, and for gone while it is not. A chip is
+// connected when the main rail or a branch has reached it, and from the start when no run leads into it, as U1 has
+// none; the page counts as `load`.
+function aim() {
+  const on = new Set(['load', ...reached]);
+  for (const r of runs) if (r.net && !runs.some(q => q.key === r.after)) on.add(r.after);
+  for (const r of runs) if (r.after && !r.net && (grown.get(r.key) ?? 0) >= 1) on.add(r.key);
+  for (const r of runs) if (r.after) r.goal = on.has(r.after) ? 1 : 0;
+}
+
 // One frame of the branches' and nets' growth; it carries on each frame until every one has reached its goal.
 function grow() {
   const now = performance.now(), dt = (now - then) / 1000;
   then = now;
   ticking = 0;
+  aim();
   let moving = false;
   for (const r of runs) {
     if (!r.after) continue;
@@ -166,6 +179,9 @@ function grow() {
     light(r, g);
     if (g !== r.goal) moving = true;
   }
+  // a branch that has just arrived can set another off
+  aim();
+  if (runs.some(r => r.after && (grown.get(r.key) ?? 0) !== r.goal)) moving = true;
   if (moving) ticking = requestAnimationFrame(grow);
 }
 

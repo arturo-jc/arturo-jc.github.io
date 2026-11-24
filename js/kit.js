@@ -114,10 +114,10 @@ export function chip(c) {
 // that feeds it ends. The net's code is written inside it. `go` marks the flag in front of a link, which warms
 // when the link is hovered.
 export const FLAG = 4;
-export function flag({ tip, y, code, dir = 1, go }) {
+export function flag({ tip, y, code, dir = 1, go, rail }) {
   const X = c => f((tip - dir * c) * P), Y = r => f(y * P + r), h = 6.6;
-  return `<path class="flag${go ? ' go' : ''}" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
-       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text>`;
+  return `<g${rail ? ` data-rail-end="${rail}"` : ''}><path class="flag${go ? ' go' : ''}" d="M${X(FLAG)} ${Y(-h)}L${X(0.7)} ${Y(-h)}L${X(0)} ${Y(0)}L${X(0.7)} ${Y(h)}L${X(FLAG)} ${Y(h)}Z"/>`
+       + `<text class="lb o" x="${f((tip - dir * (FLAG + 0.7) / 2) * P)}" y="${Y(3)}" text-anchor="middle">${code}</text></g>`;
 }
 
 // two-pad parts sitting on a trace; each knocks out the stretch of trace under it
