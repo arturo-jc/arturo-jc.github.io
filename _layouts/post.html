@@ -7,7 +7,7 @@ layout: default
   and GitHub Pages runs no plugin that does, so the replace below adds it to every link that starts with http.
 {%- endcomment -%}
 <section class="board" id="post">
-  <a class="back" data-seat="back" href="{{ '/blog/' | relative_url }}">Blog</a>
+  <a class="back" data-seat="back" href="{{ '/blog' | relative_url }}">Blog</a>
   <h1 class="title" data-seat="title">{{ page.title }}</h1>
   <p class="date" data-seat="date"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%b %d, %Y" }}</time></p>
 </section>

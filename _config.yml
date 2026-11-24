@@ -1,4 +1,4 @@
-# Jekyll, as GitHub Pages builds it. The home page is index.html; the blog is blog/index.html and the posts in
+# Jekyll, as GitHub Pages builds it. The home page is index.html; the blog is blog.html and the posts in
 # _posts, laid out by _layouts/post.html. Permalinks are Jekyll's default, as on the old site, so every post keeps
 # its URL and its Disqus thread.
 title: Arturo Javier-Castellanos

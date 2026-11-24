@@ -1,4 +1,4 @@
-// The blog's index, at /blog/: only its heading is on a board. The posts follow as plain text in a column under
+// The blog's index, at /blog: only its heading is on a board. The posts follow as plain text in a column under
 // it, outside the board (see .flow in styles.css), so a new post never moves the drawing.
 import { FLAG, bundle, wire, rail, f } from '../kit.js';
 
