@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 11 · Filling the two empty corners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --silk: #d3e8f5;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .part { font: 600 24px/1.2 var(--sans); margin: 88px 0 0; padding-top: 18px; border-top: 2px solid var(--rule); max-width: 760px; }
+  .part + p { font: 400 15px/1.6 var(--sans); color: #c5d9e6; margin: 10px 0 0; max-width: 760px; }
+  .spec { padding: 56px 0 0; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  /* a section cut off a few lines under the spot, and faded out */
+  .crop { overflow: hidden; container-type: inline-size; -webkit-mask-image: linear-gradient(to top, transparent, #000 120px); mask-image: linear-gradient(to top, transparent, #000 120px); }
+  .mix { padding: 96px 0 96px; }
+  .switches { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 0 0 32px; }
+  .switches label { display: grid; gap: 6px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .switches select { font: 400 14px/1.2 var(--sans); color: var(--text); background: var(--chip); border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; }
+
+  /* ---- the designs: the same rules as styles.css ---- */
+  .board { position: relative; container-type: inline-size; }
+  .board svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* --u is one drawing unit, so the type scales with the drawing */
+  .board [data-seat] { position: absolute; margin: 0; --u: calc(100cqw / var(--w)); }
+  .board h2 { font: 600 calc(30 * var(--u))/1 var(--sans); letter-spacing: -.01em; white-space: nowrap; }
+  .copy p { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0 0 calc(16 * var(--u)); }
+  .copy p:last-child { margin-bottom: 0; }
+  .copy .nb { white-space: nowrap; }
+  .copy a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+            text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(3 * var(--u)); }
+  .copy a:hover { color: var(--accent); }
+  .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
+  .project h3 a { text-underline-offset: calc(4 * var(--u)); }
+  .project .stack { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
+  .paper h3 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+  .paper h3 a { text-underline-offset: calc(4 * var(--u)); }
+  .paper .journal { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0 0 calc(14 * var(--u)); }
+  .t { fill: none; stroke: var(--trace); }
+  .t.o { stroke: var(--accent); }
+  .f { fill: var(--trace); } .f.o { fill: var(--accent); }
+  .ko, .hole { fill: var(--bg); }
+  .pad { fill: var(--pad); }
+  .body { fill: var(--chip); stroke: var(--trace-dim); stroke-width: 1; }
+  .silk { fill: none; stroke: var(--silk); stroke-width: 1.1; }
+  .lit { fill: var(--accent); }
+  .halo { fill: var(--accent); filter: blur(5px); opacity: .75; }
+  .lb { font-family: var(--mono); font-size: 8.5px; letter-spacing: .07em; fill: var(--pad); }
+  .lb.ref { fill: var(--silk); font-weight: 500; }
+  .lb.mark { fill: var(--trace-dim); font-size: 9px; }
+  .lb.o { fill: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 11</div>
+    <h1>The two empty corners: what goes under U3 and under U5?</h1>
+    <p>Two corners of the wide layout read as gaps rather than room. In <b>Projects</b>, it's the space right of U3's two lamps and above Step by Step Strength. In <b>Research</b>, it's the space under U5 and above Quantifier Variance. Everything else in both sections stays as it is on the site. The only thing that changes is what fills each corner.</p>
+    <p>Each corner gets the same four candidates, each fitted to its corner and fed from a chip pad that's free today: <b>a pin header</b> at the end of a bus, <b>a second chip</b> with two capacitors and a staggered tail, <b>a serpentine</b> (a length-matched bus that meanders), and <b>a crystal</b> with its two load capacitors, the part that sits beside every microcontroller. Each option shows its section from the top, cut off a few lines under the corner, with the corner as it is now first for comparison.</p>
+    <p>The panel at the bottom draws both sections in full, with any filler in each corner. The new designators here (J2, J3, U9, U10, Y1, Y2, C1 to C4) are only for the study. The one you pick is renumbered into the sequence when it's built.</p>
+  </header>
+  <main id="specimens"></main>
+</div>
+
+<template id="projects">
+    <h2 data-seat="head">Projects</h2>
+    <article class="copy project" data-seat="p1">
+      <h3><a href="https://github.com/arturo-jc/hardly-working" target="_blank" rel="noopener">Hardly Working</a></h3>
+      <p class="stack">Electron&nbsp;· Angular&nbsp;· NgRx&nbsp;· SQLite&nbsp;· Drizzle</p>
+      <p>Alongside my <span class="nb">full-time</span> job I work as a contractor, which means billing my hours. Most trackers either make you start and stop a timer, which is easy to forget when you juggle several projects, or watch which windows are active, which is invasive and says little when most of your work happens inside a terminal and a browser. Hardly Working does neither. You link a project to a repo and a few URLs, and it records your edits and commits, reads your visits from the browser's own history (no extension needed), and reconstructs your hours from them. Nothing ever leaves your machine.</p>
+    </article>
+    <article class="copy project" data-seat="p2">
+      <h3><a href="https://github.com/arturo-jc/step-by-step-strength-public" target="_blank" rel="noopener">Step by Step Strength</a></h3>
+      <p class="stack">Angular&nbsp;· Node.js&nbsp;· GraphQL&nbsp;· PostgreSQL&nbsp;· TypeORM</p>
+      <p>Step by Step Strength is a workout tracker for programs like Starting Strength, which alternate two workouts, A and B, three days a week. When I ran the program myself, the trackers I tried only supported weekly schedules, so a <span class="nb">Monday-Wednesday-Friday</span> plan repeated a workout across each weekend instead of alternating. SBSS supports schedules that span several weeks, so an <span class="nb">A-B-A,</span> <span class="nb">B-A-B</span> rotation is just a <span class="nb">two-week</span> schedule.</p>
+    </article>
+</template>
+<template id="research">
+    <h2 data-seat="head">Research</h2>
+    <article class="copy paper" data-seat="r1">
+      <h3><a href="https://link.springer.com/article/10.1007/s10670-021-00427-4" target="_blank" rel="noopener">Should the Number of Overlapping Experiencers Count?</a></h3>
+      <p class="journal">Erkenntnis (2021)</p>
+      <p>What happens if we take someone's brain, and transplant each hemisphere into a different body? At the end of the operation, you have two people with equally good claims to be the original patient, and yet they can't both be the original patient. A <span class="nb">well-known</span> solution to this puzzle says "the original patient" was actually two people all along, who start out sharing one body and then go their separate ways. Now suppose two patients report an equally bad headache, and you have only one painkiller. If you find out one of them is scheduled for the operation, does that give you more reason to give them the painkiller? Intuitively, the answer is no: why would an operation that hasn't happened yet give you more reason to relieve someone's headache <em>now</em>? But if this theory is right, the patient awaiting surgery is really two people in pain. Some philosophers respond to this by saying that the two people share a single pain, so helping them relieves no more pain than helping the other patient. I argue that this response fails, because what matters is not just how much pain there is, but how many beings experience it. If the theory is right, you really should favor the patient about to be split, and the theory's defenders have to either bite that bullet, or find another way out.</p>
+    </article>
+    <article class="copy paper" data-seat="r2">
+      <h3><a href="https://academic.oup.com/pq/article-abstract/69/275/277/5126501" target="_blank" rel="noopener">Quantifier Variance, Ontological Pluralism and Ideal Languages</a></h3>
+      <p class="journal">Philosophical Quarterly (2019). 69/275: 277–293</p>
+      <p>A lot of metaphysics is about the irreducible features of reality. Can facts about what is past, present and future be explained in more basic terms? Or is reality irreducibly tensed? Many philosophers understand such debates as debates over the "ideal" language: the language that best matches the structure of reality. From this perspective, to ask whether tense is irreducible is to ask whether the ideal language needs words like "was" or "will". This paper focuses on the relationship between the ideal language and its most basic terms. Is the language ideal because its terms are special, "carving nature at its joints"? Or are the terms special because they feature in an ideal language? The most common, <em>atomist</em> approach says that the terms come first. I argue that this approach struggles to distinguish two views about existence: ontological pluralism, according to which things can exist in different ways, and quantifier variance, according to which there are many equally good ways of talking about what exists. For this reason, I recommend a <em>holistic</em> approach, which puts the entire language first.</p>
+    </article>
+    <article class="copy paper" data-seat="r3">
+      <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.211" target="_blank" rel="noopener">Duplication and Collapse</a></h3>
+      <p class="journal">Thought: A Journal of Philosophy (2016). 5/3: 196–202</p>
+      <p>Composition as Identity (CAI) is the view that the whole is identical to its parts. Once you have fully described every part of, say, a person, you have fully described the person—or so goes the intuition behind it. Kris McDaniel argues that CAI is false because it rules out the possibility of strongly emergent properties: properties of a whole that are not fixed by its atoms. If, as some philosophers believe, consciousness were emergent, then a full description of a person's atoms would not tell you whether the person is conscious. Ted Sider replies that CAI has a strange consequence, which he calls collapse, that defuses this argument. Given CAI, there is no way to talk about a person's atoms and nothing else: any group that includes those atoms also includes everything they make up—hands, organs, etc.—up to the person themself. So phrases like "the person's atoms," which McDaniel's argument relies on, pick out nothing. In this paper, I argue that this response backfires. If collapse means you can't talk about a person's atoms on their own, it also means McDaniel's way of stating the intuition behind CAI doesn't capture it, since the intuition is about a whole's parts on their own. Defenders of CAI need another way to state it, and every obvious alternative rules out strong emergence again. They must give up either the intuition that motivated their view or the possibility of strong emergence.</p>
+    </article>
+    <article class="copy paper" data-seat="r4">
+      <h3><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/tht3.127" target="_blank" rel="noopener">Some Challenges to a Contrastive Treatment of Grounding</a></h3>
+      <p class="journal">Thought: A Journal of Philosophy (2014). 3/3: 184–92</p>
+      <p>Why did Joe Biden win the 2020 US presidential election? Because he received an absolute majority of electoral votes. This is a constitutive explanation, not a causal one: the majority didn't cause Joe Biden to win—it is what his winning <em>consisted in</em>. Many philosophers posit a <em>grounding</em> relation underlying such explanations, which is standardly assumed to be transitive: if A is grounded in B, and B is grounded in C, then A must be grounded in C. Jonathan Schaffer has offered the following putative counterexample (among others): the fact that something is meowing is grounded in the fact that a particular cat, Cadmus, is meowing, and the fact that Cadmus is meowing is grounded in the fact that he came from a specific pair of sperm and egg (that's part of what makes it <em>Cadmus</em> meowing as opposed to some other cat), but the fact that something is meowing has nothing to do with Cadmus's origins. Schaffer's diagnosis is that grounding is contrastive, always a matter of "this rather than that," and that the chain breaks because the contrast quietly shifts in the middle. In this paper, I show how to tweak Cadmus's case to break the chain even when we hold the contrast fixed, and conclude that Schaffer's contrastive account can draw no support from the original case.</p>
+    </article>
+</template>
+
+<script>
+/* ===========================================================================
+   The drawing kit, copied from js/kit.js. 1 cell = P units = one trace pitch.
+   =========================================================================== */
+const P = 12;
+const WEIGHT = 4;
+const HOP = 7;
+
+const left = ([dx, dy]) => [dy, -dx];
+const dirOf = (a, b) => [Math.sign(b[0] - a[0]), Math.sign(b[1] - a[1])];
+const f = n => +n.toFixed(2);
+const pt = p => `${f(p[0])} ${f(p[1])}`;
+const rng = (a, b) => Array.from({ length: Math.round(b - a) + 1 }, (_, i) => a + i);
+
+function bundle(center, n, big = {}) {
+  const maxd = (n - 1) / 2;
+  const std = 6 + 0.586 * maxd * P;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const d = maxd - k;                                     // k = 0 is leftmost of travel
+    const pts = [], legs = [];
+    center.forEach((v, i) => {
+      const din = i > 0 ? dirOf(center[i - 1], v) : null;
+      const dout = i < center.length - 1 ? dirOf(v, center[i + 1]) : null;
+      const nin = din && left(din), nout = dout && left(dout);
+      if (din && dout) {
+        pts.push([v[0] + d * (nin[0] + nout[0]), v[1] + d * (nin[1] + nout[1])]);
+        const cross = din[0] * dout[1] - din[1] * dout[0];  // > 0: right turn
+        legs.push((big[i] ?? std) + (cross > 0 ? 1 : -1) * 0.586 * d * P);
+      } else {
+        const nn = nin || nout;
+        pts.push([v[0] + d * nn[0], v[1] + d * nn[1]]);
+        legs.push(0);
+      }
+    });
+    out.push({ pts, legs });
+  }
+  return out;
+}
+function cut(w, seg, at) {
+  const a = w.pts[seg], b = w.pts[seg + 1];
+  w.pts = [...w.pts.slice(0, seg + 1), a[1] === b[1] ? [at, a[1]] : [a[0], at]];
+  w.legs = [...w.legs.slice(0, seg + 1), 0];
+  return w;
+}
+const wire = (pts, extra = {}) => ({ pts, ...extra });
+
+function tracePath(w) {
+  const pts = w.pts.map(p => [p[0] * P, p[1] * P]);
+  const n = pts.length;
+  const L = pts.map((_, i) => (i > 0 && i < n - 1) ? (w.legs ? w.legs[i] : 8) : 0);
+  for (let i = 0; i < n - 1; i++) {
+    const s = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (L[i] + L[i + 1] > s) { const k = s / (L[i] + L[i + 1]); L[i] *= k; L[i + 1] *= k; }
+  }
+  let d = `M${pt(pts[0])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const ux = Math.sign(b[0] - a[0]), uy = Math.sign(b[1] - a[1]), s = ux || uy;
+    if (i > 0) d += `L${pt([a[0] + ux * L[i], a[1] + uy * L[i]])}`;
+    const hop = (w.hops || []).find(h => h.seg === i);
+    if (hop) {
+      const on = v => ux ? [v, a[1]] : [a[0], v];
+      for (const h of hop.at.map(c => c * P).sort((p, q) => s * (p - q)))
+        d += `L${pt(on(h - s * HOP))}A${HOP} ${HOP} 0 0 ${s > 0 ? 1 : 0} ${pt(on(h + s * HOP))}`;
+    }
+    d += `L${pt([b[0] - ux * L[i + 1], b[1] - uy * L[i + 1]])}`;
+  }
+  return d;
+}
+
+const via = (x, y, o) => `<circle class="f${o ? ' o' : ''}" cx="${f(x)}" cy="${f(y)}" r="5.4"/><circle class="hole" cx="${f(x)}" cy="${f(y)}" r="2.1"/>`;
+
+function chip(c) {
+  const x0 = c.x0 * P, y0 = c.y0 * P, x1 = c.x1 * P, y1 = c.y1 * P, w = x1 - x0, h = y1 - y0;
+  const s = [];
+  if (c.conn) {             // a pin header: through-hole pads in a silkscreen outline
+    c.pins.b.forEach((col, i) => {
+      const x = col * P;
+      s.push(i === 0 ? `<rect class="pad" x="${f(x - 4.8)}" y="${f(y1 - 4.8)}" width="9.6" height="9.6" rx="1"/>`
+                     : `<circle class="pad" cx="${f(x)}" cy="${f(y1)}" r="4.9"/>`,
+             `<circle class="hole" cx="${f(x)}" cy="${f(y1)}" r="1.9"/>`);
+    });
+    s.push(`<rect class="silk" x="${f(x0)}" y="${f(y1 - 13)}" width="${f(w)}" height="26" rx="2"/>`);
+    return s.join('');
+  }
+  const rows = rng(c.y0 + 1, c.y1 - 1), cols = rng(c.x0 + 1, c.x1 - 1);
+  (c.allPads ? rows : c.pins.l).forEach(r => s.push(`<rect class="pad" x="${f(x0 - 11)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? rows : c.pins.r).forEach(r => s.push(`<rect class="pad" x="${f(x1 - 4)}" y="${f(r * P - 3.5)}" width="15" height="7" rx="1"/>`));
+  (c.allPads ? cols : c.pins.t).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y0 - 11)}" width="7" height="15" rx="1"/>`));
+  (c.allPads ? cols : c.pins.b).forEach(q => s.push(`<rect class="pad" x="${f(q * P - 3.5)}" y="${f(y1 - 4)}" width="7" height="15" rx="1"/>`));
+  s.push(`<rect class="body" x="${f(x0 + 3)}" y="${f(y0 + 3)}" width="${f(w - 6)}" height="${f(h - 6)}" rx="2.5"/>`,
+         `<circle cx="${f(x0 + 13)}" cy="${f(y0 + 13)}" r="2.6" fill="var(--trace-dim)"/>`,
+         `<text class="lb mark" x="${f(x0 + w / 2)}" y="${f(y0 + h / 2 + 3)}" text-anchor="middle">${c.code}</text>`);
+  return s.join('');
+}
+
+function part(p) {
+  const g = p.kind === 'LED'
+    ? `<rect class="ko" x="-12" y="-6" width="24" height="12"/><rect class="pad" x="-12" y="-5" width="7" height="10" rx="1"/><rect class="pad" x="5" y="-5" width="7" height="10" rx="1"/>`
+      + `<g class="pulse" style="animation-delay:${-(p.delay || 0)}s"><circle class="halo" r="9"/><rect class="lit" x="-5" y="-4.5" width="10" height="9" rx="1"/></g>`
+    : `<rect class="ko" x="-13" y="-6" width="26" height="12"/><rect class="pad" x="-13" y="-5.5" width="9" height="11" rx="1"/><rect class="pad" x="4" y="-5.5" width="9" height="11" rx="1"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${p.kind === 'C' ? 'var(--trace-dim)' : 'var(--chip)'}"/>`;
+  return `<g transform="translate(${f(p.x * P)} ${f(p.y * P)})${p.dir === 'v' ? ' rotate(90)' : ''}">${g}</g>`;
+}
+
+// New in this study: a crystal, lying east–west with a pad at each end, at columns x0 and x1 on row y. The can is a
+// stadium in the chip's colour inside a silkscreen outline, with its frequency written on it. The traces that
+// feed it come in to the pads, so nothing passes under the can.
+function xtal({ x0, x1, y, value }) {
+  const X0 = x0 * P, X1 = x1 * P, Y = y * P;
+  return `<rect class="silk" x="${f(X0 - 10)}" y="${f(Y - 16)}" width="${f(X1 - X0 + 20)}" height="32" rx="16"/>`
+    + `<rect class="body" x="${f(X0 + 3)}" y="${f(Y - 10)}" width="${f(X1 - X0 - 6)}" height="20" rx="10"/>`
+    + `<rect class="pad" x="${f(X0 - 6)}" y="${f(Y - 7)}" width="12" height="14" rx="1.5"/><rect class="pad" x="${f(X1 - 6)}" y="${f(Y - 7)}" width="12" height="14" rx="1.5"/>`
+    + `<text class="lb mark" x="${f((X0 + X1) / 2)}" y="${f(Y + 3)}" text-anchor="middle">${value}</text>`;
+}
+
+function svgOf(cols, c) {
+  const traces = [], ends = [];
+  for (const w of c.wires) {
+    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const e = w.pts[w.pts.length - 1];
+    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+  }
+  const labels = c.labels.map(l =>
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+  return `<svg viewBox="0 0 ${f(cols * P)} ${f(c.rows * P)}" aria-hidden="true">
+    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
+    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.xtals ?? []).map(xtal).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`;
+}
+
+const ref = (x, y, t, a) => ({ k: 'ref', x, y, t, ...(a ? { a } : {}) });
+const net = (x, y, t, a) => ({ k: 'net', x, y, t, ...(a ? { a } : {}) });
+
+/* ===========================================================================
+   The two wide layouts, copied from js/sections/projects.js and research.js, unchanged.
+   =========================================================================== */
+const projects = {
+  cols: 107,
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
+  build(m) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
+    const vx = f(m.p1.hx + 1.5);
+    const rows = f(m.p2.bot + 4);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
+      { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
+    ];
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
+    const drop = 5;
+    wires.push(...bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    wires.push(...bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3));
+    const ly = a1 + 8;
+    wires.push(wire([[69, ly], [69, ly + 10], [79, ly + 10]], { legs: [0, 8, 0], end: 'via' }), wire([[73, ly], [73, ly + 10]]));
+    [69, 73].forEach((c, i) => {
+      parts.push({ kind: 'R', x: c, y: ly + 3, dir: 'v' }, { kind: 'LED', x: c, y: ly + 6.8, dir: 'v', delay: [0, 1.3][i] });
+      labels.push({ k: 'ref', x: c + 1.1, y: ly + 3.25, t: `R${7 + i}` }, { k: 'ref', x: c + 1.2, y: ly + 7.05, t: `D${4 + i}` });
+    });
+    bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3).forEach((w, k) => {
+      const stop = a2 + [10, 15, 20][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: w.pts[2][0] + 0.9, y: stop + 0.25, t: `C041${k + 3}` });
+    });
+    const bus = 49;
+    wires.push(...bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3));
+    labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end' });
+    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
+    labels.push(
+      { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
+    );
+    return { rows, chips, wires, parts, labels };
+  },
+};
+
+function lamps(x, rows, n0, d0, wires, parts, labels) {
+  wires.push(wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]]));
+  rows.forEach((r, i) => {
+    parts.push({ kind: 'R', x: x + 5, y: r }, { kind: 'LED', x: x + 11, y: r, delay: [0, 1.3][i] });
+    labels.push({ k: 'ref', x: x + 5, y: r - 0.95, t: `R${n0 + i}`, a: 'middle' }, { k: 'ref', x: x + 11, y: r - 1.05, t: `D${d0 + i}`, a: 'middle' });
+  });
+}
+const research = {
+  cols: 107,
+  seats: {
+    head: { x: 6, y: 4 }, r1: { x: 6, y: 12, w: 36 },
+    r2: m => ({ x: 62, y: f(m.r1.cap + 32), w: 36 }),
+    r3: m => ({ x: 6, y: f(m.r1.bot + 8), w: 36 }), r4: m => ({ x: 62, y: f(m.r2.bot + 8), w: 36 }),
+  },
+  build(m) {
+    const [a1, a2, a3, a4] = ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
+    const v1 = f(m.r1.hx + 1.5), v3 = f(m.r3.hx + 1.5);
+    const wires = [], labels = [], parts = [];
+    const chips = [
+      { id: 'U5', x0: 66, y0: a1 - 3, x1: 78, y1: a1 + 6, code: 'E0510', allPads: true },
+      { id: 'U6', x0: 45, y0: a2 - 3, x1: 55, y1: a2 + 5, code: 'E0520', allPads: true },
+      { id: 'U7', x0: 47, y0: a3 - 3, x1: 57, y1: a3 + 5, code: 'E0530', allPads: true },
+      { id: 'U8', x0: 45, y0: a4 - 3, x1: 55, y1: a4 + 5, code: 'E0540', allPads: true },
+    ];
+    wires.push(...bundle([[49, 0], [49, 5.5], [72, 5.5], [72, a1 - 3]], 3));
+    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via' }),
+               wire([[47, a3], [v3, a3]], { o: true, end: 'via' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via' }));
+    parts.push({ kind: 'R', x: 56, y: a1 });
+    lamps(78, [a1 + 1, a1 + 4], 10, 6, wires, parts, labels);
+    wires.push(...bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3), ...bundle([[50, a2 + 5], [50, a3 - 3]], 3),
+               ...bundle([[51, a3 + 5], [51, a4 - 3]], 3));
+    const L = f(m.r3.bot + 4);
+    bundle([[50, a4 + 5], [50, L], [6, L]], 3).forEach((w, k) => {
+      const stop = [34, 26, 18][k];
+      cut(w, 1, stop).end = 'via';
+      wires.push(w);
+      labels.push({ k: 'net', x: stop - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end' });
+    });
+    labels.push(
+      { k: 'ref', x: 66, y: a1 - 4.1, t: 'U5' }, { k: 'ref', x: 45, y: a2 - 4.1, t: 'U6' },
+      { k: 'ref', x: 47, y: a3 - 4.1, t: 'U7' }, { k: 'ref', x: 45, y: a4 - 4.1, t: 'U8' },
+      { k: 'ref', x: 56, y: a1 - 0.95, t: 'R9', a: 'middle' },
+      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true },
+    );
+    return { rows: f(Math.max(m.r4.bot, L + 1) + 5), chips, wires, parts, labels };
+  },
+};
+
+/* ===========================================================================
+   The fillers. Each is (m, c) => adds to the circuit c, from the same measurements the section is built from.
+   In Projects, a1 and a2 are the two names' cap rows; U3 is columns 62 to 76, rows a1 − 3 to a1 + 8, and its
+   right-hand pads below the rail's (a1 + 1 to a1 + 7) are free. The lamps hang from U3 down to row a1 + 18,
+   and their return ends on a via at column 79. In Research, a1 and a2 are the first two titles' cap rows; U5
+   is columns 66 to 78, rows a1 − 3 to a1 + 6, and its bottom pads (columns 67 to 77) are all free.
+   =========================================================================== */
+const PROJ = {
+  none: null,
+  // U3's five lowest right-hand pads → east → a diagonal back west → down into a five-pin header over the second project
+  header(m, c) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap), ym = f((a1 + a2) / 2), J = f(a2 - 5);
+    c.wires.push(...bundle([[76, a1 + 5], [90, a1 + 5], [90, ym], [80, ym], [80, J]], 5, { 2: 5 * P, 3: 5 * P }));
+    c.chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
+    c.labels.push(ref(83.6, J - 0.4, 'J2'), net(83.2, f(ym + 6.5), 'B0231 – B0235'));
+  },
+  // U3 → a second chip out in the corner, with two capacitors to its right and three traces west under the lamps, stopping short
+  chip(m, c) {
+    const a1 = f(m.p1.cap), y0 = f(a1 + 19);
+    c.chips.push({ id: 'U9', x0: 84, y0, x1: 92, y1: y0 + 8, code: 'B0230', allPads: true });
+    c.wires.push(...bundle([[76, a1 + 3], [88, a1 + 3], [88, y0]], 3));
+    bundle([[84, y0 + 5], [70, y0 + 5]], 3).forEach((w, k) => {
+      const stop = [79, 75, 71][k];
+      cut(w, 0, stop).end = 'via';
+      c.wires.push(w);
+      c.labels.push(net(stop - 0.9, w.pts[1][1] + 0.25, `B023${k + 1}`, 'end'));
+    });
+    [y0 + 2, y0 + 6].forEach((r, i) => {
+      c.wires.push(wire([[92, r], [97.5, r]], { end: 'via' }));
+      c.parts.push({ kind: 'C', x: 94.8, y: r });
+      c.labels.push(ref(94.8, r - 0.95, `C${1 + i}`, 'middle'));
+    });
+    c.labels.push(ref(84, y0 - 1.1, 'U9'));
+  },
+  // U3 → a three-wide serpentine down the corner, stopping short at the foot of its last run
+  serp(m, c) {
+    const a1 = f(m.p1.cap), a2 = f(m.p2.cap), lo = f(a2 - 5), hi = f(a1 + 12);
+    bundle([[76, a1 + 5], [83, a1 + 5], [83, lo], [88, lo], [88, hi], [93, hi], [93, lo]], 3).forEach((w, k) => {
+      cut(w, 5, f(lo - [0, 2, 4][k])).end = 'via';
+      c.wires.push(w);
+    });
+    c.labels.push(net(84.8, f(a1 + 9.25), 'B0231 – B0233'));
+  },
+  // U3's two right-hand pads → a crystal, each end on to a load capacitor and a via
+  xtal(m, c) {
+    const a1 = f(m.p1.cap), Y = f(a1 + 20), xa = 83, xb = 90;
+    c.wires.push(wire([[76, a1 + 4], [xb, a1 + 4], [xb, Y + 9]], { end: 'via' }), wire([[76, a1 + 6], [xa, a1 + 6], [xa, Y + 9]], { end: 'via' }));
+    (c.xtals ??= []).push({ x0: xa, x1: xb, y: Y, value: '16.000' });
+    [xa, xb].forEach((x, i) => {
+      c.parts.push({ kind: 'C', x, y: Y + 5, dir: 'v' });
+      c.labels.push(ref(x + 1.1, Y + 5.25, `C${1 + i}`));
+    });
+    c.labels.push(ref(xa - 0.8, f(Y - 1.75), 'Y1'));
+  },
+};
+
+const RES = {
+  none: null,
+  // six of U5's bottom pads → down → a diagonal east → down into a six-pin header over the second paper
+  header(m, c) {
+    const a1 = f(m.r1.cap), a2 = f(m.r2.cap), J = f(a2 - 5), ym = f((a1 + 6 + J) / 2);
+    c.wires.push(...bundle([[72.5, a1 + 6], [72.5, ym], [84.5, ym], [84.5, J]], 6, { 1: 6 * P, 2: 6 * P }));
+    c.chips.push({ id: 'J3', conn: true, x0: 81, y0: J - 1, x1: 88, y1: J, pins: { b: [82, 83, 84, 85, 86, 87] } });
+    c.labels.push(ref(88.6, J - 0.4, 'J3'), net(76.2, f(a1 + 9.5), 'E0512 – E0517'));
+  },
+  // U5 → a second chip under it, with two capacitors to its left and three traces east and down, stopping short
+  chip(m, c) {
+    const a1 = f(m.r1.cap), a2 = f(m.r2.cap), y0 = f(a1 + 11);
+    c.chips.push({ id: 'U10', x0: 72, y0, x1: 82, y1: y0 + 8, code: 'E0560', allPads: true });
+    c.wires.push(...bundle([[76, a1 + 6], [76, y0]], 3));
+    bundle([[82, y0 + 3], [92, y0 + 3], [92, a2 - 4]], 3).forEach((w, k) => {
+      const stop = f(a2 - [12, 8, 4][k]);
+      cut(w, 1, stop).end = 'via';
+      c.wires.push(w);
+      c.labels.push(net(w.pts[2][0] + 0.9, stop + 0.25, `E056${k + 1}`));
+    });
+    [y0 + 2, y0 + 6].forEach((r, i) => {
+      c.wires.push(wire([[72, r], [65, r]], { end: 'via' }));
+      c.parts.push({ kind: 'C', x: 68.5, y: r });
+      c.labels.push(ref(68.5, r - 0.95, `C${3 + i}`, 'middle'));
+    });
+    c.labels.push(ref(72, y0 - 1.1, 'U10'));
+  },
+  // U5 → a three-wide serpentine across the corner, stopping short in its last run
+  serp(m, c) {
+    const a1 = f(m.r1.cap), a2 = f(m.r2.cap), y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
+    bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3).forEach((w, k) => {
+      cut(w, 7, [78, 80, 82][k]).end = 'via';
+      c.wires.push(w);
+    });
+  },
+  // two of U5's bottom pads → a crystal under it, each end on to a load capacitor and a via
+  xtal(m, c) {
+    const a1 = f(m.r1.cap), Y = f(a1 + 17), xa = 70, xb = 77;
+    c.wires.push(wire([[xa, a1 + 6], [xa, Y + 9]], { end: 'via' }), wire([[xb, a1 + 6], [xb, Y + 9]], { end: 'via' }));
+    (c.xtals ??= []).push({ x0: xa, x1: xb, y: Y, value: '32.768' });
+    [xa, xb].forEach((x, i) => {
+      c.parts.push({ kind: 'C', x, y: Y + 5, dir: 'v' });
+      c.labels.push(ref(x + 1.1, Y + 5.25, `C${3 + i}`));
+    });
+    c.labels.push(ref(xa - 0.8, f(Y - 1.75), 'Y2'));
+  },
+};
+
+/* ===========================================================================
+   Seating and measuring, as in js/board.js
+   =========================================================================== */
+function baselineOf(el) {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'display:inline-block;width:0;height:0';
+  el.prepend(probe);
+  const y = probe.getBoundingClientRect().bottom;
+  probe.remove();
+  return y;
+}
+function measure(el, board, u) {
+  const box = board.getBoundingClientRect(), cell = px => px / u / P, r = el.getBoundingClientRect();
+  const m = { top: cell(r.top - box.top), bot: cell(r.bottom - box.top), h: cell(r.height), l: cell(r.left - box.left) };
+  const heading = el.matches('h1, h2, a') ? el : el.querySelector('h3');
+  if (!heading) return m;
+  const word = document.createRange();
+  word.selectNodeContents(heading);
+  const cv = document.createElement('canvas').getContext('2d');
+  cv.font = `${getComputedStyle(heading).fontWeight} 1000px ${getComputedStyle(heading).fontFamily}`;
+  const capHeight = cv.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(getComputedStyle(heading).fontSize);
+  m.cap = cell(baselineOf(heading) - capHeight / 2 - box.top);
+  const rects = [...word.getClientRects()].filter(r => r.width > 0);
+  m.hx = cell(Math.max(...rects.filter(r => Math.abs(r.top - rects[0].top) < 2).map(r => r.right)) - box.left);
+  return m;
+}
+function drawBoard(board, l, extra) {
+  board.querySelector('svg')?.remove();
+  const W = l.cols * P;
+  board.style.setProperty('--w', W);
+  const u = board.getBoundingClientRect().width / W;
+  const m = {};
+  for (const [key, seat] of Object.entries(l.seats)) {
+    const el = board.querySelector(`[data-seat="${key}"]`), s = typeof seat === 'function' ? seat(m) : seat;
+    el.style.left = `${100 * s.x / l.cols}%`;
+    el.style.width = s.w ? `${100 * s.w / l.cols}%` : '';
+    el.style.top = `calc(${s.y * P} * var(--u))`;
+    m[key] = measure(el, board, u);
+  }
+  const c = l.build(m);
+  extra?.(m, c);
+  board.insertAdjacentHTML('afterbegin', svgOf(l.cols, c));
+  return m;
+}
+
+/* ===========================================================================
+   The study
+   =========================================================================== */
+const NAMES = { none: 'As now', header: 'A pin header', chip: 'A second chip', serp: 'A serpentine', xtal: 'A crystal' };
+const SPOTS = [
+  { id: 'p', title: 'Projects: right of U3’s lamps', tpl: 'projects', layout: projects, fill: PROJ,
+    crop: m => m.p2.top + 7,
+    intro: 'The corner between U3’s two lamps, the right margin and Step by Step Strength. Each filler leaves U3 through right-hand pads that are free today, below the three that About’s rail comes in on.',
+    notes: {
+      none: 'The corner as it is on the site.',
+      header: 'Five traces leave U3’s lowest right-hand pads, run east, come back west on one long diagonal parallel to the bus on the other side of U3, and drop into a five-pin header just above the second project. It’s the same kind of part as J1 at the top of About, so it ties the page together. The bus is the heaviest thing in the corner, and it fills the corner’s height.',
+      chip: 'A smaller chip out in the corner, fed by three traces from U3. Two capacitors sit off its right side, and three traces run west under the lamps and stop short at staggered lengths, like the tails elsewhere on the page. It fills the most area, and puts a third chip in a section that has two.',
+      serp: 'Three traces leave U3, run down the corner, and double back twice, the way a board lengthens a bus so its signals arrive together. They stop short at staggered heights at the foot of the last run. It’s pure texture: nothing at the end of it but vias. It fills the corner top to bottom without adding a part.',
+      xtal: 'Two traces from U3 to a crystal, the part that sits beside nearly every microcontroller, with each of its pads carrying on down to a load capacitor and a via. It’s the lightest of the four, and the most like a real board: a small, specific detail rather than a mass of traces.',
+    } },
+  { id: 'r', title: 'Research: under U5', tpl: 'research', layout: research, fill: RES,
+    crop: m => m.r2.top + 8,
+    intro: 'The corner under U5 and its two lamps, above Quantifier Variance. U5’s bottom pads are all free today, so most fillers drop straight out of them.',
+    notes: {
+      none: 'The corner as it is on the site.',
+      header: 'Six traces drop out of U5’s bottom, step east on one diagonal, and come down into a six-pin header just above the second paper. It mirrors Projects’ header option, so pick it in at most one corner. The bus runs the corner’s full height.',
+      chip: 'A smaller chip straight under U5, fed by three traces from its bottom. Two capacitors sit off its left side, and three traces leave its right, turn down the right margin and stop short at staggered heights, with their codes beside them.',
+      serp: 'Three traces drop out of U5’s bottom and sweep across the corner and back twice before stopping short in the last run. It covers the most area of the four, and is the busiest.',
+      xtal: 'A crystal hanging straight under U5 from two of its bottom pads, each end carrying on to a load capacitor and a via. The lightest option: it fills the top of the corner and leaves air above the paper.',
+    } },
+];
+
+const main = document.getElementById('specimens');
+const specs = [];   // [board, crop wrapper, spot, filler]
+SPOTS.forEach(s => {
+  main.insertAdjacentHTML('beforeend', `<h2 class="part">${s.title}</h2><p>${s.intro}</p>`);
+  Object.keys(s.fill).forEach((k, i) => {
+    main.insertAdjacentHTML('beforeend', `<section class="spec"><div class="cap"><div class="num">${i ? `Option ${'ABCD'[i - 1]}` : 'For comparison'}</div><h2>${NAMES[k]}</h2><p>${s.notes[k]}</p></div>
+      <div class="crop"><section class="board"></section></div></section>`);
+    const spec = main.lastElementChild, board = spec.querySelector('.board');
+    board.append(document.getElementById(s.tpl).content.cloneNode(true));
+    specs.push([board, spec.querySelector('.crop'), s, k]);
+  });
+});
+
+// mix your own: both sections in full, any filler in each corner
+main.insertAdjacentHTML('beforeend', `<section class="mix"><div class="cap"><div class="num">Mix your own</div><h2>Both sections in full, any filler in each corner</h2></div>
+  <div class="switches">${SPOTS.map(s => `<label>${s.title}<select data-s="${s.id}">${Object.keys(s.fill).map(k => `<option value="${k}">${NAMES[k]}</option>`).join('')}</select></label>`).join('')}</div>
+  <div id="mix-boards">${SPOTS.map(s => `<section class="board" data-s="${s.id}"></section>`).join('')}</div></section>`);
+const mix = { p: 'xtal', r: 'chip' };
+SPOTS.forEach(s => {
+  document.querySelector(`#mix-boards [data-s="${s.id}"]`).append(document.getElementById(s.tpl).content.cloneNode(true));
+  const sel = document.querySelector(`select[data-s="${s.id}"]`);
+  sel.value = mix[s.id];
+  sel.addEventListener('change', () => { mix[s.id] = sel.value; drawMix(); });
+});
+function drawMix() {
+  SPOTS.forEach(s => drawBoard(document.querySelector(`#mix-boards [data-s="${s.id}"]`), s.layout, s.fill[mix[s.id]]));
+}
+
+function drawAll() {
+  specs.forEach(([board, crop, s, k]) => {
+    crop.style.aspectRatio = '';
+    const m = drawBoard(board, s.layout, s.fill[k]);
+    crop.style.aspectRatio = `${s.layout.cols} / ${f(s.crop(m))}`;
+  });
+  drawMix();
+}
+
+const fonts = ['600 30px "IBM Plex Sans"', '400 16px "IBM Plex Sans"', 'italic 400 16px "IBM Plex Sans"', '400 9px "IBM Plex Mono"', '500 9px "IBM Plex Mono"'];
+Promise.race([Promise.allSettled(fonts.map(s => document.fonts.load(s))), new Promise(r => setTimeout(r, 3000))]).then(() => {
+  drawAll();
+  let drawnAt = main.getBoundingClientRect().width;
+  new ResizeObserver(() => {
+    const w = main.getBoundingClientRect().width;
+    if (w !== drawnAt) { drawnAt = w; drawAll(); }
+  }).observe(main);
+});
+</script>
+</body>
+</html>
