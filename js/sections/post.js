@@ -47,7 +47,7 @@ const narrow = {
     const a = m.title.cap, bc = m.back.cap, tip = m.back.hx + 0.8;
     const chips = [
       { id: 'J201', conn: true, x0: 22.2, y0: 0, x1: 26.8, y1: 1.5, pins: { b: [23, 24, 25, 26] } },
-      { id: 'U201', ref: 'top-end', nudge: [0.2, 0.6], x0: 20, y0: 4, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } },
+      { id: 'U201', ref: 'right', x0: 20, y0: 4, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } },
     ];
     const wires = [
       ...rail('J201', bundle([[24.5, 4], [24.5, 1.5]], 4), { after: 'load' }),

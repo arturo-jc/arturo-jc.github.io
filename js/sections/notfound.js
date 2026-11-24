@@ -21,7 +21,7 @@ const wide = {
     const a = m.head.cap, hc = m.home.cap, tip = m.home.hx + 0.8, end = past(m.head);
     const y0 = a - 3, y1 = a + 8;
     const chips = [
-      { id: 'J301', conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, nudge: [0, 0.15], pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
+      { id: 'J301', conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
       { id: 'U301', x0: 80, y0, x1: 89, y1, code: 'E0404', pins: { l: [a], r: [], t: [83, 84, 85, 86], b: [86, 87, 88] } },
     ];
     const wires = [

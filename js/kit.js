@@ -162,22 +162,23 @@ function part(p) {
 const codeOf = w => { const [x, y] = w.pts.at(-1), s = Math.sign(w.pts.at(-2)[0] - x); return { k: 'net', t: w.code, o: w.o, net: w.net, rail: w.rail, x: f(x + s * 0.9), y: f(y - 0.75), a: s < 0 ? 'end' : undefined }; };
 
 // Designators. A chip's is its `id`, placed beside its box by `ref`, one of the places below: `top` by default, or
-// `right` for a connector. A part's is its `ref`, over it when it lies across and beside it when it stands
-// (`dir: 'v'`), and it carries the part's marks, so it appears with the part. Either can be moved by `nudge`, [dx, dy].
+// `pins-right` for a connector. A part's is its `ref`, over it when it lies across and beside it when it stands
+// (`dir: 'v'`), and it carries the part's marks, so it appears with the part.
 const REF = {
   top: c => [c.x0, c.y0 - 1.1],                       // over the top left-hand corner
   'top-end': c => [c.x1, c.y0 - 1.1, 'end'],           // over the top right-hand corner
   left: c => [c.x0 - 0.6, c.y0 + 0.2, 'end'],          // beside the top of the left side
+  right: c => [c.x1 + 0.6, c.y0 + 0.2],                // beside the top of the right side
   below: c => [c.x0, c.y1 + 1.3],                      // under the bottom left-hand corner
   corner: c => [c.x1 + 0.6, c.y1 + 1.1],               // off the bottom right-hand corner
-  right: c => [c.x1 + 0.6, c.y1 - 0.4],                // a connector's: past the end of its row of pins
-  'pins-left': c => [c.x0 - 0.6, c.y1 - 0.25, 'end'],  // and before the start of it
+  'pins-right': c => [c.x1 + 0.6, c.y1 - 0.4],         // a connector's: past the end of its row of pins
+  'pins-left': c => [c.x0 - 0.6, c.y1 - 0.4, 'end'],   // and before the start of it
 };
-const nudged = ([x, y, a], [dx, dy] = [0, 0]) => ({ x: f(x + dx), y: f(y + dy), a });
-const chipRef = c => ({ k: 'ref', t: c.id, ...nudged(REF[c.ref ?? (c.conn ? 'right' : 'top')](c), c.nudge) });
+const at = ([x, y, a]) => ({ x, y, a });
+const chipRef = c => ({ k: 'ref', t: c.id, ...at(REF[c.ref ?? (c.conn ? 'pins-right' : 'top')](c)) });
 const partRef = p => ({
   k: 'ref', t: p.ref, net: p.net, rail: p.rail,
-  ...nudged(p.dir === 'v' ? [p.x + 1.1, p.y + 0.25] : [p.x, p.y - (p.kind === 'LED' ? 1.05 : 0.95), 'middle'], p.nudge),
+  ...at(p.dir === 'v' ? [p.x + 1.1, p.y + 0.25] : [p.x, p.y - (p.kind === 'LED' ? 1.05 : 0.95), 'middle']),
 });
 
 // A circuit, as build() returns it, drawn on a grid `cols` cells wide. Only `rows` and `wires` are required.

@@ -17,7 +17,7 @@ const wide = {
     const chips = [
       { id: 'U1', x0: 62, y0: a - 3, x1: 74, y1: a + 8, code: 'A0131', allPads: true },
       { id: 'U2', ...u2, ref: 'below', code: 'C0412', pins: { l: [], r: [a + 12, a + 13, a + 14, a + 17, a + 20, a + 23], t: [], b: [] } },
-      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, ref: 'pins-left', nudge: [0, 0.5], pins: { b: [91, 92, 93, 94, 95] } },
+      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, ref: 'pins-left', pins: { b: [91, 92, 93, 94, 95] } },
     ];
     // the accent net: straight from U1 to the name
     wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via', net: 'U1', code: 'A0130' }));
@@ -59,7 +59,7 @@ const narrow = {
   },
   build(m) {
     const chips = [
-      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, nudge: [0, -0.2], pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
+      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
       { id: 'U1', x0: 18, y0: 3, x1: 27, y1: 10, code: 'A0131', allPads: true },
     ];
     const wires = [], labels = [];

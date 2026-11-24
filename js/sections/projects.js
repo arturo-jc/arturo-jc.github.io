@@ -60,7 +60,7 @@ const narrow = {
     const F = m.p2.bot + 2.5;                // U4's top
     const chips = [
       { id: 'U3', ref: 'top-end', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
-      { id: 'U4', ref: 'left', nudge: [0, 0.7], x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
+      { id: 'U4', ref: 'left', x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
     ];
     const wires = [], labels = [];
     // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
