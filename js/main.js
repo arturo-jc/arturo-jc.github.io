@@ -12,6 +12,10 @@ import notfound from './sections/notfound.js';
 
 const sections = { about, projects, research, blog, post, notfound };
 
+// The modules have run, so the type will be shown as each board is drawn: cancel the head's fallback, which
+// shows it anyway after three seconds (_includes/scripts.html).
+clearTimeout(window.showAnyway);
+
 for (const [id, layouts] of Object.entries(sections)) {
   const board = document.getElementById(id);
   if (board) mountBoard(board, layouts);

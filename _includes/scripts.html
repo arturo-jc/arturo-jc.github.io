@@ -1,0 +1,19 @@
+{%- comment -%}
+  The scripts, in every page's head. Include with fades=true on the home page, where the type fades in.
+
+  The inline script runs before the first paint. Its class `js` hides each board's type until the board is drawn
+  (styles.css), because until then the type sits in the plain column a page without the scripts shows, and would
+  flash there before jumping to its seat. `fades` hides what fades in (js/fades.js). If the modules never run,
+  both classes go after three seconds and the page shows its type in that column; main.js cancels this.
+
+  Every module is preloaded, so that the browser fetches them all at once instead of finding each through the one
+  that imports it. Jekyll lists them, so a new file in js/ is preloaded without being added here.
+{%- endcomment -%}
+<script>
+  document.documentElement.classList.add('js'{% if include.fades %}, 'fades'{% endif %});
+  window.showAnyway = setTimeout(() => document.documentElement.classList.remove('js', 'fades'), 3000);
+</script>
+{%- for file in site.static_files %}{% if file.extname == '.js' and file.path contains '/js/' %}
+<link rel="modulepreload" href="{{ file.path | relative_url }}">
+{%- endif %}{% endfor %}
+<script type="module" src="{{ '/js/main.js' | relative_url }}"></script>

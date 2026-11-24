@@ -88,6 +88,7 @@ The 404 page, which GitHub Pages serves for any address it has no page for, is o
 |---|---|
 | `index.html` | The home page's markup: each section's `.board` and the blocks of type in it, in page order, then the footer. Each block a layout seats has a `data-seat`. Its empty front matter makes Jekyll process it, for the footer's include. |
 | `_includes/footer.html` | The footer, on every page. Included with `blog=true`, the name links to the home page. |
+| `_includes/scripts.html` | The scripts, in every page's head: the class set before the first paint that keeps the type hidden until its board is drawn, with `fades=true` on the home page, the preloads and `main.js`. |
 | `_layouts/default.html` | The blog pages' frame: the head, `main`, and the footer with `blog=true`. |
 | `blog.html` | The blog's index: its head's board, then every post, newest first, in `.flow`. |
 | `_layouts/post.html` | A post: its head's board, then the post and its Disqus thread in `.flow`. |
@@ -142,7 +143,9 @@ What sits on a run appears as the tip reaches it, so nothing floats ahead of its
 
 On load the reading line sweeps down from the top of the page to its place in `SWEEP` seconds, easing out, so the main rail grows out of U1 instead of appearing half drawn; everything else follows the line, so the sweep needs nothing from them. It covers a fraction of the way to the line's place, so it takes the same time however far down the page opens.
 
-**The type fades in,** on the home page only, once and never back out. The name does not fade; About's copy and link, marked `data-fade="load"`, fade in on load, the link a little after the copy; every other block marked `data-fade` fades in once its top is 85% of the way down the window. `index.html` sets the class `fades` on `<html>` before the first paint, and the CSS hides the blocks only under it and without reduced motion, so the page is readable without the scripts. Fade opacity only: a transform would move the boxes `measure()` reads.
+**The type fades in,** on the home page only, once and never back out. The name does not fade; About's copy and link, marked `data-fade="load"`, fade in on load, the link a little after the copy; every other block marked `data-fade` fades in once its top is 85% of the way down the window. `index.html` includes `_includes/scripts.html` with `fades=true`, which sets the class `fades` on `<html>` before the first paint, and the CSS hides the blocks only under it and without reduced motion, so the page is readable without the scripts. Fade opacity only: a transform would move the boxes `measure()` reads.
+
+**No type shows before its board is drawn.** Until the modules have run, a board's blocks sit in the plain column a page without the scripts shows, and the first paint comes before that, so without this the name would flash at the top centre, small, before jumping to its seat. So `_includes/scripts.html`, in every page's head, sets the class `js` before the first paint, and `styles.css` hides a board's blocks under it until the board has the class `drawn`. If the modules never run, the include's timer takes `js` and `fades` away after three seconds so the type shows in that column; `main.js` cancels the timer. The include also preloads every module in `js/`, listed by Jekyll, so that the browser fetches them in one round instead of finding each through its importer.
 
 A trace is drawn from its first point, so write a run's centreline from its source. A branch's and a net's drawn length is kept by name, so a redraw needs nothing from them. With reduced motion everything is drawn from the start.
 

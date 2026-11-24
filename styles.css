@@ -28,6 +28,9 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
 .board .project, .board .paper { margin-bottom: 36px; }
 .board svg { display: block; width: 100%; height: auto; overflow: visible; }
 /* --u is one drawing unit, so the type scales with the drawing */
+/* With the scripts, a board's type is hidden until it is drawn, so it never shows in that column first: see
+   _includes/scripts.html. */
+.js .board:not(.drawn) [data-seat] { visibility: hidden; }
 .board.drawn [data-seat] { position: absolute; max-width: none; margin: 0; --u: calc(100cqw / var(--w)); }
 /* Below this width a section draws its narrow layout: see NARROW in js/board.js, which must match.
    The narrow drawing grows with the screen up to 448px and is centred beyond that. */
