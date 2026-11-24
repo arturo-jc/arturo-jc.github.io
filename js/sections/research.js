@@ -13,7 +13,7 @@ function lamps(x, rows, n0, d0, wires, parts, labels) {
 
 // Wide: two columns, the right one dropped by about half a paper, so the papers read in a zigzag and leave a corner
 // empty at each end. Projects' bus crosses the top into U5 in the top right-hand corner, which reaches the first
-// paper across the gap and lights two lamps. A chain of chips runs down the gap, one level with each title after it,
+// paper across the gap, lights two lamps and sends a serpentine across the corner over the second paper. A chain of chips runs down the gap, one level with each title after it,
 // and the last sends three traces under the bottom left-hand paper, stopping short.
 const wide = {
   cols: 107,
@@ -40,6 +40,12 @@ const wide = {
                wire([[47, a3], [v3, a3]], { o: true, end: 'via' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via' }));
     parts.push({ kind: 'R', x: 56, y: a1 });
     lamps(78, [a1 + 1, a1 + 4], 10, 6, wires, parts, labels);
+    // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
+    const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
+    bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3).forEach((w, k) => {
+      cut(w, 7, [78, 80, 82][k]).end = 'via';
+      wires.push(w);
+    });
     // U5 → west → down the gap → U6 → U7 → U8
     wires.push(...bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3), ...bundle([[50, a2 + 5], [50, a3 - 3]], 3),
                ...bundle([[51, a3 + 5], [51, a4 - 3]], 3));

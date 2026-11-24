@@ -3,7 +3,8 @@ import { P, bundle, cut, wire, f } from '../kit.js';
 
 // Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
 // accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
-// parallel to About's. Two lamps hang under U3; three traces leave U4 and stop down the left margin, and three
+// parallel to About's. Two lamps hang under U3, and a bus leaves its right side, comes back on a diagonal and drops
+// into a pin header over the second project. Three traces leave U4 and stop down the left margin, and three
 // more leave its right side and drop off the board's foot into Research.
 const wide = {
   cols: 107,
@@ -31,6 +32,11 @@ const wide = {
       parts.push({ kind: 'R', x: c, y: ly + 3, dir: 'v' }, { kind: 'LED', x: c, y: ly + 6.8, dir: 'v', delay: [0, 1.3][i] });
       labels.push({ k: 'ref', x: c + 1.1, y: ly + 3.25, t: `R${7 + i}` }, { k: 'ref', x: c + 1.2, y: ly + 7.05, t: `D${4 + i}` });
     });
+    // U3's five lowest right-hand pads → east → back west on one diagonal → down into a pin header over the second project
+    const ym = f((a1 + a2) / 2), J = f(a2 - 5);
+    wires.push(...bundle([[76, a1 + 5], [90, a1 + 5], [90, ym], [80, ym], [80, J]], 5, { 2: 5 * P, 3: 5 * P }));
+    chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
+    labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(ym + 6.5), t: 'B0231 – B0235' });
     // U4 → west → down the left margin; each stops at a different height
     bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3).forEach((w, k) => {
       const stop = a2 + [10, 15, 20][k];

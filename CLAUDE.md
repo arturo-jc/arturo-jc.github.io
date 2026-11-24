@@ -69,6 +69,7 @@ Studies double as a parts bin of working code:
 - `studies/08-blog-flag.html` holds the endings for the link to the blog that the site does not use: the net fed from a new pad on U2's foot, the word drawn inside the flag as its outline, and a plain via before the word with no flag. Its panel also colours the net all orange or all blue.
 - `studies/09-blog.html` holds the blog drawn with a rail of three traces down the posts and down an article, tapping in to each post's title and each section's heading, stepped or with parts between taps. The user turned it down: on a long article the rail distracts from the text. It also holds `marks`, a measurement of every `h2` in a block of running text.
 - `studies/10-blog-head.html` holds the two other blog heads the site does not use: three traces dropping beside the head and stopping short, and three turning under it as a divider. Its panel also puts a lone via before each heading in the text.
+- `studies/11-empty-corners.html` holds the fillers for the empty corners under U3 and U5 in the wide layouts that the site does not use: a second chip with two capacitors and a staggered tail, a crystal with its two load capacitors (a part `js/kit.js` does not have), a serpentine down U3's corner, and a six-pin header under U5.
 
 ## The code
 
@@ -156,7 +157,7 @@ Render the page and look at it; a description of the code is not evidence. The u
 
 ## Facts and decoration
 
-Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, R5 to R8, D4 and D5; Research has U5 to U8, R9 to R11, D6 and D7. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. Names, places, jobs, dates, projects and links must come from `~/Code/personal-website` or from the user. The surname is hyphenated: Javier-Castellanos.
+Codes, designators and part values are texture and can be invented. Designators run on from one section to the next and are the same in a section's two layouts: About has U1, U2, J1, R1 to R4 and D1 to D3; Projects has U3, U4, J2, R5 to R8, D4 and D5; Research has U5 to U8, R9 to R11, D6 and D7. The blog's pages are numbered apart: the index has U101 and J101, a post U201, J201 and R201. Names, places, jobs, dates, projects and links must come from `~/Code/personal-website` or from the user. The surname is hyphenated: Javier-Castellanos.
 
 ## Committing
 
