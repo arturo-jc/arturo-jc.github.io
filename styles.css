@@ -86,7 +86,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
 .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
 /* The blog. Its index and each post have one board, for the head: the index's heading, set like the name, and a
    post's way back, title and date. Everything under the head is outside the board, in .flow: a column on the
-   boards' grid, cells 36 to 72 of 107, or 6 to 30 of 32 below the breakpoint, whose type scales with the drawing
+   boards' grid, cells 30 to 84 of 107, or 6 to 30 of 32 below the breakpoint, whose type scales with the drawing
    above it. The widths here must match the head layouts in js/sections/blog.js and post.js. */
 .big { font: 600 calc(var(--fs, 60) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; margin: 0; }
 .title { font: 600 calc(var(--fs, 34) * var(--u))/1.18 var(--sans); letter-spacing: -.015em; text-wrap: balance; margin: 0; }
@@ -98,7 +98,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
 .back:hover { color: var(--accent); }
 .back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .flow { container-type: inline-size; }
-.flow .col { --u: calc(100cqw / 1284); margin-left: calc(36 / 107 * 100%); width: calc(36 / 107 * 100%); }
+.flow .col { --u: calc(100cqw / 1284); margin-left: calc(30 / 107 * 100%); width: calc(54 / 107 * 100%); }
 .flow .col:last-child { padding-bottom: calc(72 * var(--u)); }
 @media (max-width: 1099px) {
   .flow { max-width: 448px; margin: 0 auto; }

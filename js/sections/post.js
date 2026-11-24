@@ -10,27 +10,27 @@ import { FLAG, bundle, wire, f } from '../kit.js';
 const wide = {
   cols: 107,
   seats: {
-    back: { x: 6, y: 3 }, title: { x: 36, y: 11, w: 46, size: 34 },
-    date: m => ({ x: 36, y: f(m.title.bot + 1) }),
+    back: { x: 6, y: 3 }, title: { x: 30, y: 11, w: 54, size: 34 },
+    date: m => ({ x: 30, y: f(m.title.bot + 1) }),
   },
   build(m) {
     const a = f(m.title.cap), bc = f(m.back.cap), tip = f(m.back.hx + 0.8);
     const chips = [
-      { id: 'U201', x0: 18, y0: f(bc - 1.5), x1: 28, y1: f(a + 3), code: 'H0710', pins: { l: [bc], r: [5, 6, 7, 8, a], t: [], b: [] } },
+      { id: 'U201', x0: 17.5, y0: f(bc - 1.5), x1: 23, y1: f(a + 3), code: 'H0710', pins: { l: [bc], r: [5, 6, 7, 8, a], t: [], b: [] } },
       { id: 'J201', conn: true, x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } },
     ];
     const wires = [
-      wire([[f(tip + FLAG), bc], [18, bc]]),
-      wire([[28, a], [34.5, a]], { o: true, end: 'via' }),
-      ...bundle([[86.5, 1.5], [86.5, 6.5], [28, 6.5]], 4),
+      wire([[f(tip + FLAG), bc], [17.5, bc]]),
+      wire([[23, a], [28.5, a]], { o: true, end: 'via' }),
+      ...bundle([[86.5, 1.5], [86.5, 6.5], [23, 6.5]], 4),
     ];
     const labels = [
-      { k: 'ref', x: 18, y: f(bc - 2.6), t: 'U201' }, { k: 'ref', x: 31, y: f(a - 0.95), t: 'R201', a: 'middle' },
+      { k: 'ref', x: 17.5, y: f(bc - 2.6), t: 'U201' }, { k: 'ref', x: 25.75, y: f(a - 0.95), t: 'R201', a: 'middle' },
       { k: 'ref', x: 83.6, y: 1.25, t: 'J201', a: 'end' }, { k: 'net', x: 90, y: 6.75, t: 'D0 – D3' },
     ];
     const flags = [{ tip, y: bc, code: 'G0601', dir: -1, go: true }];
     // the post starts 3.5 rows under the date
-    return { rows: f(m.date.bot + 3.5), chips, wires, parts: [{ kind: 'R', x: 31, y: a }], labels, flags };
+    return { rows: f(m.date.bot + 3.5), chips, wires, parts: [{ kind: 'R', x: 25.75, y: a }], labels, flags };
   },
 };
 
