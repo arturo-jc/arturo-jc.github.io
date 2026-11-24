@@ -1,0 +1,19 @@
+# Jekyll, as GitHub Pages builds it. The home page is index.html; the blog is blog/index.html and the posts in
+# _posts, laid out by _layouts/post.html. Permalinks are Jekyll's default, as on the old site, so every post keeps
+# its URL and its Disqus thread.
+title: Arturo Javier-Castellanos
+description: Personal website of Arturo Javier-Castellanos.
+baseurl: ""
+url: "https://arturojc.dev"
+
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+
+exclude:
+  - CLAUDE.md
+  - studies/
+  - Gemfile
+  - Gemfile.lock
+  - vendor/

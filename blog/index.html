@@ -1,0 +1,22 @@
+---
+layout: default
+title: Blog
+---
+{%- comment -%}
+  The blog's index: its heading on a board, then every post, newest first, as plain text in a column on the
+  board's grid: the title, which links to the post, the date and the excerpt from the post's front matter.
+{%- endcomment -%}
+<section class="board" id="blog">
+  <h1 class="big" data-seat="head">Blog</h1>
+</section>
+<div class="flow">
+  <div class="col">
+    {%- for post in site.posts %}
+    <article class="entry">
+      <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+      <p class="date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></p>
+      <p class="ex">{{ post.excerpt | strip_html }}</p>
+    </article>
+    {%- endfor %}
+  </div>
+</div>

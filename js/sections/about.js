@@ -39,7 +39,7 @@ const wide = {
     const by = f(m.blog.cap), tip = f(m.blog.l - 0.8);
     wires.push(wire([[u2.x1, lamps[0]], [30, lamps[0]], [30, by], [f(tip - FLAG), by]], { legs: [0, 8, 8, 0] }),
                wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]]));
-    const flags = [{ tip, y: by, code: 'A0140' }];
+    const flags = [{ tip, y: by, code: 'A0140', go: true }];
     lamps.forEach((r, i) => {
       parts.push({ kind: 'R', x: 19, y: r }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i] });
       labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle' });
@@ -91,7 +91,7 @@ const narrow = {
     toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
     wires.push(toFlag, ...down);
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
-    const flags = [{ tip, y: by, code: 'A0140' }];
+    const flags = [{ tip, y: by, code: 'A0140', go: true }];
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },

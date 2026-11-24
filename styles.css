@@ -58,7 +58,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
         text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
 .blog:hover { color: var(--accent); }
 .blog:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.board:has(.blog:hover) .flag { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
+.board:has(a[data-seat]:hover) .flag.go { fill: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
 /* A project is its name, which links to its repo, its stack, and a paragraph. */
 .project h3 { font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(5 * var(--u)); white-space: nowrap; }
 .project h3 a { text-underline-offset: calc(4 * var(--u)); }
@@ -84,6 +84,56 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
 .lb.mark { fill: var(--trace-dim); font-size: 9px; }
 .lb.o { fill: var(--accent); }
 .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
+/* The blog. Its index and each post have one board, for the head: the index's heading, set like the name, and a
+   post's way back, title and date. Everything under the head is outside the board, in .flow: a column on the
+   boards' grid, cells 36 to 72 of 107, or 6 to 30 of 32 below the breakpoint, whose type scales with the drawing
+   above it. The widths here must match the head layouts in js/sections/blog.js and post.js. */
+.big { font: 600 calc(var(--fs, 60) * var(--u))/1.05 var(--sans); letter-spacing: -.02em; white-space: nowrap; margin: 0; }
+.title { font: 600 calc(var(--fs, 34) * var(--u))/1.18 var(--sans); letter-spacing: -.015em; text-wrap: balance; margin: 0; }
+.date { font: 400 calc(11.5 * var(--u))/1.4 var(--mono); letter-spacing: .04em; color: var(--pad); margin: 0; }
+/* a post's way back, set like a project's name; hovering it warms its flag */
+.back { color: inherit; font: 600 calc(22 * var(--u))/1.2 var(--sans); letter-spacing: -.005em; white-space: nowrap;
+        text-decoration: underline; text-decoration-color: var(--accent);
+        text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+.back:hover { color: var(--accent); }
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.flow { container-type: inline-size; }
+.flow .col { --u: calc(100cqw / 1284); margin-left: calc(36 / 107 * 100%); width: calc(36 / 107 * 100%); }
+.flow .col:last-child { padding-bottom: calc(72 * var(--u)); }
+@media (max-width: 1099px) {
+  .flow { max-width: 448px; margin: 0 auto; }
+  .flow .col { --u: calc(100cqw / 384); margin-left: calc(6 / 32 * 100%); width: calc(24 / 32 * 100%); }
+}
+/* an entry on the index: the title, which links to the post, the date and the excerpt */
+.entry + .entry { margin-top: calc(60 * var(--u)); }
+.entry h2 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: 0 0 calc(6 * var(--u)); text-wrap: balance; }
+.entry h2 a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent);
+              text-decoration-thickness: max(1px, calc(1.5 * var(--u))); text-underline-offset: calc(4 * var(--u)); }
+.entry h2 a:hover { color: var(--accent); }
+.entry h2 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.entry .date { margin: 0 0 calc(12 * var(--u)); }
+.entry .ex { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); margin: 0; }
+/* a post's body: what kramdown writes from the post's Markdown */
+.copy li { font: 400 calc(16.5 * var(--u))/1.64 var(--sans); }
+.copy ul, .copy ol { margin: 0 0 calc(16 * var(--u)); padding-left: 1.3em; }
+.copy h2 { font: 600 calc(22 * var(--u))/1.25 var(--sans); letter-spacing: -.005em; margin: calc(44 * var(--u)) 0 calc(12 * var(--u)); text-wrap: balance; }
+.copy h3 { font: 600 calc(18 * var(--u))/1.3 var(--sans); margin: calc(32 * var(--u)) 0 calc(10 * var(--u)); }
+.copy > :first-child { margin-top: 0; }
+.copy code { font: 400 .88em/1 var(--mono); color: var(--pad); overflow-wrap: anywhere; }
+.copy pre { font: 400 calc(12.5 * var(--u))/1.6 var(--mono); color: var(--silk); background: var(--chip); border-radius: calc(3 * var(--u));
+            padding: calc(12 * var(--u)) calc(14 * var(--u)); margin: 0 0 calc(16 * var(--u)); overflow-x: auto;
+            scrollbar-width: thin; scrollbar-color: var(--trace-dim) transparent; }
+.copy pre code { font: inherit; color: inherit; overflow-wrap: normal; }
+.copy .highlight { margin: 0; }
+.copy blockquote { margin: 0 0 calc(16 * var(--u)); padding-left: 1.2em; color: var(--muted); font-style: italic; }
+.copy img { max-width: 100%; height: auto; }
+/* Disqus draws the comments in its own frame, in its own styles */
+.comments { margin-top: calc(64 * var(--u)); }
+/* on the blog's pages, the name in the footer links to the home page, quietly */
+.foot .home { color: inherit; text-decoration: none; transition: color .15s; }
+.foot .home:hover { color: var(--accent); }
+.foot .home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
 /* The footer: a band of its own colour under the last board, edge to edge, with no drawing in it. Inside, the
    icons and the copyright are centred on the boards' grid, which they share and scale with: 107 cells wide,
    centred on Research's two columns (cells 6 to 98) rather than the window; below the breakpoint, 32 cells. */
