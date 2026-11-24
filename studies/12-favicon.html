@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 12 · The favicon</title>
+<link rel="icon" id="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b3048;
+    --trace: #3f9fd8;
+    --trace-dim: #1f6593;
+    --pad: #9bd0ee;
+    --chip: #072235;
+    --accent: #f7a52b;
+    --text: #e7f0f6;
+    --muted: #8fb4cb;
+    --rule: #1c4c6c;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  /* ---- study chrome (not part of the designs) ---- */
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+  .intro { padding: 56px 0 8px; max-width: 760px; }
+  .kicker, .num { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro h1 { font: 600 30px/1.2 var(--sans); margin: 14px 0 16px; text-wrap: balance; }
+  .intro p { font: 400 15.5px/1.6 var(--sans); color: #c5d9e6; margin: 0 0 10px; }
+  .intro b { color: var(--text); font-weight: 600; }
+  .spec { padding: 56px 0 0; }
+  .cap { border-top: 1px solid var(--rule); padding-top: 16px; margin-bottom: 24px; max-width: 760px; }
+  .cap h2 { font: 600 20px/1.2 var(--sans); margin: 10px 0 8px; }
+  .cap p { font: 400 14px/1.5 var(--sans); color: #c5d9e6; margin: 0 0 12px; }
+  .mix { padding: 96px 0 96px; }
+  .switches { display: flex; flex-wrap: wrap; gap: 14px 22px; margin: 0 0 32px; }
+  .switches label { display: grid; gap: 6px; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .switches select { font: 400 14px/1.2 var(--sans); color: var(--text); background: var(--chip); border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; }
+
+  /* one option: the icon large, at the sizes a browser asks for, a 1x pixel view, and two tab strips */
+  .row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 28px 36px; max-width: 760px; padding: 22px 26px 14px; border-radius: 8px; background: #d5dce2; }
+  .row figcaption { color: #4a5d6c !important; }
+  .row figure { margin: 0; display: grid; justify-items: center; gap: 8px; }
+  .row figcaption { font: 500 10.5px/1 var(--mono); letter-spacing: .1em; color: var(--muted); }
+  .row img { display: block; }
+  .px { width: 64px; height: 64px; image-rendering: pixelated; }
+  .tabs { display: grid; gap: 10px; margin-top: 28px; max-width: 760px; }
+  .strip { display: flex; align-items: flex-end; height: 42px; padding: 0 10px; border-radius: 8px 8px 0 0; }
+  .tab { display: flex; align-items: center; gap: 8px; height: 34px; width: 240px; padding: 0 12px; border-radius: 9px 9px 0 0;
+         font: 400 12px/1 system-ui, sans-serif; white-space: nowrap; overflow: hidden; }
+  .tab img { flex: none; }
+  .tab span { overflow: hidden; text-overflow: ellipsis; }
+  .tab.off { background: none; }
+  .light { background: #dfe3e8; } .light .tab { background: #fff; color: #1f1f1f; } .light .tab.off { background: none; color: #444; }
+  .dark { background: #1f2023; } .dark .tab { background: #35363a; color: #e8eaed; } .dark .tab.off { background: none; color: #a9acb2; }
+  button.try { margin-top: 18px; font: 500 12px/1 var(--mono); letter-spacing: .08em; color: var(--text); background: var(--chip);
+               border: 1px solid var(--rule); border-radius: 4px; padding: 9px 12px; cursor: pointer; }
+  button.try:hover, button.try.on { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <div class="kicker">Study 12</div>
+    <h1>A favicon drawn from the board</h1>
+    <p>Three parts from the drawing, each cut out of the board on a rounded square of its ground, with the trace running off the crop as it would on the page. Everything else is held fixed: the palette, the trace weight and the size of the part in the frame.</p>
+    <p>Each is shown <b>large</b>, at the <b>sizes a browser asks for</b> (16 for a tab, 32 for a high-density tab, 48 and 180 for bookmarks and home screens), <b>at 16 real pixels</b> magnified, which is what a tab on a 1x screen gets, and in <b>light and dark tab strips</b>. “Try in this tab” makes it this page's own favicon.</p>
+  </header>
+  <main id="options"></main>
+  <section class="mix wrap" style="padding-left:0;padding-right:0">
+    <div class="cap"><div class="num">Mix your own</div><h2>Any part, any ground</h2><p>The switches the options above are built from.</p></div>
+    <div class="switches" id="switches"></div>
+    <div id="mine"></div>
+  </section>
+</div>
+<script>
+// The palette, written out: a favicon is a file on its own and cannot read the page's CSS.
+const C = { bg: '#0b3048', trace: '#3f9fd8', dim: '#1f6593', pad: '#9bd0ee', chip: '#072235', accent: '#f7a52b' };
+const WEIGHT = 4;                                   // the trace weight, in drawing units, as in js/kit.js
+const f = n => +n.toFixed(2);
+
+// Each part is drawn in drawing units round (0, 0), the same geometry as js/kit.js, and lists the points its
+// traces leave from with the direction they run. The icon scales the part into a 32-unit frame.
+const PARTS = {
+  lamp: {
+    label: 'Lamp',
+    draw: o => `<rect x="-12" y="-5" width="7" height="10" rx="1" fill="${C.pad}"/><rect x="5" y="-5" width="7" height="10" rx="1" fill="${C.pad}"/>`
+      + (o.halo ? `<circle r="9" fill="${C.accent}" opacity=".75" filter="url(#b)"/>` : '')
+      + `<rect x="-5" y="-4.5" width="10" height="9" rx="1" fill="${C.accent}"/>`,
+    ends: [[-12, 0, -1, 0], [12, 0, 1, 0]], colour: C.trace,
+  },
+  resistor: {
+    label: 'Resistor',
+    draw: () => `<rect x="-13" y="-5.5" width="9" height="11" rx="1" fill="${C.pad}"/><rect x="4" y="-5.5" width="9" height="11" rx="1" fill="${C.pad}"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${C.chip}"/>`,
+    ends: [[-13, 0, -1, 0], [13, 0, 1, 0]], colour: C.trace,
+  },
+  capacitor: {
+    label: 'Capacitor',
+    draw: () => `<rect x="-13" y="-5.5" width="9" height="11" rx="1" fill="${C.pad}"/><rect x="4" y="-5.5" width="9" height="11" rx="1" fill="${C.pad}"/>`
+      + `<rect x="-4.5" y="-4.5" width="9" height="9" fill="${C.dim}"/>`,
+    ends: [[-13, 0, -1, 0], [13, 0, 1, 0]], colour: C.trace,
+  },
+  // a chip with two pads a side, its pin-one mark lit
+  chip: {
+    label: 'Chip',
+    draw: o => {
+      const s = [];
+      for (const q of [-4, 4]) {
+        s.push(`<rect x="-14" y="${q - 2}" width="6" height="4" rx=".6" fill="${C.pad}"/>`, `<rect x="8" y="${q - 2}" width="6" height="4" rx=".6" fill="${C.pad}"/>`,
+               `<rect x="${q - 2}" y="-14" width="4" height="6" rx=".6" fill="${C.pad}"/>`, `<rect x="${q - 2}" y="8" width="4" height="6" rx=".6" fill="${C.pad}"/>`);
+      }
+      s.push(`<rect x="-9.5" y="-9.5" width="19" height="19" rx="1.8" fill="${C.chip}" stroke="${C.dim}" stroke-width="1"/>`,
+             `<circle cx="-5" cy="-5" r="1.8" fill="${o.dot ? C.accent : C.dim}"/>`);
+      return s.join('');
+    },
+    ends: [[-14, -4, -1, 0], [-14, 4, -1, 0], [14, -4, 1, 0], [14, 4, 1, 0]], colour: C.trace,
+  },
+  // the accent net's end: an orange trace turning 45° into a via
+  via: {
+    label: 'Via',
+    draw: () => `<circle r="5.4" fill="${C.accent}"/><circle r="2.1" fill="${C.bg}"/>`,
+    ends: [], colour: C.accent, own: true,
+  },
+};
+
+const GROUNDS = { rsq: 'Rounded square', circle: 'Circle', square: 'Square', none: 'None' };
+const ground = g => g === 'rsq' ? `<rect width="32" height="32" rx="7" fill="${C.bg}"/>`
+  : g === 'circle' ? `<circle cx="16" cy="16" r="16" fill="${C.bg}"/>`
+  : g === 'square' ? `<rect width="32" height="32" fill="${C.bg}"/>` : '';
+
+// The whole icon, as an svg string in a 32-unit frame. `scale` is drawing units to frame units.
+function icon(o) {
+  const p = PARTS[o.part], k = o.scale, w = f(WEIGHT * k);
+  const at = (x, y) => [f(16 + x * k), f(16 + y * k)];
+  let traces = '';
+  if (p.own) {
+    // via at the upper right; its trace leaves south-west at 45° and turns down off the crop
+    const [vx, vy] = [20.5, 11.5], d = 9;
+    traces = `<path d="M${vx} ${vy}L${vx - d} ${vy + d}L${vx - d} 33" fill="none" stroke="${p.colour}" stroke-width="${w}" stroke-linejoin="round"/>`;
+    return svg(o, traces + `<g transform="translate(${vx} ${vy}) scale(${k})">${p.draw(o)}</g>`);
+  }
+  if (o.trace !== 'none') {
+    for (const [x, y, dx, dy] of p.ends) {
+      const [sx, sy] = at(x, y);
+      const ex = o.trace === 'through' ? (dx < 0 ? -1 : 33) : f(sx + dx * 4.5 * k);
+      traces += `<path d="M${sx} ${sy}L${ex} ${sy}" stroke="${p.colour}" stroke-width="${w}"/>`;
+      if (o.trace === 'vias') traces += `<g transform="translate(${ex} ${sy}) scale(${k})"><circle r="5.4" fill="${p.colour}"/><circle r="2.1" fill="${C.bg}"/></g>`;
+    }
+  }
+  return svg(o, traces + `<g transform="translate(16 16) scale(${k})">${p.draw(o)}</g>`);
+}
+const svg = (o, body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">`
+  + `<defs><filter id="b" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="3.2"/></filter>`
+  + `<clipPath id="c">${ground(o.ground === 'none' ? 'square' : o.ground).replace(/ fill="[^"]*"/, '')}</clipPath></defs>`
+  + ground(o.ground) + `<g clip-path="url(#c)">${body}</g></svg>`;
+const url = s => 'data:image/svg+xml,' + encodeURIComponent(s);
+
+// One option's specimen sheet.
+function sheet(o) {
+  const u = url(icon(o)), el = document.createElement('div');
+  el.innerHTML = `<div class="row">
+      <figure><img src="${u}" width="180" height="180" alt=""><figcaption>180</figcaption></figure>
+      <figure><img src="${u}" width="48" height="48" alt=""><figcaption>48</figcaption></figure>
+      <figure><img src="${u}" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+      <figure><img src="${u}" width="16" height="16" alt=""><figcaption>16</figcaption></figure>
+      <figure><canvas class="px" width="16" height="16"></canvas><figcaption>16 at 1x, ×4</figcaption></figure>
+    </div>
+    <div class="tabs">${['light', 'dark'].map(t => `<div class="strip ${t}">
+      <div class="tab"><img src="${u}" width="16" height="16" alt=""><span>Arturo Javier-Castellanos</span></div>
+      <div class="tab off"><img src="data:," width="0" height="16" alt=""><span>Inbox (3)</span></div></div>`).join('')}</div>
+    <button class="try" type="button">Try in this tab</button>`;
+  const img = new Image();
+  img.onload = () => el.querySelector('canvas').getContext('2d').drawImage(img, 0, 0, 16, 16);
+  img.src = u;
+  const b = el.querySelector('.try');
+  b.onclick = () => {
+    document.getElementById('icon').href = u;
+    document.querySelectorAll('.try.on').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+  };
+  return el;
+}
+
+const BASE = { ground: 'rsq', trace: 'through', halo: true, dot: true, scale: 1.05 };
+const OPTIONS = [
+  { title: 'Lamp', text: 'A lit lamp, D1 to D5, on a blue trace that runs off both sides of the crop. The halo is what makes it read at 16 pixels: it is the one warm blur in the tab strip.', o: { part: 'lamp' } },
+  { title: 'Chip', text: 'A small chip with two pads a side, its pin-one mark lit orange where the board has it dim, so the icon keeps the accent. Two traces leave each side.', o: { part: 'chip', scale: .95 } },
+  { title: 'Via', text: 'The end of the accent net: an orange trace turning 45° into a via, as every net that leads to the copy ends beside a heading.', o: { part: 'via', scale: 1.5 } },
+];
+
+const main = document.getElementById('options');
+OPTIONS.forEach((x, i) => {
+  const s = document.createElement('section');
+  s.className = 'spec';
+  s.innerHTML = `<div class="cap"><div class="num">Option ${String.fromCharCode(65 + i)}</div><h2>${x.title}</h2><p>${x.text}</p></div>`;
+  s.append(sheet({ ...BASE, ...x.o }));
+  main.append(s);
+});
+
+// the panel
+const SW = {
+  part: Object.fromEntries(Object.entries(PARTS).map(([k, v]) => [k, v.label])),
+  ground: GROUNDS,
+  trace: { through: 'Runs off the crop', vias: 'Ends on vias', none: 'None' },
+  halo: { true: 'On', false: 'Off' },
+  dot: { true: 'Lit', false: 'Dim' },
+  scale: { .85: 'Small', .95: 'Medium', 1.05: 'Large', 1.2: 'Larger', 1.5: 'Largest' },
+};
+const NAMES = { part: 'Part', ground: 'Ground', trace: 'Trace', halo: 'Lamp halo', dot: 'Chip mark', scale: 'Size' };
+const mine = { ...BASE, part: 'lamp' };
+const box = document.getElementById('switches');
+for (const [k, opts] of Object.entries(SW)) {
+  const l = document.createElement('label');
+  l.innerHTML = `${NAMES[k]}<select>${Object.entries(opts).map(([v, t]) => `<option value="${v}"${String(mine[k]) === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+  l.querySelector('select').onchange = e => {
+    const v = e.target.value;
+    mine[k] = k === 'scale' ? +v : v === 'true' ? true : v === 'false' ? false : v;
+    redraw();
+  };
+  box.append(l);
+}
+const redraw = () => document.getElementById('mine').replaceChildren(sheet(mine));
+redraw();
+</script>
+</body>
+</html>
