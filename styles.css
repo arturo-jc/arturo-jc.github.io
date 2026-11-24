@@ -83,6 +83,9 @@ main { max-width: 1500px; margin: 0 auto; padding: 48px 32px 0; }
 .lb.ref { fill: var(--silk); font-weight: 500; }
 .lb.mark { fill: var(--trace-dim); font-size: 9px; }
 .lb.o { fill: var(--accent); }
+/* an accent net is blue until the rail into its chip arrives: see js/rails.js */
+.t.o, .f.o, .lb.o { transition: stroke .6s, fill .6s; }
+.t.o.off { stroke: var(--trace); } .off .f.o { fill: var(--trace); } .lb.o.off { fill: var(--pad); }
 .flag { fill: var(--bg); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; transition: fill .15s; }
 /* The blog. Its index and each post have one board, for the head: the index's heading, set like the name, and a
    post's way back, title and date. Everything under the head is outside the board, in .flow: a column on the

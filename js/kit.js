@@ -48,6 +48,10 @@ export function cut(w, seg, at) {
   return w;
 }
 export const wire = (pts, extra = {}) => ({ pts, ...extra });
+// Mark traces as a rail into chip `to`: js/rails.js draws them out of their source as the page scrolls. A rail
+// that crosses into the next board is marked with the same `to` in both. An accent net, its via and its code marked
+// `net: 'U3'` are blue until the rail into U3 arrives, and then turn orange.
+export const rail = (to, ws) => ws.map(w => Object.assign(w, { rail: to }));
 
 // a trace as a path: 45° corners, and a semicircular bridge at every hop
 export function tracePath(w) {

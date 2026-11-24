@@ -1,6 +1,6 @@
 // Research: the heading and four papers, newest first, each a title that links to the published article, the
 // journal and a summary. The titles are long and wrap; `cap` and `hx` are their first line's.
-import { bundle, cut, wire, f } from '../kit.js';
+import { bundle, cut, wire, rail, f } from '../kit.js';
 
 // two lamps out of a chip's side, each a resistor and a lamp, with a common return
 function lamps(x, rows, n0, d0, wires, parts, labels) {
@@ -33,11 +33,11 @@ const wide = {
       { id: 'U8', x0: 45, y0: a4 - 3, x1: 55, y1: a4 + 5, code: 'E0540', allPads: true },
     ];
     // Projects' bus, picked up at the top edge in the same columns, across the top into U5
-    wires.push(...bundle([[49, 0], [49, 5.5], [72, 5.5], [72, a1 - 3]], 3));
+    wires.push(...rail('U5', bundle([[49, 0], [49, 5.5], [72, 5.5], [72, a1 - 3]], 3)));
     // the accent net: U5 across the gap to the first paper; each chip in the gap to the paper level with it, ending
     // just past the title on the left and just before it on the right
-    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via' }),
-               wire([[47, a3], [v3, a3]], { o: true, end: 'via' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via' }));
+    wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
+               wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
     parts.push({ kind: 'R', x: 56, y: a1 });
     lamps(78, [a1 + 1, a1 + 4], 8, 4, wires, parts, labels);
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
@@ -47,8 +47,8 @@ const wide = {
       wires.push(w);
     });
     // U5 → west → down the gap → U6 → U7 → U8
-    wires.push(...bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3), ...bundle([[50, a2 + 5], [50, a3 - 3]], 3),
-               ...bundle([[51, a3 + 5], [51, a4 - 3]], 3));
+    wires.push(...rail('U6', bundle([[66, a1 + 4], [51, a1 + 4], [51, a2 - 3]], 3)), ...rail('U7', bundle([[50, a2 + 5], [50, a3 - 3]], 3)),
+               ...rail('U8', bundle([[51, a3 + 5], [51, a4 - 3]], 3)));
     // U8 → down the gap → west under the third paper, stopping short
     const L = f(m.r3.bot + 4);
     bundle([[50, a4 + 5], [50, L], [6, L]], 3).forEach((w, k) => {
@@ -62,7 +62,7 @@ const wide = {
       { k: 'ref', x: 66, y: a1 - 4.1, t: 'U5' }, { k: 'ref', x: 45, y: a2 - 4.1, t: 'U6' },
       { k: 'ref', x: 47, y: a3 - 4.1, t: 'U7' }, { k: 'ref', x: 45, y: a4 - 4.1, t: 'U8' },
       { k: 'ref', x: 56, y: a1 - 0.95, t: 'R7', a: 'middle' },
-      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true },
+      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true, net: 'U5' }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true, net: 'U7' },
     );
     return { rows: f(Math.max(m.r4.bot, L + 1) + 5), chips, wires, parts, labels };
   },
@@ -83,12 +83,12 @@ const narrow = {
     const chips = [{ id: 'U5', x0: 9, y0: 2, x1: 18, y1: 9, code: 'E0510', allPads: true }];
     const wires = [], labels = [], parts = [];
     // Projects' bus, picked up at the top edge in the same columns, west into U5's right-hand pads
-    wires.push(...bundle([[26, 0], [26, 5], [18, 5]], 3));
+    wires.push(...rail('U5', bundle([[26, 0], [26, 5], [18, 5]], 3)));
     // U5 → west → down the left of the papers. The rail's nearest trace, at column 3, is the accent net.
     const [acc, inner, outer] = bundle([[9, 7], [2, 7], [2, a4]], 3);
     acc.pts.push([4.5, a4]); acc.legs.splice(-1, 1, 6, 0);
-    wires.push({ ...acc, o: true, end: 'via' });
-    [a1, a2, a3].forEach(a => wires.push(wire([[3, a], [4.5, a]], { o: true, end: 'via' })));
+    wires.push({ ...acc, o: true, end: 'via', net: 'U5' });
+    [a1, a2, a3].forEach(a => wires.push(wire([[3, a], [4.5, a]], { o: true, end: 'via', net: 'U5' })));
     // the other two turn under the last paper, each into a resistor and a lamp, with a common return
     inner.pts.splice(-1, 1, [2, L], [20, L], [20, L + 6]); inner.legs.splice(-1, 1, 8, 8, 0);
     outer.pts.splice(-1, 1, [1, L + 3], [20, L + 3]); outer.legs.splice(-1, 1, 8, 0);

@@ -1,5 +1,5 @@
 // Projects: the heading and two projects, each a name that links to its repo, a stack and a paragraph.
-import { P, bundle, cut, wire, f } from '../kit.js';
+import { P, bundle, cut, wire, rail, f } from '../kit.js';
 
 // Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
 // accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
@@ -19,12 +19,12 @@ const wide = {
       { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
     ];
     // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
-    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via' }));
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4' }));
     // U3 → down → the long diagonal between the rows → west into U4
     const drop = 5;                             // rows the bus runs straight down before the diagonal starts
-    wires.push(...bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P }));
+    wires.push(...rail('U4', bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P })));
     // About's rail, picked up at the top edge in the same columns, into U3's top right pads
-    wires.push(...bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3));
+    wires.push(...rail('U3', bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3)));
     // U3's five lowest right-hand pads → east → down under About's rail, its outer trace in line with the rail's →
     // back west on one diagonal → down into a pin header over the second project
     const ym = f((a1 + a2) / 2), J = f(a2 - 5);
@@ -40,14 +40,14 @@ const wide = {
     });
     // U4 → east → down off the board's foot. Research picks the three up at its top edge in the same columns.
     const bus = 49;
-    wires.push(...bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3));
+    wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
     labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end' });
     parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
     // ref = silkscreen designators · net = wire codes
     labels.push(
       { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
       { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
-      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end' },
+      { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end', net: 'U4' },
     );
     return { rows, chips, wires, parts, labels };
   },
@@ -70,15 +70,15 @@ const narrow = {
     ];
     const wires = [], labels = [];
     // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
-    wires.push(wire([[28, 10], [28, a2], [v2, a2]], { o: true, legs: [0, 10, 0], end: 'via' }),
-               wire([[28, a1], [v1, a1]], { o: true, end: 'via' }));
+    wires.push(wire([[28, 10], [28, a2], [v2, a2]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U3' }),
+               wire([[28, a1], [v1, a1]], { o: true, end: 'via', net: 'U3' }));
     // U3 → down the right of both projects → U4
-    wires.push(wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]]));
+    wires.push(...rail('U4', [wire([[29, 10], [29, F]]), wire([[30, 10], [30, F]])]));
     // About's rail, its two outer traces picked up at the top edge in the same columns, east into U3's two top
     // left-hand pads
-    wires.push(...bundle([[13.5, 0], [13.5, 4.5], [22, 4.5]], 2));
+    wires.push(...rail('U3', bundle([[13.5, 0], [13.5, 4.5], [22, 4.5]], 2)));
     // U4 → down off the board's foot. Research picks the three up at its top edge in the same columns.
-    wires.push(...bundle([[26, F + 6], [26, F + 9]], 3));
+    wires.push(...rail('U5', bundle([[26, F + 6], [26, F + 9]], 3)));
     // U4 → two traces west, stopping short on vias
     [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
       wires.push(wire([[22, r], [stop, r]], { end: 'via' }));
@@ -89,7 +89,7 @@ const narrow = {
     ];
     labels.push(
       { k: 'ref', x: 31, y: 1.9, t: 'U3', a: 'end' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },
-      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'B0221', o: true }, { k: 'net', x: v2 + 0.9, y: a2 - 0.75, t: 'C0411', o: true },
+      { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: v2 + 0.9, y: a2 - 0.75, t: 'C0411', o: true, net: 'U3' },
     );
     return { rows: F + 9, chips, wires, parts, labels };
   },

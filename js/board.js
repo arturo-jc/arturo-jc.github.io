@@ -68,12 +68,13 @@ function drawBoard(board, layouts) {
   const c = l.build(m);
   const traces = [], ends = [];
   for (const w of c.wires) {
-    traces.push(`<path class="t${w.o ? ' o' : ''}" d="${tracePath(w)}"/>`);
+    const net = w.net ? ` data-net="${w.net}"` : '';
+    traces.push(`<path class="t${w.o ? ' o' : ''}"${w.rail ? ` data-rail="${w.rail}"` : ''}${net} d="${tracePath(w)}"/>`);
     const e = w.pts[w.pts.length - 1];
-    if (w.end === 'via') ends.push(via(e[0] * P, e[1] * P, w.o));
+    if (w.end === 'via') ends.push(`<g${net}>${via(e[0] * P, e[1] * P, w.o)}</g>`);
   }
   const labels = c.labels.map(l =>
-    `<text class="lb ${l.k}${l.o ? ' o' : ''}" x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
+    `<text class="lb ${l.k}${l.o ? ' o' : ''}"${l.net ? ` data-net="${l.net}"` : ''} x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
   // The old drawing stays until the new one is in: without it the page is shorter, a scrollbar can go, and
   // the type would be measured at a width it is not shown at.
   const old = board.querySelector('svg');
@@ -81,6 +82,7 @@ function drawBoard(board, layouts) {
     <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
     <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags ?? []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
   old?.remove();
+  document.dispatchEvent(new Event('boarddrawn'));
 }
 
 // Draw a section, and again whenever its width changes or the fonts arrive: the type wraps

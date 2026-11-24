@@ -1,5 +1,5 @@
 // About, which opens the page: the name, as the page's heading, two paragraphs, and a link to the blog.
-import { P, FLAG, bundle, cut, wire, f } from '../kit.js';
+import { P, FLAG, bundle, cut, wire, rail, f } from '../kit.js';
 
 // Wide: the name upper left and the copy lower right. U1 sits level with the name's first line, so the
 // accent net is one straight run. Three traces leave U1 on a long diagonal between the two blocks and go
@@ -30,7 +30,7 @@ const wide = {
     // the rail: east from U1's right side, then down the copy's right and off the board's foot. Projects picks it
     // up at its top edge in the same columns and takes it into U3.
     const Xr = 94;
-    wires.push(...bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3));
+    wires.push(...rail('U3', bundle([[74, a + 6], [Xr, a + 6], [Xr, rows]], 3)));
     // the diagonal, then west under the name → U2
     wires.push(...bundle([[62, yc], [X, yc], [X, Yd], [u2.x1, Yd]], 6, { 1: shoulder, 2: (Yd - yc) * P - shoulder }).slice(3));
     // U2 → three lamps → common return → down and east, along the middle of the word's capitals, into the flag,
@@ -89,7 +89,7 @@ const narrow = {
     const tip = f(m.blog.l - 0.8);
     const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
     toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
-    wires.push(toFlag, ...down);
+    wires.push(...rail('U3', [toFlag, ...down]));
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
     const flags = [{ tip, y: by, code: 'A0140', go: true }];
     const parts = [
