@@ -57,15 +57,15 @@ const wide = {
 };
 
 // Narrow: J1 and U1 above the name, which is on three lines; the accent net comes down out of U1 and in
-// along the name's first line; three traces run down the left of the name and the copy and turn under it. The
-// one nearest the copy runs straight on east into an off-page flag before the link to the blog; the other two
-// drop into Projects' U3.
+// along the name's first line; three traces run down the left of the name and the copy, turn under it and turn
+// down. The one nearest the copy turns east again after a short 45° step, into an off-page flag before the link to
+// the blog; the other two drop into Projects' U3.
 const narrow = {
   cols: 32,
   seats: {
     name: { x: 6, y: 14, size: 50 }, copy: m => ({ x: 6, y: f(m.name.bot + 2.2), w: 24 }),
-    // the link just under the copy's last line, its flag's tail 3 cells past the column where the other two turn down
-    blog: m => ({ x: 22.8, y: f(m.copy.bot + 2.5) }),
+    // the link 3 rows under the rail's turn, its flag's tail a couple of cells past the end of the step
+    blog: m => ({ x: 23.3, y: f(m.copy.bot + 5.5) }),
   },
   build(m) {
     const chips = [
@@ -78,17 +78,20 @@ const narrow = {
     // the accent net: down out of U1 and in along the name's first line, ending just past it
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
     wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via' }));
-    // J1 → down the left of the name and the copy → under the copy. The trace nearest the copy runs on east, along
-    // the middle of the link's capitals, into the flag; the other two turn down off the board's foot, and Projects
-    // picks them up at its top edge in the same columns and takes them into U3's two top left-hand pads.
-    const under = f(m.blog.cap);               // the row of the trace nearest the copy's last line
-    const rows = f(under + 4);
+    // J1 → down the left of the name and the copy → under the copy → down. The two outer traces carry on down off
+    // the board's foot, and Projects picks them up at its top edge in the same columns and takes them into U3's two
+    // top left-hand pads. The one nearest the copy turns down with them, then east again `step` rows lower, along the
+    // middle of the link's capitals, into the flag. Its two cuts add up to the step, so the turn is one straight 45°
+    // run, and the first is the bundle's own, so the run stays nested with the other two.
+    const step = 3, by = f(m.blog.cap);
+    const under = f(by - step);                // the row of the trace nearest the copy's last line
+    const rows = f(Math.max(under + 4, m.blog.bot + 2));
     const tip = f(m.blog.l - 0.8);
     const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
-    toFlag.pts.splice(2, 2, [f(tip - FLAG), under]); toFlag.legs.splice(2, 2, 0);
+    toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
     wires.push(toFlag, ...down);
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
-    const flags = [{ tip, y: under, code: 'A0140' }];
+    const flags = [{ tip, y: by, code: 'A0140' }];
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },
