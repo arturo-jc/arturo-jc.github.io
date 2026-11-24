@@ -4,11 +4,10 @@ import { bundle, cut, wire, rail, f } from '../kit.js';
 
 // two lamps out of a chip's side, each a resistor and a lamp, with a common return: a branch named `run`, which
 // grows out of the chip `after` once the main rail reaches it, its parts and designators appearing as it passes
-function lamps(x, rows, n0, d0, run, after, wires, parts, labels) {
+function lamps(x, rows, n0, d0, run, after, wires, parts) {
   wires.push(...rail(run, [wire([[x, rows[0]], [x + 16, rows[0]], [x + 16, rows[0] + 5]], { legs: [0, 8, 0], end: 'via' }), wire([[x, rows[1]], [x + 16, rows[1]]])], after));
   rows.forEach((r, i) => {
-    parts.push({ kind: 'R', x: x + 5, y: r, rail: run }, { kind: 'LED', x: x + 11, y: r, delay: [0, 1.3][i], rail: run });
-    labels.push({ k: 'ref', x: x + 5, y: r - 0.95, t: `R${n0 + i}`, a: 'middle', rail: run }, { k: 'ref', x: x + 11, y: r - 1.05, t: `D${d0 + i}`, a: 'middle', rail: run });
+    parts.push({ kind: 'R', x: x + 5, y: r, ref: `R${n0 + i}`, rail: run }, { kind: 'LED', x: x + 11, y: r, ref: `D${d0 + i}`, delay: [0, 1.3][i], rail: run });
   });
 }
 
@@ -39,8 +38,8 @@ const wide = {
     // just past the title on the left and just before it on the right
     wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
                wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
-    parts.push({ kind: 'R', x: 56, y: a1, net: 'U5' });
-    lamps(78, [a1 + 1, a1 + 4], 8, 4, 'U5 lamps', 'U5', wires, parts, labels);
+    parts.push({ kind: 'R', x: 56, y: a1, ref: 'R7', net: 'U5' });
+    lamps(78, [a1 + 1, a1 + 4], 8, 4, 'U5 lamps', 'U5', wires, parts);
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
     const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
     rail('U5 serpentine', bundle([[74, a1 + 6], [74, Y[0]], [92, Y[0]], [92, Y[1]], [67, Y[1]], [67, Y[2]], [92, Y[2]], [92, Y[3]], [78, Y[3]]], 3), 'U5').forEach((w, k) => {
@@ -58,11 +57,7 @@ const wide = {
       wires.push(w);
       labels.push({ k: 'net', x: stop - 0.9, y: w.pts[2][1] + 0.25, t: `E054${k + 1}`, a: 'end', rail: 'U8 west' });
     });
-    // ref = silkscreen designators · net = wire codes
     labels.push(
-      { k: 'ref', x: 66, y: a1 - 4.1, t: 'U5' }, { k: 'ref', x: 45, y: a2 - 4.1, t: 'U6' },
-      { k: 'ref', x: 47, y: a3 - 4.1, t: 'U7' }, { k: 'ref', x: 45, y: a4 - 4.1, t: 'U8' },
-      { k: 'ref', x: 56, y: a1 - 0.95, t: 'R7', a: 'middle', net: 'U5' },
       { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true, net: 'U5' }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true, net: 'U7' },
     );
     return { rows: f(Math.max(m.r4.bot, L + 1) + 5), chips, wires, parts, labels };
@@ -81,8 +76,8 @@ const narrow = {
   build(m) {
     const [a1, a2, a3, a4] = ['r1', 'r2', 'r3', 'r4'].map(k => f(m[k].cap));
     const L = f(m.r4.bot + 3.5);                // the row of the first lamp, under the last paper's last line
-    const chips = [{ id: 'U5', x0: 9, y0: 2, x1: 18, y1: 9, code: 'E0510', allPads: true }];
-    const wires = [], labels = [], parts = [];
+    const chips = [{ id: 'U5', ref: 'left', x0: 9, y0: 2, x1: 18, y1: 9, code: 'E0510', allPads: true }];
+    const wires = [], parts = [];
     // Projects' bus, picked up at the top edge in the same columns, west into U5's right-hand pads
     wires.push(...rail('U5', bundle([[26, 0], [26, 5], [18, 5]], 3)));
     // U5 → west → down the left of the papers. The rail's nearest trace, at column 3, is the accent net.
@@ -95,12 +90,10 @@ const narrow = {
     outer.pts.splice(-1, 1, [1, L + 3], [20, L + 3]); outer.legs.splice(-1, 1, 8, 0);
     wires.push({ ...inner, end: 'via' }, outer);
     [L, L + 3].forEach((r, i) => {
-      parts.push({ kind: 'R', x: 8, y: r }, { kind: 'LED', x: 14, y: r, delay: [0, 1.3][i] });
-      labels.push({ k: 'ref', x: 8, y: r - 0.95, t: `R${8 + i}`, a: 'middle' }, { k: 'ref', x: 14, y: r - 1.05, t: `D${4 + i}`, a: 'middle' });
+      parts.push({ kind: 'R', x: 8, y: r, ref: `R${8 + i}` }, { kind: 'LED', x: 14, y: r, ref: `D${4 + i}`, delay: [0, 1.3][i] });
     });
-    parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v', net: 'U5' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
-    labels.push({ k: 'ref', x: 8.4, y: 2.2, t: 'U5', a: 'end' }, { k: 'ref', x: 3.9, y: f(m.r2.top + 0.5 * m.r2.h + 0.25), t: 'R7', net: 'U5' });
-    return { rows: f(L + 9), chips, wires, parts, labels };
+    parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v', ref: 'R7', nudge: [-0.2, 0], net: 'U5' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
+    return { rows: f(L + 9), chips, wires, parts };
   },
 };
 

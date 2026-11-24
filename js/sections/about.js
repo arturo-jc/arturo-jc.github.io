@@ -16,8 +16,8 @@ const wide = {
     const u2 = { x0: 5.75, y0: a + 10, x1: 13.75, y1: a + 24 };
     const chips = [
       { id: 'U1', x0: 62, y0: a - 3, x1: 74, y1: a + 8, code: 'A0131', allPads: true },
-      { id: 'U2', ...u2, code: 'C0412', pins: { l: [], r: [a + 12, a + 13, a + 14, a + 17, a + 20, a + 23], t: [], b: [] } },
-      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, pins: { b: [91, 92, 93, 94, 95] } },
+      { id: 'U2', ...u2, ref: 'below', code: 'C0412', pins: { l: [], r: [a + 12, a + 13, a + 14, a + 17, a + 20, a + 23], t: [], b: [] } },
+      { id: 'J1', conn: true, x0: 90.2, y0: 3, x1: 95.8, y1: 4.5, ref: 'pins-left', nudge: [0, 0.5], pins: { b: [91, 92, 93, 94, 95] } },
     ];
     // the accent net: straight from U1 to the name
     wires.push(wire([[62, a], [vx, a]], { o: true, end: 'via', net: 'U1' }));
@@ -41,14 +41,10 @@ const wide = {
                wire([[u2.x1, lamps[1]], [30, lamps[1]]]), wire([[u2.x1, lamps[2]], [30, lamps[2]]])], 'U2'));
     const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U2 lamps' }];
     lamps.forEach((r, i) => {
-      parts.push({ kind: 'R', x: 19, y: r, rail: 'U2 lamps' }, { kind: 'LED', x: 25.5, y: r, delay: [0, 1.3, 2.5][i], rail: 'U2 lamps' });
-      labels.push({ k: 'ref', x: 19, y: r - 0.95, t: `R${i + 1}`, a: 'middle', rail: 'U2 lamps' }, { k: 'ref', x: 25.5, y: r - 1.05, t: `D${i + 1}`, a: 'middle', rail: 'U2 lamps' });
+      parts.push({ kind: 'R', x: 19, y: r, ref: `R${i + 1}`, rail: 'U2 lamps' }, { kind: 'LED', x: 25.5, y: r, ref: `D${i + 1}`, delay: [0, 1.3, 2.5][i], rail: 'U2 lamps' });
     });
-    parts.push({ kind: 'R', x: 42, y: a, net: 'U1' });
-    // ref = silkscreen designators · net = wire codes
+    parts.push({ kind: 'R', x: 42, y: a, ref: 'R4', net: 'U1' });
     labels.push(
-      { k: 'ref', x: 62, y: a - 4.1, t: 'U1' }, { k: 'ref', x: u2.x0, y: u2.y1 + 1.3, t: 'U2' }, { k: 'ref', x: 89.6, y: 4.75, t: 'J1', a: 'end' },
-      { k: 'ref', x: 42, y: a - 0.95, t: 'R4', a: 'middle', net: 'U1' },
       { k: 'net', x: vx + 0.9, y: a - 0.75, t: 'A0130', o: true, net: 'U1' },
       { k: 'net', x: 96.8, y: 8.3, t: 'D0 – D4', rail: 'J1' },
     );
@@ -69,7 +65,7 @@ const narrow = {
   },
   build(m) {
     const chips = [
-      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
+      { id: 'J1', conn: true, x0: 1, y0: 1, x1: 10, y1: 2.5, nudge: [0, -0.2], pins: { b: [2, 3, 4, 5, 6, 7, 8, 9] } },
       { id: 'U1', x0: 18, y0: 3, x1: 27, y1: 10, code: 'A0131', allPads: true },
     ];
     const wires = [], labels = [];
@@ -95,12 +91,10 @@ const narrow = {
     labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133', rail: 'U3' });
     const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U3' }];
     const parts = [
-      { kind: 'R', x: 25, y: 13.2, dir: 'v', net: 'U1' },
+      { kind: 'R', x: 25, y: 13.2, dir: 'v', ref: 'R4', net: 'U1' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v', rail: 'U3' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v', rail: 'U3' },
     ];
     labels.push(
-      { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },
-      { k: 'ref', x: 26.1, y: 13.45, t: 'R4', net: 'U1' },
       { k: 'net', x: 10.5, y: 9.75, t: 'D0 – D3', rail: 'J1' },
       { k: 'net', x: vx + 0.9, y: ay - 0.75, t: 'A0130', o: true, net: 'U1' },
     );

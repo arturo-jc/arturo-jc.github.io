@@ -22,7 +22,7 @@ const wide = {
     const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
     const y0 = f(a - 3), y1 = f(a + 8);
     const chips = [
-      { id: 'J301', conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
+      { id: 'J301', conn: true, x0: 20.2, y0: 0, x1: 28.8, y1: 1.5, nudge: [0, 0.15], pins: { b: [21, 22, 23, 25, 26, 27, 28] } },
       { id: 'U301', x0: 80, y0, x1: 89, y1, code: 'E0404', pins: { l: [a], r: [], t: [83, 84, 85, 86], b: [86, 87, 88] } },
     ];
     const wires = [
@@ -36,15 +36,13 @@ const wide = {
     ];
     const r = f((86 + tip + FLAG) / 2);
     const labels = [
-      { k: 'ref', x: 29.4, y: 1.25, t: 'J301' }, { k: 'ref', x: 80, y: f(y0 - 1.1), t: 'U301' },
       { k: 'net', x: 87.6, y: 10, t: 'D0 – D3' },
       { k: 'net', x: 75, y: f(a - 0.75), t: 'A0404', a: 'middle', o: true },
       { k: 'net', x: f((66 + end) / 2), y: f(a - 0.75), t: 'A0404', a: 'middle' },
       { k: 'net', x: 20.2, y: f(hc + 2.3), t: 'H0601 – H0603', a: 'end' }, { k: 'net', x: 88.9, y: f(hc + 4.3), t: 'H0611' },
-      { k: 'ref', x: r, y: f(hc - 0.95), t: 'R301', a: 'middle' },
     ];
     const flags = [{ tip, y: hc, code: 'A0001', dir: -1, go: true }];
-    return { rows: f(Math.max(m.home.bot + 6, hc + 6)), chips, wires, parts: [{ kind: 'R', x: r, y: hc }], labels, flags };
+    return { rows: f(Math.max(m.home.bot + 6, hc + 6)), chips, wires, parts: [{ kind: 'R', x: r, y: hc, ref: 'R301' }], labels, flags };
   },
 };
 
@@ -62,7 +60,7 @@ const narrow = {
     const a = f(m.head.cap), hc = f(m.home.cap), tip = f(m.home.hx + 0.8), end = f(m.head.hx + 1.5);
     const chips = [
       { id: 'J301', conn: true, x0: 1.2, y0: 0, x1: 7.8, y1: 1.5, pins: { b: [2, 3, 4, 5, 6, 7] } },
-      { id: 'U301', x0: 22, y0: 2, x1: 31, y1: 9.5, code: 'E0404', pins: { l: [4, 5, 6, 7], r: [], t: [], b: [25, 28, 29, 30] } },
+      { id: 'U301', ref: 'left', x0: 22, y0: 2, x1: 31, y1: 9.5, code: 'E0404', pins: { l: [4, 5, 6, 7], r: [], t: [], b: [25, 28, 29, 30] } },
     ];
     // the cut's far side, at least 3.5 cells past the heading's end
     const cut = f(Math.max(end + 3.5, 18.5));
@@ -74,12 +72,11 @@ const narrow = {
       drop(29, 9.5, f(hc + 1.5)), drop(30, 9.5, f(hc + 3)),
     ];
     const labels = [
-      { k: 'ref', x: 8.4, y: 1.1, t: 'J301' }, { k: 'ref', x: 21.4, y: 2.2, t: 'U301', a: 'end' },
       { k: 'net', x: 9.5, y: 8.75, t: 'D0 – D3' },
       { k: 'net', x: f(cut + 1.75), y: f(a - 0.75), t: 'A0404', a: 'middle', o: true },
     ];
     const flags = [{ tip, y: hc, code: 'A0001', dir: -1, go: true }];
-    return { rows: f(hc + 5.5), chips, wires, parts: [], labels, flags };
+    return { rows: f(hc + 5.5), chips, wires, labels, flags };
   },
 };
 

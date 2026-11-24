@@ -16,7 +16,7 @@ const wide = {
     const wires = [], labels = [], parts = [];
     const chips = [
       { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
-      { id: 'U4', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
+      { id: 'U4', ref: 'corner', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
     ];
     // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
     wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4' }));
@@ -30,7 +30,7 @@ const wide = {
     const ym = f((a1 + a2) / 2), J = f(a2 - 5);
     wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), 'U3'));
     chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
-    labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235', rail: 'J2' });
+    labels.push({ k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235', rail: 'J2' });
     // U4 → west → down the left margin; each stops at a different height
     rail('U4 west', bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3), 'U4').forEach((w, k) => {
       const stop = a2 + [10, 15, 20][k];
@@ -42,11 +42,8 @@ const wide = {
     const bus = 49;
     wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
     labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end', rail: 'U5' });
-    parts.push({ kind: 'R', x: 46, y: a1, net: 'U3' }, { kind: 'R', x: 42, y: a2, net: 'U4' });
-    // ref = silkscreen designators · net = wire codes
+    parts.push({ kind: 'R', x: 46, y: a1, ref: 'R5', net: 'U3' }, { kind: 'R', x: 42, y: a2, ref: 'R6', net: 'U4' });
     labels.push(
-      { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
-      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle', net: 'U3' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle', net: 'U4' },
       { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end', net: 'U4' },
     );
     return { rows, chips, wires, parts, labels };
@@ -65,8 +62,8 @@ const narrow = {
     const v1 = f(m.p1.hx + 1.5), v2 = f(m.p2.hx + 1.5);
     const F = f(m.p2.bot + 2.5);                // U4's top
     const chips = [
-      { id: 'U3', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
-      { id: 'U4', x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
+      { id: 'U3', ref: 'top-end', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
+      { id: 'U4', ref: 'left', nudge: [0, 0.7], x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
     ];
     const wires = [], labels = [];
     // the accent net: down out of U3, a branch in along the first name's row, and in along the second's
@@ -88,7 +85,6 @@ const narrow = {
       { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v', rail: 'U4' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v', rail: 'U4' },
     ];
     labels.push(
-      { k: 'ref', x: 31, y: 1.9, t: 'U3', a: 'end' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },
       { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: v2 + 0.9, y: a2 - 0.75, t: 'C0411', o: true, net: 'U3' },
     );
     return { rows: F + 9, chips, wires, parts, labels };

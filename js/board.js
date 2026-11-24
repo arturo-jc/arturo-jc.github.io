@@ -1,5 +1,5 @@
 // Putting a section on the page: seat its type, measure it, draw its circuit, and redraw when either changes.
-import { P, WEIGHT, f, tracePath, via, chip, part, flag } from './kit.js';
+import { P, drawing } from './kit.js';
 
 // The baseline of the line that `el` starts, in px.
 function baselineOf(el) {
@@ -65,22 +65,10 @@ function drawBoard(board, layouts) {
     m[key] = measure(el, board, u);
   }
 
-  const c = l.build(m);
-  const traces = [], ends = [];
-  for (const w of c.wires) {
-    const net = w.net ? ` data-net="${w.net}"` : '';
-    traces.push(`<path class="t${w.o ? ' o' : ''}"${w.rail ? ` data-rail="${w.rail}"` : ''}${w.after ? ` data-after="${w.after}"` : ''}${w.dur ? ` data-dur="${w.dur}"` : ''}${w.wait != null ? ` data-wait="${w.wait}"` : ''}${w.from ? ` data-from="${w.from}"` : ''}${net} d="${tracePath(w)}"/>`);
-    const e = w.pts[w.pts.length - 1];
-    if (w.end === 'via') ends.push(`<g${net}${w.rail ? ` data-rail-end="${w.rail}"` : ''}>${via(e[0] * P, e[1] * P, w.o)}</g>`);
-  }
-  const labels = c.labels.map(l =>
-    `<text class="lb ${l.k}${l.o ? ' o' : ''}"${l.net ? ` data-net="${l.net}"` : ''}${l.rail ? ` data-rail-end="${l.rail}"` : ''} x="${f(l.x * P)}" y="${f(l.y * P)}"${l.a ? ` text-anchor="${l.a}"` : ''}>${l.t}</text>`);
   // The old drawing stays until the new one is in: without it the page is shorter, a scrollbar can go, and
   // the type would be measured at a width it is not shown at.
   const old = board.querySelector('svg');
-  board.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${f(c.rows * P)}" aria-hidden="true">
-    <g stroke-width="${WEIGHT}" stroke-linecap="round" stroke-linejoin="round">${traces.join('')}</g>
-    <g>${c.chips.map(chip).join('')}${c.parts.map(part).join('')}${(c.flags ?? []).map(flag).join('')}</g><g>${ends.join('')}</g><g>${labels.join('')}</g></svg>`);
+  board.insertAdjacentHTML('afterbegin', drawing(l.build(m), l.cols));
   old?.remove();
   document.dispatchEvent(new Event('boarddrawn'));
 }

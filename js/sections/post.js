@@ -18,7 +18,7 @@ const wide = {
     const a = f(m.title.cap), bc = f(m.back.cap), tip = f(m.back.hx + 0.8);
     const chips = [
       { id: 'U201', x0: 17.5, y0: f(bc - 1.5), x1: 23, y1: f(a + 3), code: 'H0710', pins: { l: [bc], r: [5, 6, 7, 8, a], t: [], b: [] } },
-      { id: 'J201', conn: true, x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } },
+      { id: 'J201', conn: true, ref: 'pins-left', x0: 84.2, y0: 0, x1: 88.8, y1: 1.5, pins: { b: [85, 86, 87, 88] } },
     ];
     const wires = [
       ...rail('U201 back', [wire([[17.5, bc], [f(tip + FLAG), bc]])], 'load'),
@@ -26,12 +26,11 @@ const wide = {
       ...rail('J201', bundle([[23, 6.5], [86.5, 6.5], [86.5, 1.5]], 4), 'load'),
     ];
     const labels = [
-      { k: 'ref', x: 17.5, y: f(bc - 2.6), t: 'U201' }, { k: 'ref', x: 25.75, y: f(a - 0.95), t: 'R201', a: 'middle', net: 'U201' },
-      { k: 'ref', x: 83.6, y: 1.25, t: 'J201', a: 'end' }, { k: 'net', x: 90, y: 6.75, t: 'D0 – D3', rail: 'J201' },
+      { k: 'net', x: 90, y: 6.75, t: 'D0 – D3', rail: 'J201' },
     ];
     const flags = [{ tip, y: bc, code: 'G0601', dir: -1, go: true, rail: 'U201 back' }];
     // the post starts 3.5 rows under the date
-    return { rows: f(m.date.bot + 3.5), chips, wires, parts: [{ kind: 'R', x: 25.75, y: a, net: 'U201' }], labels, flags };
+    return { rows: f(m.date.bot + 3.5), chips, wires, parts: [{ kind: 'R', x: 25.75, y: a, ref: 'R201', net: 'U201' }], labels, flags };
   },
 };
 
@@ -48,7 +47,7 @@ const narrow = {
     const a = f(m.title.cap), bc = f(m.back.cap), tip = f(m.back.hx + 0.8);
     const chips = [
       { id: 'J201', conn: true, x0: 22.2, y0: 0, x1: 26.8, y1: 1.5, pins: { b: [23, 24, 25, 26] } },
-      { id: 'U201', x0: 20, y0: 4, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } },
+      { id: 'U201', ref: 'top-end', nudge: [0.2, 0.6], x0: 20, y0: 4, x1: 29, y1: 10.5, code: 'H0710', pins: { l: [5.5, 8.5], r: [], t: [23, 24, 25, 26], b: [] } },
     ];
     const wires = [
       ...rail('J201', bundle([[24.5, 4], [24.5, 1.5]], 4), 'load'),
@@ -57,11 +56,10 @@ const narrow = {
       wire([[20, 8.5], [3, 8.5], [3, f(a - 1.5)], [4.5, a]], { o: true, legs: [0, 8, 0, 0], end: 'via', net: 'U201' }),
     ];
     const labels = [
-      { k: 'ref', x: 27.4, y: 1.1, t: 'J201' }, { k: 'ref', x: 29.2, y: 3.5, t: 'U201', a: 'end' },
       { k: 'net', x: 21.6, y: 3.05, t: 'D0 – D3', a: 'end', rail: 'J201' },
     ];
     const flags = [{ tip, y: bc, code: 'G0601', dir: -1, go: true, rail: 'U201 back' }];
-    return { rows: f(m.date.bot + 3), chips, wires, parts: [], labels, flags };
+    return { rows: f(m.date.bot + 3), chips, wires, labels, flags };
   },
 };
 
