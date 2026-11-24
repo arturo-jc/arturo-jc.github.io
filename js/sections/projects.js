@@ -19,7 +19,7 @@ const wide = {
       { id: 'U4', ref: 'corner', x0: 20, y0: a2 - 5, x1: 32, y1: a2 + 7, code: 'C0412', allPads: true },
     ];
     // the accent net: straight from each chip to its project's name, ending just past the first and just before the second
-    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3', code: 'B0221' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4' }));
+    wires.push(wire([[62, a1], [vx, a1]], { o: true, end: 'via', net: 'U3', code: 'B0221' }), wire([[32, a2], [52.5, a2]], { o: true, end: 'via', net: 'U4', code: 'C0411' }));
     // U3 → down → the long diagonal between the rows → west into U4
     const drop = 5;                             // rows the bus runs straight down before the diagonal starts
     wires.push(...rail('U4', bundle([[64, a1 + 8], [64, a2 - 3], [32, a2 - 3]], 3, { 1: (a2 - a1 - 11 - drop) * P })));
@@ -41,8 +41,6 @@ const wide = {
     wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
     labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end', rail: 'U5' });
     parts.push({ kind: 'R', x: 46, y: a1, ref: 'R5', net: 'U3' }, { kind: 'R', x: 42, y: a2, ref: 'R6', net: 'U4' });
-    // the second accent's code sits over its via rather than behind it
-    labels.push({ k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end', net: 'U4' });
     return { rows, chips, wires, parts, labels };
   },
 };

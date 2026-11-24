@@ -60,9 +60,10 @@ export function tail(w, pts, legs = []) {
   w.legs = [...w.legs.slice(0, -1), ...legs, 0];
   return w;
 }
-// A single trace. `end: 'via'` ends it on a via, and `start: 'via'` starts it on one; `code` writes its wire code
-// over it, just behind the via it ends on, as an accent net's is.
-export const wire = (pts, extra = {}) => ({ pts, ...extra });
+// A single trace, from its points or from one of a bundle's traces, with its options. `end: 'via'` ends it on a via,
+// and `start: 'via'` starts it on one; `code` writes its wire code over it, just behind the via it ends on, as an
+// accent net's is; `o: true` draws it in the accent, and `net` marks it as a chip's accent net.
+export const wire = (pts, extra = {}) => Array.isArray(pts) ? { pts, ...extra } : { ...pts, ...extra };
 // Where an accent net's via goes: just past the end of a block's heading's first line.
 export const past = b => f(b.hx + 1.5);
 // Mark traces `ws` as a run that js/rails.js animates, `to` being the chip it runs into, or a branch's name. With

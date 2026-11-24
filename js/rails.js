@@ -1,17 +1,32 @@
-// The circuit, drawn as the page scrolls. Three kinds of run:
-// - The main rail: every trace a layout marks with rail(to, …), from one chip into chip `to`, on one board or across
-//   the seam into the next. It is drawn out of its source as the reader scrolls down, so that its tip reaches `to` as
-//   `to` comes up to the reading line. Its drawn length is worked out from the scroll position alone.
-// - A branch: marked rail(name, …, after), it leaves a chip on the main rail and stops short. It does not follow the
-//   scroll, but grows by itself once the main rail reaches its chip, and draws back in, faster, if the reader scrolls
-//   back above it.
-// - A chip's accent net: everything marked `net: to`. It grows out of `to` like a branch, in blue, but in the same
-//   time whatever its length, and turns orange once it reaches the content; it turns blue again and draws back in
-//   when `to` disconnects. Its parts, via and code appear as the tip reaches them.
-// A branch with `after: 'load'` grows as soon as the page loads, and one that reaches a chip connects it as the main
-// rail does, so that a branch can grow out of the end of another. A branch's and a net's drawn length is kept by name,
-// so a redraw never puts any of them out of step. On load the reading line sweeps down to its place, and everything
-// follows it.
+// The circuit, drawn as the page scrolls: the reference for how the runs a layout marks are animated. Everything
+// unmarked is drawn from the start, and with reduced motion everything is.
+//
+// Three kinds of run, each marked with rail() from js/kit.js or `net`:
+// - The main rail: every trace marked rail(to, …), from one chip into chip `to`, on one board or across the seam into
+//   the next. It is drawn out of its source as the reader scrolls down, so that its tip reaches `to` as `to` comes up
+//   to the reading line (READ). Its drawn length is worked out from the scroll position alone. A run that stops short
+//   but is named and given no `after`, as U8's tail is, follows the scroll the same way.
+// - A branch: marked rail(name, …, { after }), named for where it goes ('U4 west'), it leaves chip `after` and stops
+//   short. It does not follow the scroll, but grows by itself at GROW once the main rail reaches its chip, and draws
+//   back in at RETRACT if the reader scrolls back above it. One that reaches a chip connects it as the main rail
+//   does, so that a branch can grow out of the end of another.
+// - A chip's accent net: everything marked `net: to`. It grows out of `to` like a branch, in blue, but in NET seconds
+//   whatever its length, so that every net lights on the same beat, and turns orange once it reaches the content; it
+//   turns blue again and draws back in when `to` disconnects. A chip no run leads into, as none leads into U1, counts
+//   as connected from the start. A trace of a net that starts on its trunk waits for the trunk's tip to reach it.
+//
+// On load the reading line sweeps down from the top of the page to its place in SWEEP seconds, easing out, so that
+// the main rail grows out of U1 instead of appearing half drawn. A branch after 'load' grows as the page opens. The
+// runs drawn on load, those and the nets of chips no run leads into, run on one clock (chains()): each chain of them
+// finishes in LOAD seconds however long it is, or in its head's `dur`, starting late so as to finish with the others
+// unless it sets `wait`, the seconds after load it starts. A main rail marked `from` a chip holds the sweep back until
+// that chip connects.
+//
+// What sits on a run appears as the run reaches it: a via, a flag and a label marked `rail` or `net` with the run's
+// name when the nearest trace end is reached, and a part, with its designator, when the tip passes it.
+//
+// A trace is drawn from its first point, so a layout writes a run's centreline from its source. A branch's and a
+// net's drawn length is kept by name, so a redraw never puts any of them out of step.
 const READ = 0.7;                       // the reading line, as a fraction of the window's height down from its top
 const SWEEP = 0.8;                      // the seconds the reading line takes to sweep down to its place on load
 const GROW = 900;                       // a branch's growth, in drawing units a second
