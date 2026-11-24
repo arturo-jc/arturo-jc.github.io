@@ -2,6 +2,7 @@
 // and research, the blog's index has blog, a post has post, and the 404 page has notfound. Each page mounts the boards it has.
 import { mountBoard } from './board.js';
 import './rails.js';
+import './fades.js';
 import about from './sections/about.js';
 import projects from './sections/projects.js';
 import research from './sections/research.js';

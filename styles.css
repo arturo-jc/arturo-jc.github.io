@@ -167,3 +167,13 @@ main { flex: 1 0 auto; width: 100%; max-width: 1500px; margin: 0 auto; padding: 
   .pulse { animation: pulse 3.6s ease-in-out infinite; }
   @keyframes pulse { 0%, 48%, 72%, 100% { opacity: 1; } 60% { opacity: .28; } }
 }
+
+/* The type fades in: see js/fades.js. About's copy and link on load, the link a little after the copy, as its
+   net reaches the flag; every other block as it comes up the window. Opacity only: a transform would move the
+   boxes that js/board.js measures. */
+@media (prefers-reduced-motion: no-preference) {
+  .fades [data-fade] { opacity: 0; transition: opacity .9s ease-out; }
+  .fades [data-fade].in { opacity: 1; }
+  .fades [data-fade="load"] { transition-delay: .15s; }
+  .fades .blog[data-fade="load"] { transition-delay: .5s; }
+}

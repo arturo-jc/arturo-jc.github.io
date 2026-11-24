@@ -97,6 +97,7 @@ The 404 page, which GitHub Pages serves for any address it has no page for, is o
 | `js/kit.js` | What a layout is written with (`bundle`, `cut`, `wire`), and how a trace, chip, part or via becomes SVG. It does not touch the page. |
 | `js/board.js` | `mountBoard()`: seats and measures the type, draws the layout, and redraws when the width changes. |
 | `js/rails.js` | The animation: draws the main rail as the page scrolls, and grows the branches and accent nets once their chip connects. |
+| `js/fades.js` | The type's fade: About's copy and link on load, every block below About as it comes up the window. |
 | `js/sections/<id>.js` | One section's two layouts, exported as `{ wide, narrow }`. |
 | `js/main.js` | The list of boards, on every page. It mounts each one whose `.board` is on the page, by id, and fills in the footer's year. `blog` is the index's head, `post` a post's and `notfound` the 404 page's. |
 | `favicon.svg`, `favicon.ico`, `apple-touch-icon.png` | The icon: a chip with two pads a side, its pin-one mark lit orange, and a trace off each side pad. The SVG is the source; the other two are rendered from it, the `.ico` at 16, 32 and 48 (`rsvg-convert -w N -h N`, then `magick` the three PNGs into one), the touch icon at 180 with the square's `rx` removed, because phones round its corners themselves. Linked from `index.html` and `_layouts/default.html`. |
@@ -137,6 +138,8 @@ The 404 page, which GitHub Pages serves for any address it has no page for, is o
 What sits on a run appears as the tip reaches it, so nothing floats ahead of its trace: a via, and a label marked `rail` or `net` with the run's name, when the nearest trace end is reached; a part marked the same way, and a designator (`k: 'ref'`), when the tip passes it. Mark every part and label on an animated run, or it is drawn from the start.
 
 On load the reading line sweeps down from the top of the page to its place in `SWEEP` seconds, easing out, so the main rail grows out of U1 instead of appearing half drawn; everything else follows the line, so the sweep needs nothing from them. It covers a fraction of the way to the line's place, so it takes the same time however far down the page opens.
+
+**The type fades in,** on the home page only, once and never back out. The name does not fade; About's copy and link, marked `data-fade="load"`, fade in on load, the link a little after the copy; every other block marked `data-fade` fades in once its top is 85% of the way down the window. `index.html` sets the class `fades` on `<html>` before the first paint, and the CSS hides the blocks only under it and without reduced motion, so the page is readable without the scripts. Fade opacity only: a transform would move the boxes `measure()` reads.
 
 A trace is drawn from its first point, so write a run's centreline from its source. A branch's and a net's drawn length is kept by name, so a redraw needs nothing from them. With reduced motion everything is drawn from the start.
 
