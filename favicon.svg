@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<!-- The end of the accent net: an orange trace turning 45° into a via, option C of studies/12-favicon.html -->
+<defs><clipPath id="c"><rect width="32" height="32" rx="7"/></clipPath></defs>
+<rect width="32" height="32" rx="7" fill="#0b3048"/>
+<g clip-path="url(#c)">
+<path d="M20.5 11.5L11.5 20.5V33" fill="none" stroke="#f7a52b" stroke-width="6" stroke-linejoin="round"/>
+<circle cx="20.5" cy="11.5" r="8.1" fill="#f7a52b"/><circle cx="20.5" cy="11.5" r="3.15" fill="#0b3048"/>
+</g>
+</svg>
