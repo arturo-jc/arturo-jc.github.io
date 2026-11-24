@@ -69,7 +69,7 @@ function drawBoard(board, layouts) {
   const traces = [], ends = [];
   for (const w of c.wires) {
     const net = w.net ? ` data-net="${w.net}"` : '';
-    traces.push(`<path class="t${w.o ? ' o' : ''}"${w.rail ? ` data-rail="${w.rail}"` : ''}${w.after ? ` data-after="${w.after}"` : ''}${w.dur ? ` data-dur="${w.dur}"` : ''}${w.from ? ` data-from="${w.from}"` : ''}${net} d="${tracePath(w)}"/>`);
+    traces.push(`<path class="t${w.o ? ' o' : ''}"${w.rail ? ` data-rail="${w.rail}"` : ''}${w.after ? ` data-after="${w.after}"` : ''}${w.dur ? ` data-dur="${w.dur}"` : ''}${w.wait != null ? ` data-wait="${w.wait}"` : ''}${w.from ? ` data-from="${w.from}"` : ''}${net} d="${tracePath(w)}"/>`);
     const e = w.pts[w.pts.length - 1];
     if (w.end === 'via') ends.push(`<g${net}${w.rail ? ` data-rail-end="${w.rail}"` : ''}>${via(e[0] * P, e[1] * P, w.o)}</g>`);
   }

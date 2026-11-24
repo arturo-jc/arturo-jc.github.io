@@ -94,6 +94,9 @@ function run(key, paths, more) {
   return { key, legs, len: legs.reduce((s, l) => s + l.len, 0), y0: legs[0].ps[0].pts[0].y, y1: last.pts.at(-1).y, goal: 0, lit: null, ...more };
 }
 
+// A run drawn on load can set how long its chain takes, `dur`, and how long it waits before it starts, `wait`.
+const timing = p => ({ dur: p.dataset.dur ? +p.dataset.dur : null, wait: p.dataset.wait ? +p.dataset.wait : null });
+
 // Every run on the page.
 function collect() {
   const group = attr => {
@@ -110,14 +113,14 @@ function collect() {
     // flag, is shown when the nearest trace end is reached, and a part sitting on one, with its designator, when the
     // tip reaches the part.
     ...group('rail').map(([to, paths]) => {
-      const r = run(to, paths, { after: paths[0].dataset.after, dur: +paths[0].dataset.dur || null, from: paths[0].dataset.from });
+      const r = run(to, paths, { after: paths[0].dataset.after, ...timing(paths[0]), from: paths[0].dataset.from });
       const ps = r.legs.flatMap(l => l.ps);
       r.reveal = [...document.querySelectorAll(`[data-rail-end="${to}"]`)].map(el => ({ ...nearest(ps, centre(el), !el.matches('[transform], .ref')), el }));
       return r;
     }),
     // the accent nets. Their parts, vias and codes are shown when the tip reaches the point nearest them.
     ...group('net').map(([to, paths]) => {
-      const r = run(`net ${to}`, paths, { after: to, net: true });
+      const r = run(`net ${to}`, paths, { after: to, net: true, ...timing(paths[0]) });
       const ps = r.legs[0].ps, els = [...document.querySelectorAll(`[data-net="${to}"]:not(path)`)];
       r.reveal = els.map(el => ({ ...nearest(ps, centre(el)), el }));
       r.nets = [...document.querySelectorAll(`[data-net="${to}"]`)];
@@ -130,11 +133,16 @@ function collect() {
 
 // The runs drawn on load: those after 'load', the net of a chip no run leads into, and every branch after one of
 // them. Each chain of them shares one clock, easing out, so that every chain finishes at once however long it is:
-// `lead` is how far along its chain a run starts, and its head's `chain` is the chain's length.
+// `lead` is how far along its chain a run starts, and its head's `chain` is the chain's length. A chain takes LOAD
+// seconds, or its head's `dur`; one that takes less waits to start, so that it finishes with the others, unless its
+// head sets its own `wait`.
 function chains() {
   const keyed = new Map(runs.map(r => [r.key, r]));
   for (const r of runs)
-    if (r.after === 'load' || (r.net && !keyed.has(r.after))) Object.assign(r, { load: true, lead: 0, head: r, chain: 0, dur: r.dur ?? LOAD });
+    if (r.after === 'load' || (r.net && !keyed.has(r.after))) {
+      const dur = r.dur ?? LOAD;
+      Object.assign(r, { load: true, lead: 0, head: r, chain: 0, dur, wait: r.wait ?? LOAD - dur });
+    }
   for (let more = true; more;) {
     more = false;
     for (const r of runs) {
@@ -226,9 +234,8 @@ function grow() {
     if (!r.after) continue;
     let g = grown.get(r.key) ?? 0;
     if (r.load) {
-      // a run drawn on load: its share of its chain, on the chain's clock. A chain that takes less than LOAD starts late,
-      // so that it still finishes with the others.
-      const dur = r.head.dur, s = still.matches ? 1 : clamp((now - born) / 1000 / dur - (LOAD - dur) / dur);
+      // a run drawn on load: its share of its chain, on the chain's clock, which starts `wait` seconds after load
+      const { dur, wait } = r.head, s = still.matches ? 1 : clamp(((now - born) / 1000 - wait) / dur);
       g = clamp(((1 - (1 - s) ** 3) * r.head.chain - r.lead) / r.len);
     } else {
       // a branch grows at a steady speed, and a net in a steady time, retracting as much faster as a branch does

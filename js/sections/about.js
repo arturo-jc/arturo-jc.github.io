@@ -73,12 +73,13 @@ const narrow = {
       { id: 'U1', x0: 18, y0: 3, x1: 27, y1: 10, code: 'A0131', allPads: true },
     ];
     const wires = [], labels = [];
-    // U1 → J1, four wide: a branch drawn out of U1 on load. It is short, so it starts late and takes `dur` seconds,
-    // reaching J1 as the accent net finishes, and the rail out of J1 waits for it.
-    wires.push(...rail('J1', bundle([[18, 6.5], [7.5, 6.5], [7.5, 2.5]], 4), 'load').map(w => Object.assign(w, { dur: 0.35 })));
-    // the accent net: down out of U1 and in along the name's first line, ending just past it
+    // U1 → J1, four wide: a branch drawn out of U1 on load, at once and in `dur` seconds. The rail out of J1 waits
+    // for it, then follows the reading line's sweep (SWEEP in rails.js, 0.8 seconds) down the left of the copy.
+    wires.push(...rail('J1', bundle([[18, 6.5], [7.5, 6.5], [7.5, 2.5]], 4), 'load').map(w => Object.assign(w, { dur: 0.35, wait: 0 })));
+    // the accent net: down out of U1 and in along the name's first line, ending just past it. It is much shorter
+    // than the way round through J1, so it starts a moment after the bus and finishes with the rail's sweep, at 1.15s.
     const ay = f(m.name.cap), vx = f(m.name.hx + 1.5);
-    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1' }));
+    wires.push(wire([[25, 10], [25, ay], [vx, ay]], { o: true, legs: [0, 10, 0], end: 'via', net: 'U1', wait: 0.15, dur: 1 }));
     // J1 → down the left of the name and the copy → under the copy → down. The two outer traces carry on down off
     // the board's foot, and Projects picks them up at its top edge in the same columns and takes them into U3's two
     // top left-hand pads. The one nearest the copy turns down with them, then east again `step` rows lower, along the
