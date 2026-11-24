@@ -1,5 +1,5 @@
 // Projects: the heading and two projects, each a name that links to its repo, a stack and a paragraph.
-import { P, bundle, stagger, wire, past, rail, f } from '../kit.js';
+import { P, bundle, stagger, wire, past, rail } from '../kit.js';
 
 // Wide: a row each, on alternate sides. Each project has its own chip beside it, level with its name, so each
 // accent run is straight. A bus drops out of U3 and crosses to U4 on a long diagonal between the rows,
@@ -8,11 +8,11 @@ import { P, bundle, stagger, wire, past, rail, f } from '../kit.js';
 // more leave its right side and drop off the board's foot into Research.
 const wide = {
   cols: 107,
-  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: f(m.p1.bot + 7), w: 36 }) },
+  seats: { head: { x: 6, y: 4 }, p1: { x: 6, y: 12, w: 36 }, p2: m => ({ x: 54, y: m.p1.bot + 7, w: 36 }) },
   build(m) {
-    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);   // each accent's row; each chip is placed from its own
+    const a1 = m.p1.cap, a2 = m.p2.cap;   // each accent's row; each chip is placed from its own
     const vx = past(m.p1);                      // the first accent's via, just past the name
-    const rows = f(m.p2.bot + 4);
+    const rows = m.p2.bot + 4;
     const wires = [], labels = [], parts = [];
     const chips = [
       { id: 'U3', x0: 62, y0: a1 - 3, x1: 76, y1: a1 + 8, code: 'B0220', allPads: true },
@@ -27,10 +27,10 @@ const wide = {
     wires.push(...rail('U3', bundle([[94, 0], [94, a1 - 1], [74, a1 - 1]], 3)));
     // U3's five lowest right-hand pads → east → down under About's rail, its outer trace in line with the rail's →
     // back west on one diagonal → down into a pin header over the second project
-    const ym = f((a1 + a2) / 2), J = f(a2 - 5);
+    const ym = (a1 + a2) / 2, J = a2 - 5;
     wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), { after: 'U3' }));
     chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
-    labels.push({ k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235', rail: 'J2' });
+    labels.push({ k: 'net', x: 83.2, y: J - 3, t: 'B0231 – B0235', rail: 'J2' });
     // U4 → west → down the left margin; each stops at a different height
     const stops = [10, 15, 20].map(d => a2 + d);
     const west = stagger(rail('U4 west', bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3), { after: 'U4' }), 1, stops);
@@ -53,11 +53,11 @@ const wide = {
 // sends three traces off the board's foot into Research.
 const narrow = {
   cols: 32,
-  seats: { head: { x: 2, y: 12 }, p1: { x: 2, y: 17.5, w: 24 }, p2: m => ({ x: 2, y: f(m.p1.bot + 4.5), w: 24 }) },
+  seats: { head: { x: 2, y: 12 }, p1: { x: 2, y: 17.5, w: 24 }, p2: m => ({ x: 2, y: m.p1.bot + 4.5, w: 24 }) },
   build(m) {
-    const a1 = f(m.p1.cap), a2 = f(m.p2.cap);
+    const a1 = m.p1.cap, a2 = m.p2.cap;
     const v1 = past(m.p1), v2 = past(m.p2);
-    const F = f(m.p2.bot + 2.5);                // U4's top
+    const F = m.p2.bot + 2.5;                // U4's top
     const chips = [
       { id: 'U3', ref: 'top-end', x0: 22, y0: 3, x1: 31, y1: 10, code: 'B0220', allPads: true },
       { id: 'U4', ref: 'left', nudge: [0, 0.7], x0: 22, y0: F, x1: 31, y1: F + 6, code: 'C0412', pins: { l: [F + 2, F + 4], r: [], t: [29, 30], b: [25, 26, 27] } },
@@ -79,7 +79,7 @@ const narrow = {
       labels.push({ k: 'net', x: stop - 0.9, y: r + 0.25, t: `C041${i + 3}`, a: 'end', rail: 'U4 west' });
     });
     const parts = [
-      { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v', rail: 'U4' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v', rail: 'U4' },
+      { kind: 'R', x: 30, y: m.p1.top + 0.55 * m.p1.h, dir: 'v', rail: 'U4' }, { kind: 'C', x: 29, y: m.p2.top + 0.6 * m.p2.h, dir: 'v', rail: 'U4' },
     ];
     return { rows: F + 9, chips, wires, parts, labels };
   },
