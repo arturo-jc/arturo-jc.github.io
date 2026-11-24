@@ -42,11 +42,11 @@ const wide = {
     const bus = 49;
     wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
     labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end' });
-    parts.push({ kind: 'R', x: 46, y: a1 }, { kind: 'R', x: 42, y: a2 });
+    parts.push({ kind: 'R', x: 46, y: a1, net: 'U3' }, { kind: 'R', x: 42, y: a2, net: 'U4' });
     // ref = silkscreen designators · net = wire codes
     labels.push(
       { k: 'ref', x: 62, y: a1 - 4.1, t: 'U3' }, { k: 'ref', x: 32.6, y: a2 + 8.1, t: 'U4' },
-      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle' },
+      { k: 'ref', x: 46, y: a1 - 0.95, t: 'R5', a: 'middle', net: 'U3' }, { k: 'ref', x: 42, y: a2 - 0.95, t: 'R6', a: 'middle', net: 'U4' },
       { k: 'net', x: vx + 0.9, y: a1 - 0.75, t: 'B0221', o: true, net: 'U3' }, { k: 'net', x: 52.5, y: a2 - 0.95, t: 'C0411', o: true, a: 'end', net: 'U4' },
     );
     return { rows, chips, wires, parts, labels };
@@ -79,13 +79,13 @@ const narrow = {
     wires.push(...rail('U3', bundle([[13.5, 0], [13.5, 4.5], [22, 4.5]], 2)));
     // U4 → down off the board's foot. Research picks the three up at its top edge in the same columns.
     wires.push(...rail('U5', bundle([[26, F + 6], [26, F + 9]], 3)));
-    // U4 → two traces west, stopping short on vias
+    // U4 → two traces west, stopping short on vias: a branch, which grows once Projects' rail reaches U4
     [[F + 2, 14], [F + 4, 8]].forEach(([r, stop], i) => {
-      wires.push(wire([[22, r], [stop, r]], { end: 'via' }));
-      labels.push({ k: 'net', x: stop - 0.9, y: r + 0.25, t: `C041${i + 3}`, a: 'end' });
+      wires.push(...rail('U4 west', [wire([[22, r], [stop, r]], { end: 'via' })], 'U4'));
+      labels.push({ k: 'net', x: stop - 0.9, y: r + 0.25, t: `C041${i + 3}`, a: 'end', rail: 'U4 west' });
     });
     const parts = [
-      { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v' },
+      { kind: 'R', x: 30, y: f(m.p1.top + 0.55 * m.p1.h), dir: 'v', rail: 'U4' }, { kind: 'C', x: 29, y: f(m.p2.top + 0.6 * m.p2.h), dir: 'v', rail: 'U4' },
     ];
     labels.push(
       { k: 'ref', x: 31, y: 1.9, t: 'U3', a: 'end' }, { k: 'ref', x: 21.4, y: F + 0.9, t: 'U4', a: 'end' },

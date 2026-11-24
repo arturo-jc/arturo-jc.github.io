@@ -38,7 +38,7 @@ const wide = {
     // just past the title on the left and just before it on the right
     wires.push(wire([[66, a1], [v1, a1]], { o: true, end: 'via', net: 'U5' }), wire([[55, a2], [60.5, a2]], { o: true, end: 'via', net: 'U6' }),
                wire([[47, a3], [v3, a3]], { o: true, end: 'via', net: 'U7' }), wire([[55, a4], [60.5, a4]], { o: true, end: 'via', net: 'U8' }));
-    parts.push({ kind: 'R', x: 56, y: a1 });
+    parts.push({ kind: 'R', x: 56, y: a1, net: 'U5' });
     lamps(78, [a1 + 1, a1 + 4], 8, 4, wires, parts, labels);
     // U5's bottom → a serpentine across the corner over the second paper, stopping short in its last run
     const y0 = f(a1 + 10), s = f((a2 - 5 - y0) / 3), Y = [0, 1, 2, 3].map(i => f(y0 + i * s));
@@ -61,7 +61,7 @@ const wide = {
     labels.push(
       { k: 'ref', x: 66, y: a1 - 4.1, t: 'U5' }, { k: 'ref', x: 45, y: a2 - 4.1, t: 'U6' },
       { k: 'ref', x: 47, y: a3 - 4.1, t: 'U7' }, { k: 'ref', x: 45, y: a4 - 4.1, t: 'U8' },
-      { k: 'ref', x: 56, y: a1 - 0.95, t: 'R7', a: 'middle' },
+      { k: 'ref', x: 56, y: a1 - 0.95, t: 'R7', a: 'middle', net: 'U5' },
       { k: 'net', x: v1 + 0.9, y: a1 - 0.75, t: 'E0511', o: true, net: 'U5' }, { k: 'net', x: v3 + 0.9, y: a3 - 0.75, t: 'E0531', o: true, net: 'U7' },
     );
     return { rows: f(Math.max(m.r4.bot, L + 1) + 5), chips, wires, parts, labels };
@@ -97,8 +97,8 @@ const narrow = {
       parts.push({ kind: 'R', x: 8, y: r }, { kind: 'LED', x: 14, y: r, delay: [0, 1.3][i] });
       labels.push({ k: 'ref', x: 8, y: r - 0.95, t: `R${8 + i}`, a: 'middle' }, { k: 'ref', x: 14, y: r - 1.05, t: `D${4 + i}`, a: 'middle' });
     });
-    parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
-    labels.push({ k: 'ref', x: 8.4, y: 2.2, t: 'U5', a: 'end' }, { k: 'ref', x: 3.9, y: f(m.r2.top + 0.5 * m.r2.h + 0.25), t: 'R7' });
+    parts.push({ kind: 'R', x: 3, y: f(m.r2.top + 0.5 * m.r2.h), dir: 'v', net: 'U5' }, { kind: 'C', x: 1, y: f(m.r3.top + 0.5 * m.r3.h), dir: 'v' });
+    labels.push({ k: 'ref', x: 8.4, y: 2.2, t: 'U5', a: 'end' }, { k: 'ref', x: 3.9, y: f(m.r2.top + 0.5 * m.r2.h + 0.25), t: 'R7', net: 'U5' });
     return { rows: f(L + 9), chips, wires, parts, labels };
   },
 };

@@ -94,7 +94,7 @@ const narrow = {
     const flags = [{ tip, y: by, code: 'A0140', go: true }];
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v' },
-      { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v' },
+      { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v', rail: 'U3' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v', rail: 'U3' },
     ];
     labels.push(
       { k: 'ref', x: 18, y: 1.9, t: 'U1' }, { k: 'ref', x: 10.6, y: 1.9, t: 'J1' },
