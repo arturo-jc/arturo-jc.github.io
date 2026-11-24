@@ -91,8 +91,8 @@ const narrow = {
     const [toFlag, ...down] = bundle([[3, 2.5], [3, under + 1], [14, under + 1], [14, rows]], 3);
     toFlag.pts.splice(3, 1, [15, by], [f(tip - FLAG), by]); toFlag.legs.splice(3, 1, step * P - toFlag.legs[2], 0);
     wires.push(...rail('U3', [toFlag, ...down]).map(w => Object.assign(w, { from: 'J1' })));
-    labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133' });
-    const flags = [{ tip, y: by, code: 'A0140', go: true }];
+    labels.push({ k: 'net', x: 4, y: under + 3.35, t: 'A0131 – A0133', rail: 'U3' });
+    const flags = [{ tip, y: by, code: 'A0140', go: true, rail: 'U3' }];
     const parts = [
       { kind: 'R', x: 25, y: 13.2, dir: 'v', net: 'U1' },
       { kind: 'R', x: 2, y: f(m.copy.top + 0.32 * m.copy.h), dir: 'v', rail: 'U3' }, { kind: 'C', x: 4, y: f(m.copy.top + 0.64 * m.copy.h), dir: 'v', rail: 'U3' },

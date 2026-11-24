@@ -30,7 +30,7 @@ const wide = {
     const ym = f((a1 + a2) / 2), J = f(a2 - 5);
     wires.push(...rail('J2', bundle([[76, a1 + 5], [93, a1 + 5], [93, ym], [80, ym], [80, J]], 5, { 2: 6.5 * P, 3: 6.5 * P }), 'U3'));
     chips.push({ id: 'J2', conn: true, x0: 77, y0: J - 1, x1: 83, y1: J, pins: { b: [78, 79, 80, 81, 82] } });
-    labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235' });
+    labels.push({ k: 'ref', x: 83.6, y: J - 0.4, t: 'J2' }, { k: 'net', x: 83.2, y: f(J - 3), t: 'B0231 – B0235', rail: 'J2' });
     // U4 → west → down the left margin; each stops at a different height
     rail('U4 west', bundle([[20, a2 + 1], [10, a2 + 1], [10, a2 + 20]], 3), 'U4').forEach((w, k) => {
       const stop = a2 + [10, 15, 20][k];
@@ -41,7 +41,7 @@ const wide = {
     // U4 → east → down off the board's foot. Research picks the three up at its top edge in the same columns.
     const bus = 49;
     wires.push(...rail('U5', bundle([[32, a2 + 5], [bus, a2 + 5], [bus, rows]], 3)));
-    labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end' });
+    labels.push({ k: 'net', x: bus - 2, y: rows - 3, t: 'E0501 – E0503', a: 'end', rail: 'U5' });
     parts.push({ kind: 'R', x: 46, y: a1, net: 'U3' }, { kind: 'R', x: 42, y: a2, net: 'U4' });
     // ref = silkscreen designators · net = wire codes
     labels.push(
