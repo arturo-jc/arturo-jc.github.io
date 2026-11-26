@@ -40,8 +40,8 @@ const wide = {
 const narrow = {
   cols: 32,
   seats: {
-    back: { x: 6, y: 2 }, title: { x: 6, y: 11.5, w: 24, size: 26 },
-    date: m => ({ x: 6, y: m.title.bot + 1 }),
+    back: { x: 2, y: 2 }, title: { x: 2, y: 11.5, w: 28, size: 26 },
+    date: m => ({ x: 2, y: m.title.bot + 1 }),
   },
   build(m) {
     const a = m.title.cap, bc = m.back.cap, tip = m.back.hx + 0.8;
@@ -53,7 +53,7 @@ const narrow = {
       ...rail('J201', bundle([[24.5, 4], [24.5, 1.5]], 4), { after: 'load' }),
       // the step's two ends are as far apart across as down, so it is a 45° run
       ...rail('U201 back', [wire([[20, 5.5], [17.5, 5.5], [17.5 - (5.5 - bc), bc], [tip + FLAG, bc]], { legs: [0, 0, 0, 0] })], { after: 'load' }),
-      wire([[20, 8.5], [3, 8.5], [3, a - 1.5], [4.5, a]], { o: true, legs: [0, 0.75, 0, 0], end: 'via', net: 'U201' }),
+      wire([[20, 8.5], [2, 8.5], [2, a - 2.5], [4.5, a]], { o: true, legs: [0, 0.75, 0, 0], end: 'via', net: 'U201' }),
     ];
     const labels = [
       { k: 'net', x: 21.6, y: 3.05, t: 'D0 – D3', a: 'end', rail: 'J201' },

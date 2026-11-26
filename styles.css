@@ -194,7 +194,9 @@ main { flex: 1 0 auto; width: 100%; padding: 48px 32px 0; }
      to the via, 3.3 for the code and half a cell clear, past the copy's 24 columns. Only phones under about 350px
      wrap it. Not balanced: that breaks "Step by / Step Strength". */
   .project h3 { white-space: normal; max-width: calc(100% - 42 * var(--u)); }
-  .flow .col { margin-left: calc(6 / 32 * 100%); width: calc(24 / 32 * 100%); }
+  .flow .col { margin-left: calc(2 / 32 * 100%); width: calc(28 / 32 * 100%); }
+  /* a post's title sets its first line 4 cells in, where post.js's narrow layout brings the accent net in */
+  #post .title { text-indent: calc(48 * var(--u)); }
   .foot-in { padding: 0; }
   .foot-body { padding: calc(4 * var(--c)) calc(2 * var(--c)) calc(3.5 * var(--c)); }
   .foot .contacts { gap: calc(4 * var(--c)); }

@@ -31,7 +31,7 @@ const wide = {
 // and in along the heading's row into a flag pointing back at the heading. Both grow out of U101 on load.
 const narrow = {
   cols: 32,
-  seats: { head: { x: 6, y: 13, size: 50 } },
+  seats: { head: { x: 2, y: 13, size: 50 } },
   build(m) {
     const a = m.head.cap, tip = m.head.hx + 0.8;
     const chips = [
